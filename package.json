@@ -3,7 +3,7 @@
     "version": "2.1.0",
     "main": "dist-electron/main/index.js",
     "description": "Commando another alternative to Total Commander",
-    "author": "Albert Li <albert_lee@hotmail.com",
+    "author": "Albert Li <albert_lee@hotmail.com>",
     "license": "MIT",
     "private": true,
     "debug": {
