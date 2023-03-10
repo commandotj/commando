@@ -45,7 +45,11 @@
         "@chakra-ui/react": "^2.5.0",
         "@emotion/react": "^11.10.5",
         "@emotion/styled": "^11.10.5",
+        "@reduxjs/toolkit": "^1.9.3",
         "antd": "^5.2.1",
-        "framer-motion": "^9.0.2"
+        "framer-motion": "^9.0.2",
+        "klaw": "^4.1.0",
+        "react-redux": "^8.0.5",
+        "redux": "^4.2.1"
     }
 }
