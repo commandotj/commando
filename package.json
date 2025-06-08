@@ -12,7 +12,8 @@
         }
     },
     "scripts": {
-        "dev": "vite",
+        "dev": "npx concurrently \"yarn tsc:preload:watch\" \"vite\"",
+        "tsc:preload:watch": "tsc --project electron/tsconfig.preload.json --watch",
         "build": "tsc && vite build && electron-builder",
         "preview": "vite preview",
         "pree2e": "vite build --mode=test",
@@ -23,8 +24,9 @@
         "@types/react": "^18.0.27",
         "@types/react-dom": "^18.0.10",
         "@vitejs/plugin-react": "^3.0.1",
-        "electron": "^22.0.3",
-        "electron-builder": "^23.6.0",
+        "concurrently": "^9.1.2",
+        "electron": "^36.4.0",
+        "electron-builder": "^26.0.12",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "react-splitter-layout": "^4.0.0",
@@ -38,7 +40,7 @@
         "node": "^14.18.0 || >=16.0.0"
     },
     "volta": {
-        "node": "14.18.0",
+        "node": "22.16.0",
         "yarn": "1.22.17"
     },
     "dependencies": {

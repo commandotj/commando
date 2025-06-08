@@ -1,6 +1,8 @@
 import { app, BrowserWindow, shell, ipcMain, screen } from "electron";
 import { release } from "node:os";
 import { join } from "node:path";
+import fs from "fs";
+import path from "path";
 
 // The built directory structure
 //
@@ -49,11 +51,9 @@ async function createWindow() {
         height: height - 200,
         webPreferences: {
             preload,
-            // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
-            // Consider using contextBridge.exposeInMainWorld
-            // Read more on https://www.electronjs.org/docs/latest/tutorial/context-isolation
-            nodeIntegration: true,
-            contextIsolation: false,
+            contextIsolation: true,
+            nodeIntegration: false,
+            sandbox: false,
         },
     });
 
@@ -110,8 +110,9 @@ ipcMain.handle("open-win", (_, arg) => {
     const childWindow = new BrowserWindow({
         webPreferences: {
             preload,
-            nodeIntegration: true,
-            contextIsolation: false,
+            contextIsolation: true,
+            nodeIntegration: false,
+            sandbox: false,
         },
     });
 
@@ -119,5 +120,20 @@ ipcMain.handle("open-win", (_, arg) => {
         childWindow.loadURL(`${url}#${arg}`);
     } else {
         childWindow.loadFile(indexHtml, { hash: arg });
+    }
+});
+
+// IPC handler for directory listing
+ipcMain.handle("list-dir", async (_event, dirPath) => {
+    try {
+        const entries = await fs.promises.readdir(dirPath, {
+            withFileTypes: true,
+        });
+        return entries.map((entry) => ({
+            name: entry.name,
+            isDirectory: entry.isDirectory(),
+        }));
+    } catch (err) {
+        return [];
     }
 });
