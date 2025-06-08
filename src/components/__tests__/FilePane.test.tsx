@@ -17,10 +17,10 @@ jest.mock("rc-util/lib/getScrollBarSize", () => ({
 
 const mockStore = configureStore<RootState>([]);
 
-jest.mock("../app/hooks");
+jest.mock("../../app/hooks");
 
-jest.mock("../app/fileManagerSlice", () => ({
-    ...jest.requireActual("../app/fileManagerSlice"),
+jest.mock("../../app/fileManagerSlice", () => ({
+    ...jest.requireActual("../../app/fileManagerSlice"),
     fetchDirectory: jest.fn(() => ({ type: "fileManager/fetchDirectory" })),
 }));
 
