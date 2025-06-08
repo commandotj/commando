@@ -3,6 +3,7 @@ import { release } from "node:os";
 import { join } from "node:path";
 import fs from "fs";
 import path from "path";
+import { listDirSync } from "./listDir";
 
 // The built directory structure
 //
@@ -126,13 +127,7 @@ ipcMain.handle("open-win", (_, arg) => {
 // IPC handler for directory listing
 ipcMain.handle("list-dir", async (_event, dirPath) => {
     try {
-        const entries = await fs.promises.readdir(dirPath, {
-            withFileTypes: true,
-        });
-        return entries.map((entry) => ({
-            name: entry.name,
-            isDirectory: entry.isDirectory(),
-        }));
+        return listDirSync(dirPath);
     } catch (err) {
         return [];
     }

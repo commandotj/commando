@@ -3,10 +3,10 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
-import FilePane from "./FilePane";
-import * as redux from "../app/hooks";
-import { fetchDirectory } from "../app/fileManagerSlice";
-import type { RootState } from "../app/store";
+import FilePane from "../FilePane";
+import * as redux from "../../app/hooks";
+import { fetchDirectory } from "../../app/fileManagerSlice";
+import type { RootState } from "../../app/store";
 
 // Mock rc-util scrollbar size calculation
 jest.mock("rc-util/lib/getScrollBarSize", () => ({
@@ -98,7 +98,11 @@ describe("FilePane", () => {
                         currentPath: "/Users/test",
                         entries: [
                             { name: "Documents", isDirectory: true },
-                            { name: "file.txt", isDirectory: false },
+                            {
+                                name: "file.txt",
+                                isDirectory: false,
+                                size: 123456,
+                            },
                         ],
                     },
                     {
@@ -125,6 +129,7 @@ describe("FilePane", () => {
         expect(screen.getByText("Users")).toBeInTheDocument();
         expect(screen.getByText("Documents")).toBeInTheDocument();
         expect(screen.getByText("file.txt")).toBeInTheDocument();
+        expect(screen.getByText("120.56 KB")).toBeInTheDocument();
     });
 
     it("dispatches fetchDirectory when folder is clicked", () => {

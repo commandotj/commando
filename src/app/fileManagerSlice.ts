@@ -3,6 +3,7 @@ import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 interface FileEntry {
     name: string;
     isDirectory: boolean;
+    size?: number;
 }
 
 interface PaneState {
