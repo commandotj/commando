@@ -1,46 +1,11 @@
 import React, { useState } from "react";
-import { Breadcrumb, Layout, Table } from "antd";
+import { Breadcrumb, Layout } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { fetchDirectory } from "../../app/fileManagerSlice";
 import { splitPath, joinPath, formatSize } from "./utils";
-import { Resizable } from "react-resizable";
-import "react-resizable/css/styles.css";
+import { ResizableTable } from "../ResizableTable/index";
 import "./styles.css";
-
-interface ResizableTitleProps {
-    onResize: (
-        e: React.SyntheticEvent,
-        { size }: { size: { width: number } }
-    ) => void;
-    width?: number;
-    [key: string]: any;
-}
-
-const ResizableTitle: React.FC<ResizableTitleProps> = (props) => {
-    const { onResize, width, ...restProps } = props;
-
-    if (!width) {
-        return <th {...restProps} />;
-    }
-
-    return (
-        <Resizable
-            width={width}
-            height={0}
-            handle={
-                <span
-                    className="react-resizable-handle"
-                    onClick={(e) => e.stopPropagation()}
-                />
-            }
-            onResize={onResize}
-            draggableOpts={{ enableUserSelectHack: false }}
-        >
-            <th {...restProps} />
-        </Resizable>
-    );
-};
 
 interface FileEntry {
     name: string;
@@ -97,25 +62,6 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
         },
     ]);
 
-    const handleResize =
-        (index: number) =>
-        (e: React.SyntheticEvent, { size }: { size: { width: number } }) => {
-            const newColumns = [...columns];
-            newColumns[index] = {
-                ...newColumns[index],
-                width: size.width,
-            };
-            setColumns(newColumns);
-        };
-
-    const resizableColumns = columns.map((col, index) => ({
-        ...col,
-        onHeaderCell: (column: any) => ({
-            width: column.width,
-            onResize: handleResize(index),
-        }),
-    })) as ColumnsType<FileEntry>;
-
     const rowSelection = {
         selectedRowKeys,
         onChange: (newSelectedRowKeys: React.Key[]) => {
@@ -170,19 +116,15 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                     position: "relative",
                 }}
             >
-                <Table
-                    components={{
-                        header: {
-                            cell: ResizableTitle,
-                        },
-                    }}
-                    columns={resizableColumns}
+                <ResizableTable
+                    columns={columns}
                     dataSource={pane.entries.map(
                         (entry: FileEntry, idx: number) => ({
                             ...entry,
                             key: idx,
                         })
                     )}
+                    onColumnsChange={setColumns}
                     pagination={false}
                     rowSelection={rowSelection}
                     size="small"
