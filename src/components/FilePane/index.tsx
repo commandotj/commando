@@ -114,22 +114,42 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                     flex: 1,
                     overflow: "auto",
                     position: "relative",
+                    display: "flex",
+                    flexDirection: "column",
                 }}
             >
-                <ResizableTable
-                    columns={columns}
-                    dataSource={pane.entries.map(
-                        (entry: FileEntry, idx: number) => ({
-                            ...entry,
-                            key: idx,
-                        })
-                    )}
-                    onColumnsChange={setColumns}
-                    pagination={false}
-                    rowSelection={rowSelection}
-                    size="small"
-                    scroll={{ y: "calc(100vh - 120px)" }}
-                />
+                <div style={{ flex: 1, minHeight: 0 }}>
+                    <ResizableTable
+                        columns={columns}
+                        dataSource={pane.entries.map(
+                            (entry: FileEntry, idx: number) => ({
+                                ...entry,
+                                key: idx,
+                            })
+                        )}
+                        onColumnsChange={setColumns}
+                        pagination={false}
+                        rowSelection={rowSelection}
+                        size="small"
+                        scroll={{ y: "calc(100vh - 160px)" }}
+                    />
+                </div>
+                <div
+                    style={{
+                        height: 32,
+                        background: "#fafafa",
+                        borderTop: "1px solid #f0f0f0",
+                        display: "flex",
+                        alignItems: "center",
+                        padding: "0 16px",
+                        fontSize: 13,
+                        color: "#888",
+                        flexShrink: 0,
+                    }}
+                >
+                    {pane.entries.length} items, {selectedRowKeys.length}{" "}
+                    selected
+                </div>
             </Layout.Content>
         </Layout>
     );

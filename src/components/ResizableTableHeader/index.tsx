@@ -6,6 +6,7 @@ interface ResizableTableHeaderProps {
     columnKey: string;
     children: React.ReactNode;
     isDragging?: boolean;
+    isLastColumn?: boolean;
 }
 
 export const ResizableTableHeader: React.FC<ResizableTableHeaderProps> = ({
@@ -13,6 +14,7 @@ export const ResizableTableHeader: React.FC<ResizableTableHeaderProps> = ({
     columnKey,
     children,
     isDragging = false,
+    isLastColumn = false,
 }) => {
     const { attributes, listeners, setNodeRef } = useDraggable({
         id: `resize-${columnKey}`,
@@ -40,14 +42,17 @@ export const ResizableTableHeader: React.FC<ResizableTableHeaderProps> = ({
                 transition: isDragging ? "none" : "width 0.2s ease",
                 userSelect: isDragging ? "none" : undefined,
             }}
+            data-column-key={columnKey}
         >
             {children}
-            <div
-                ref={setNodeRef}
-                style={handleStyle}
-                {...listeners}
-                {...attributes}
-            />
+            {!isLastColumn && columnKey && (
+                <div
+                    ref={setNodeRef}
+                    style={handleStyle}
+                    {...listeners}
+                    {...attributes}
+                />
+            )}
         </th>
     );
 };
