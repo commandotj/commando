@@ -27,7 +27,7 @@ export const fetchDirectory = createAsyncThunk(
         { paneIndex, path }: { paneIndex: 0 | 1; path: string },
         { dispatch }
     ) => {
-        // @ts-ignore
+        // @ts-expect-ignore
         const entries = await window.fsApi.listDir(path);
         dispatch(setPanePath({ paneIndex, path }));
         dispatch(setPaneEntries({ paneIndex, entries }));

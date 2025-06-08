@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Breadcrumb, Layout, Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
@@ -17,6 +17,15 @@ function joinPath(currentPath: string, name: string) {
 const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
     const dispatch = useAppDispatch();
     const pane = useAppSelector((state) => state.fileManager.panes[paneIndex]);
+
+    const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+
+    const rowSelection = {
+        selectedRowKeys,
+        onChange: (newSelectedRowKeys: React.Key[]) => {
+            setSelectedRowKeys(newSelectedRowKeys);
+        },
+    };
 
     const columns: ColumnsType<any> = [
         {
@@ -80,6 +89,8 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                         key: idx,
                     }))}
                     pagination={false}
+                    rowSelection={rowSelection}
+                    size="small"
                 />
             </Layout.Content>
         </Layout>
