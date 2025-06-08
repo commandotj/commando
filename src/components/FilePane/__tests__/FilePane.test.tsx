@@ -3,10 +3,11 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
-import FilePane from "../FilePane";
-import * as redux from "../../app/hooks";
-import { fetchDirectory } from "../../app/fileManagerSlice";
-import type { RootState } from "../../app/store";
+import FilePane from "../index";
+import * as redux from "../../../app/hooks";
+import { fetchDirectory } from "../../../app/fileManagerSlice";
+import type { RootState } from "../../../app/store";
+import { DndContext, DragEndEvent } from "@dnd-kit/core";
 
 // Mock rc-util scrollbar size calculation
 jest.mock("rc-util/lib/getScrollBarSize", () => ({
@@ -17,10 +18,10 @@ jest.mock("rc-util/lib/getScrollBarSize", () => ({
 
 const mockStore = configureStore<RootState>([]);
 
-jest.mock("../../app/hooks");
+jest.mock("../../../app/hooks");
 
-jest.mock("../../app/fileManagerSlice", () => ({
-    ...jest.requireActual("../../app/fileManagerSlice"),
+jest.mock("../../../app/fileManagerSlice", () => ({
+    ...jest.requireActual("../../../app/fileManagerSlice"),
     fetchDirectory: jest.fn(() => ({ type: "fileManager/fetchDirectory" })),
 }));
 
@@ -182,5 +183,72 @@ describe("FilePane", () => {
         const rowCheckbox = checkboxes[1]; // First checkbox is the header checkbox
         fireEvent.click(rowCheckbox);
         expect(rowCheckbox).toBeChecked();
+    });
+
+    it("renders resizable columns", () => {
+        render(
+            <Provider store={store}>
+                <FilePane paneIndex={0} />
+            </Provider>
+        );
+
+        // Check if resizable column headers are present
+        const columnHeaders = screen.getAllByRole("columnheader");
+        columnHeaders.forEach((header) => {
+            expect(header).toHaveStyle({ resize: "horizontal" });
+        });
+    });
+
+    describe("Drag and Drop", () => {
+        it("renders draggable file items", () => {
+            render(
+                <Provider store={store}>
+                    <FilePane paneIndex={0} />
+                </Provider>
+            );
+
+            const fileItem = screen.getByText("file.txt");
+            expect(
+                fileItem.closest('[data-draggable="true"]')
+            ).toBeInTheDocument();
+        });
+
+        it("renders droppable folder items", () => {
+            render(
+                <Provider store={store}>
+                    <FilePane paneIndex={0} />
+                </Provider>
+            );
+
+            const folderItem = screen.getByText("Documents");
+            expect(
+                folderItem.closest('[data-droppable="true"]')
+            ).toBeInTheDocument();
+        });
+
+        it("handles drag end event", () => {
+            const mockDispatch = jest.fn();
+            (redux.useAppDispatch as jest.Mock).mockReturnValue(mockDispatch);
+
+            render(
+                <Provider store={store}>
+                    <FilePane paneIndex={0} />
+                </Provider>
+            );
+
+            const fileItem = screen.getByText("file.txt");
+            const folderItem = screen.getByText("Documents");
+
+            // Simulate drag end event
+            const dragEndEvent = {
+                active: { id: "file.txt" },
+                over: { id: "Documents" },
+            } as DragEndEvent;
+
+            fireEvent.dragEnd(fileItem, dragEndEvent);
+
+            // Verify that the appropriate action was dispatched
+            expect(mockDispatch).toHaveBeenCalled();
+        });
     });
 });

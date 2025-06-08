@@ -1,0 +1,70 @@
+.react-resizable {
+    position: relative;
+    background-clip: padding-box;
+}
+
+.react-resizable-handle {
+    position: absolute;
+    right: -5px;
+    bottom: 0;
+    z-index: 1;
+    width: 10px;
+    height: 100%;
+    cursor: col-resize;
+}
+
+.react-resizable-handle::after {
+    content: "";
+    position: absolute;
+    right: 4px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #e8e8e8;
+    transition: background-color 0.3s;
+}
+
+.react-resizable-handle:hover::after {
+    background-color: #1890ff;
+}
+
+/* Drag and Drop Styles */
+[data-draggable="true"] {
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+}
+
+[data-draggable="true"]:active {
+    cursor: grabbing;
+}
+
+[data-droppable="true"] {
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+[data-droppable="true"]:hover {
+    background-color: rgba(24, 144, 255, 0.1);
+}
+
+[data-droppable="true"][data-over="true"] {
+    background-color: rgba(24, 144, 255, 0.2);
+    border: 2px dashed #1890ff;
+}
+
+/* Drag Overlay Styles */
+.dnd-kit-drag-overlay {
+    z-index: 1000;
+    pointer-events: none;
+}
+
+/* Ensure the table row maintains its structure during drag */
+.ant-table-row {
+    position: relative;
+}
+
+/* Prevent text selection during drag */
+.ant-table-cell {
+    user-select: none;
+}

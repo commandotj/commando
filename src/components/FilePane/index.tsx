@@ -1,47 +1,65 @@
 import React, { useState } from "react";
 import { Breadcrumb, Layout, Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { fetchDirectory } from "../app/fileManagerSlice";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { fetchDirectory } from "../../app/fileManagerSlice";
+import { splitPath, joinPath, formatSize } from "./utils";
+import { Resizable } from "react-resizable";
+import "react-resizable/css/styles.css";
+import "./styles.css";
 
-// Helper to split path for breadcrumb
-const splitPath = (path: string) => path.split(/[\\/]/).filter(Boolean);
-
-// Helper to join paths (cross-platform)
-function joinPath(currentPath: string, name: string) {
-    if (currentPath.endsWith("/")) return currentPath + name;
-    if (currentPath.match(/^([A-Za-z]:)?\\/)) return currentPath + "\\" + name; // Windows
-    return currentPath + "/" + name; // Unix
+interface ResizableTitleProps {
+    onResize: (
+        e: React.SyntheticEvent,
+        { size }: { size: { width: number } }
+    ) => void;
+    width?: number;
+    [key: string]: any;
 }
 
-// Helper to format file size
-const formatSize = (size?: number) => {
-    if (size === undefined || size === null) return "";
-    if (size === 0) return "0 B";
-    const units = ["B", "KB", "MB", "GB", "TB"];
-    const i = Math.floor(Math.log(size) / Math.log(1024));
-    return (size / Math.pow(1024, i)).toFixed(2) + " " + units[i];
+const ResizableTitle: React.FC<ResizableTitleProps> = (props) => {
+    const { onResize, width, ...restProps } = props;
+
+    if (!width) {
+        return <th {...restProps} />;
+    }
+
+    return (
+        <Resizable
+            width={width}
+            height={0}
+            handle={
+                <span
+                    className="react-resizable-handle"
+                    onClick={(e) => e.stopPropagation()}
+                />
+            }
+            onResize={onResize}
+            draggableOpts={{ enableUserSelectHack: false }}
+        >
+            <th {...restProps} />
+        </Resizable>
+    );
 };
+
+interface FileEntry {
+    name: string;
+    isDirectory: boolean;
+    size?: number;
+}
 
 const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
     const dispatch = useAppDispatch();
     const pane = useAppSelector((state) => state.fileManager.panes[paneIndex]);
-
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
-    const rowSelection = {
-        selectedRowKeys,
-        onChange: (newSelectedRowKeys: React.Key[]) => {
-            setSelectedRowKeys(newSelectedRowKeys);
-        },
-    };
-
-    const columns: ColumnsType<any> = [
+    const [columns, setColumns] = useState<ColumnsType<FileEntry>>([
         {
             title: "Name",
             dataIndex: "name",
             key: "name",
-            render: (text: string, record: any) => (
+            width: 200,
+            render: (text: string, record: FileEntry) => (
                 <a
                     onClick={() => {
                         if (record.isDirectory) {
@@ -65,17 +83,45 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
             title: "Type",
             dataIndex: "isDirectory",
             key: "isDirectory",
+            width: 100,
             render: (isDirectory: boolean) => (isDirectory ? "Folder" : "File"),
         },
         {
             title: "Size",
             dataIndex: "size",
             key: "size",
-            render: (size: number, record: any) =>
+            width: 100,
+            render: (size: number | undefined, record: FileEntry) =>
                 record.isDirectory ? "" : formatSize(size),
             align: "right",
         },
-    ];
+    ]);
+
+    const handleResize =
+        (index: number) =>
+        (e: React.SyntheticEvent, { size }: { size: { width: number } }) => {
+            const newColumns = [...columns];
+            newColumns[index] = {
+                ...newColumns[index],
+                width: size.width,
+            };
+            setColumns(newColumns);
+        };
+
+    const resizableColumns = columns.map((col, index) => ({
+        ...col,
+        onHeaderCell: (column: any) => ({
+            width: column.width,
+            onResize: handleResize(index),
+        }),
+    })) as ColumnsType<FileEntry>;
+
+    const rowSelection = {
+        selectedRowKeys,
+        onChange: (newSelectedRowKeys: React.Key[]) => {
+            setSelectedRowKeys(newSelectedRowKeys);
+        },
+    };
 
     // Breadcrumb navigation
     const handleBreadcrumbClick = (index: number) => {
@@ -91,7 +137,11 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
 
     return (
         <Layout
-            style={{ height: "100%", display: "flex", flexDirection: "column" }}
+            style={{
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+            }}
         >
             <Layout.Header
                 style={{
@@ -121,11 +171,18 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                 }}
             >
                 <Table
-                    columns={columns}
-                    dataSource={pane.entries.map((entry: any, idx: number) => ({
-                        ...entry,
-                        key: idx,
-                    }))}
+                    components={{
+                        header: {
+                            cell: ResizableTitle,
+                        },
+                    }}
+                    columns={resizableColumns}
+                    dataSource={pane.entries.map(
+                        (entry: FileEntry, idx: number) => ({
+                            ...entry,
+                            key: idx,
+                        })
+                    )}
                     pagination={false}
                     rowSelection={rowSelection}
                     size="small"
