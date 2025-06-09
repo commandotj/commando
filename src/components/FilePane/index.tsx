@@ -26,7 +26,7 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
     useEffect(() => {
         function updateHeight() {
             if (contentRef.current) {
-                setTableHeight(contentRef.current.offsetHeight);
+                setTableHeight(contentRef.current.clientHeight);
             }
         }
         updateHeight();
@@ -124,27 +124,24 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                 </Breadcrumb>
             </div>
             {/* Content/Table */}
-            <div className="flex-1 min-h-0 flex flex-col">
-                <div className="flex-1 min-h-0">
-                    <ResizableTable
-                        key={pane.currentPath}
-                        columns={columns}
-                        dataSource={pane.entries
-                            .filter(
-                                (entry: FileEntry) =>
-                                    !entry.name.startsWith(".")
-                            )
-                            .map((entry: FileEntry, idx: number) => ({
-                                ...entry,
-                                key: idx,
-                            }))}
-                        onColumnsChange={() => {}}
-                        pagination={false}
-                        rowSelection={rowSelection}
-                        size="small"
-                        scroll={{ y: 400 }}
-                    />
-                </div>
+            <div className="flex-1 min-h-0" ref={contentRef}>
+                <ResizableTable
+                    key={pane.currentPath}
+                    columns={columns}
+                    dataSource={pane.entries
+                        .filter(
+                            (entry: FileEntry) => !entry.name.startsWith(".")
+                        )
+                        .map((entry: FileEntry, idx: number) => ({
+                            ...entry,
+                            key: idx,
+                        }))}
+                    onColumnsChange={() => {}}
+                    pagination={false}
+                    rowSelection={rowSelection}
+                    size="small"
+                    scroll={{ y: tableHeight }}
+                />
             </div>
             {/* Footer/Status Bar */}
             <div className="h-8 border-t border-gray-200 flex items-center px-4 text-sm text-gray-500 flex-shrink-0">

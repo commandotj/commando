@@ -156,6 +156,7 @@ export const ResizableTable = <T extends object>({
             onDragMove={handleDragMove}
         >
             <div
+                className="flex flex-col h-full"
                 ref={tableWrapperRef}
                 style={{
                     position: "relative",
