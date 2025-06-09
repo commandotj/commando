@@ -1,4 +1,4 @@
-import { splitPath, joinPath, formatSize } from "../utils";
+import { splitPath, joinPath, formatSize } from "../path";
 
 describe("FilePane utils", () => {
     describe("splitPath", () => {

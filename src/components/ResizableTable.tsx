@@ -10,8 +10,8 @@ import {
     DragEndEvent,
     DragMoveEvent,
 } from "@dnd-kit/core";
-import { ResizableTableHeader } from "../ResizableTableHeader";
-import { ResizableTableOverlay } from "../ResizableTableOverlay";
+import { ResizableTableHeader } from "./ResizableTableHeader";
+import { ResizableTableOverlay } from "./ResizableTableOverlay";
 
 interface ResizableTableProps<T> {
     columns: ColumnsType<T>;
@@ -156,6 +156,7 @@ export const ResizableTable = <T extends object>({
             onDragMove={handleDragMove}
         >
             <div
+                className="flex flex-col h-full"
                 ref={tableWrapperRef}
                 style={{
                     position: "relative",

@@ -5,13 +5,13 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+  background-color: #fff !important;
 }
 
 body {
@@ -84,4 +84,19 @@ code {
   code {
     background-color: #f9f9f9;
   }
+}
+
+/* Custom light scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  background: #f4f4f4;
+}
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db #f4f4f4;
 }
