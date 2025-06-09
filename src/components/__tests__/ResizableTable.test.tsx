@@ -1,6 +1,6 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
-import { ResizableTable } from "../index";
+import { ResizableTable } from "../ResizableTable";
 
 // Mock window.matchMedia for Ant Design Table
 beforeAll(() => {

@@ -1,11 +1,41 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Breadcrumb } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { fetchDirectory } from "../../app/fileManagerSlice";
-import { splitPath, joinPath, formatSize } from "./utils";
-import { ResizableTable } from "../ResizableTable/index";
-import "./styles.css";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { fetchDirectory } from "../app/fileManagerSlice";
+import { ResizableTable } from "./ResizableTable";
+import { joinPath, formatSize } from "../common/path";
+import PathBreadcrumb from "./PathBreadcrumb";
+
+// --- CSS-in-JS styles ---
+const filePaneStyle: React.CSSProperties = {
+    display: "flex",
+    flexDirection: "column",
+    height: "calc(100vh - 64px)",
+};
+const headerStyle: React.CSSProperties = {
+    height: 32,
+    borderBottom: "1px solid #e5e7eb",
+    paddingLeft: 16,
+    paddingRight: 16,
+    display: "flex",
+    alignItems: "center",
+    flexShrink: 0,
+};
+const contentStyle: React.CSSProperties = {
+    flex: 1,
+    minHeight: 0,
+};
+const footerStyle: React.CSSProperties = {
+    height: 32,
+    borderTop: "1px solid #e5e7eb",
+    display: "flex",
+    alignItems: "center",
+    paddingLeft: 16,
+    paddingRight: 16,
+    fontSize: 14,
+    color: "#6b7280",
+    flexShrink: 0,
+};
 
 interface FileEntry {
     name: string;
@@ -15,11 +45,8 @@ interface FileEntry {
 
 const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
     const dispatch = useAppDispatch();
-    const pane = useAppSelector((state) => {
-        return state.fileManager.panes[paneIndex];
-    });
+    const pane = useAppSelector((state) => state.fileManager.panes[paneIndex]);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-
     const contentRef = useRef<HTMLDivElement>(null);
     const [tableHeight, setTableHeight] = useState<number>(400);
 
@@ -34,7 +61,6 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
         return () => window.removeEventListener("resize", updateHeight);
     }, []);
 
-    // Define columns inline for simplicity
     const columns: ColumnsType<FileEntry> = [
         {
             title: "Name",
@@ -44,19 +70,14 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
             render: (text: string, record: FileEntry) => (
                 <a
                     onClick={() => {
-                        if (!pane.currentPath) {
-                            return;
-                        }
+                        if (!pane.currentPath) return;
                         if (record.isDirectory) {
                             const nextPath = joinPath(
                                 pane.currentPath,
                                 record.name
                             );
                             dispatch(
-                                fetchDirectory({
-                                    paneIndex,
-                                    path: nextPath,
-                                })
+                                fetchDirectory({ paneIndex, path: nextPath })
                             );
                         }
                     }}
@@ -85,19 +106,15 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
 
     const rowSelection = {
         selectedRowKeys,
-        onChange: (newSelectedRowKeys: React.Key[]) => {
-            setSelectedRowKeys(newSelectedRowKeys);
-        },
+        onChange: (newSelectedRowKeys: React.Key[]) =>
+            setSelectedRowKeys(newSelectedRowKeys),
     };
 
-    // Breadcrumb navigation
     const handleBreadcrumbClick = (index: number) => {
-        const parts = splitPath(pane.currentPath);
+        const parts = pane.currentPath.split(/[\\/]/).filter(Boolean);
         let newPath = "";
         if (parts.length > 0) {
-            // For Unix: join with "/" and prepend "/"
             newPath = "/" + parts.slice(0, index + 1).join("/");
-            // For Windows: handle drive letter
             if (/^[A-Za-z]:$/.test(parts[0])) {
                 newPath = parts.slice(0, index + 1).join("\\");
             }
@@ -107,24 +124,17 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
         dispatch(fetchDirectory({ paneIndex, path: newPath }));
     };
 
-    const parts = splitPath(pane.currentPath);
-
     return (
-        <div className="flex flex-col file-pane">
+        <div style={filePaneStyle}>
             {/* Header/Breadcrumb */}
-            <div className="h-8 border-b border-gray-200 px-4 flex items-center flex-shrink-0">
-                <Breadcrumb className="m-0 h-8 leading-8 p-0 whitespace-nowrap overflow-hidden text-ellipsis">
-                    {parts.map((part, idx) => (
-                        <Breadcrumb.Item key={idx}>
-                            <a onClick={() => handleBreadcrumbClick(idx)}>
-                                {part}
-                            </a>
-                        </Breadcrumb.Item>
-                    ))}
-                </Breadcrumb>
+            <div style={headerStyle}>
+                <PathBreadcrumb
+                    path={pane.currentPath}
+                    onClick={handleBreadcrumbClick}
+                />
             </div>
             {/* Content/Table */}
-            <div className="flex-1 min-h-0" ref={contentRef}>
+            <div style={contentStyle} ref={contentRef}>
                 <ResizableTable
                     key={pane.currentPath}
                     columns={columns}
@@ -144,7 +154,7 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                 />
             </div>
             {/* Footer/Status Bar */}
-            <div className="h-8 border-t border-gray-200 flex items-center px-4 text-sm text-gray-500 flex-shrink-0">
+            <div style={footerStyle}>
                 {pane.entries.length} items, {selectedRowKeys.length} selected
             </div>
         </div>

@@ -3,10 +3,10 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
-import FilePane from "../index";
-import * as redux from "../../../app/hooks";
-import { fetchDirectory } from "../../../app/fileManagerSlice";
-import type { RootState } from "../../../app/store";
+import FilePane from "../FilePane";
+import * as redux from "../../app/hooks";
+import { fetchDirectory } from "../../app/fileManagerSlice";
+import type { RootState } from "../../app/store";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
 
 // Mock rc-util scrollbar size calculation
@@ -18,10 +18,10 @@ jest.mock("rc-util/lib/getScrollBarSize", () => ({
 
 const mockStore = configureStore<RootState>([]);
 
-jest.mock("../../../app/hooks");
+jest.mock("../../app/hooks");
 
-jest.mock("../../../app/fileManagerSlice", () => ({
-    ...jest.requireActual("../../../app/fileManagerSlice"),
+jest.mock("../../app/fileManagerSlice", () => ({
+    ...jest.requireActual("../../app/fileManagerSlice"),
     fetchDirectory: jest.fn(() => ({ type: "fileManager/fetchDirectory" })),
 }));
 

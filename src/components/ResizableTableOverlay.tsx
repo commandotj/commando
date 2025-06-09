@@ -9,7 +9,6 @@ export const ResizableTableOverlay: React.FC<ResizableTableOverlayProps> = ({
     active,
     overlayX,
 }) => {
-    console.log("OverlayX prop", overlayX);
     if (!active || overlayX == null) return null;
 
     return (

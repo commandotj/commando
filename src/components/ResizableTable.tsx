@@ -10,8 +10,8 @@ import {
     DragEndEvent,
     DragMoveEvent,
 } from "@dnd-kit/core";
-import { ResizableTableHeader } from "../ResizableTableHeader";
-import { ResizableTableOverlay } from "../ResizableTableOverlay";
+import { ResizableTableHeader } from "./ResizableTableHeader";
+import { ResizableTableOverlay } from "./ResizableTableOverlay";
 
 interface ResizableTableProps<T> {
     columns: ColumnsType<T>;

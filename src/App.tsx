@@ -3,7 +3,7 @@ import { useAppDispatch } from "./app/hooks";
 import SplitterLayout from "react-splitter-layout";
 import "react-splitter-layout/lib/index.css";
 import React from "react";
-import { Layout, Menu, theme } from "antd";
+import { ConfigProvider, Layout, Menu, theme } from "antd";
 import "antd/dist/reset.css";
 import "./App.scss";
 import FilePane from "./components/FilePane";
@@ -22,25 +22,34 @@ const App: React.FC = () => {
     }, [dispatch]);
 
     return (
-        <Layout>
-            <Header>
-                <Menu
-                    theme="dark"
-                    mode="horizontal"
-                    defaultSelectedKeys={["2"]}
-                    items={new Array(3).fill(null).map((_, index) => ({
-                        key: String(index + 1),
-                        label: `nav ${index + 1}`,
-                    }))}
-                />
-            </Header>
-            <Content>
-                <SplitterLayout primaryIndex={0} percentage>
-                    <FilePane paneIndex={0} />
-                    <FilePane paneIndex={1} />
-                </SplitterLayout>
-            </Content>
-        </Layout>
+        <ConfigProvider
+            theme={{
+                components: {
+                    Layout: {
+                        headerBg: "#00b96b",
+                    },
+                },
+            }}
+        >
+            <Layout>
+                <Header>
+                    <Menu
+                        mode="horizontal"
+                        defaultSelectedKeys={["2"]}
+                        items={new Array(3).fill(null).map((_, index) => ({
+                            key: String(index + 1),
+                            label: `nav ${index + 1}`,
+                        }))}
+                    />
+                </Header>
+                <Content>
+                    <SplitterLayout primaryIndex={0} percentage>
+                        <FilePane paneIndex={0} />
+                        <FilePane paneIndex={1} />
+                    </SplitterLayout>
+                </Content>
+            </Layout>
+        </ConfigProvider>
     );
 };
 
