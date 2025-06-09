@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Breadcrumb, Layout } from "antd";
+import React, { useState, useRef, useEffect } from "react";
+import { Breadcrumb } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { fetchDirectory } from "../../app/fileManagerSlice";
@@ -19,6 +19,20 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
         return state.fileManager.panes[paneIndex];
     });
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+
+    const contentRef = useRef<HTMLDivElement>(null);
+    const [tableHeight, setTableHeight] = useState<number>(400);
+
+    useEffect(() => {
+        function updateHeight() {
+            if (contentRef.current) {
+                setTableHeight(contentRef.current.offsetHeight);
+            }
+        }
+        updateHeight();
+        window.addEventListener("resize", updateHeight);
+        return () => window.removeEventListener("resize", updateHeight);
+    }, []);
 
     // Define columns inline for simplicity
     const columns: ColumnsType<FileEntry> = [
@@ -96,24 +110,10 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
     const parts = splitPath(pane.currentPath);
 
     return (
-        <Layout
-            style={{
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
-            }}
-        >
-            <Layout.Header
-                style={{
-                    padding: "0 16px",
-                    background: "#fff",
-                    borderBottom: "1px solid #f0f0f0",
-                    position: "sticky",
-                    top: 0,
-                    zIndex: 1,
-                }}
-            >
-                <Breadcrumb style={{ margin: "16px 0" }}>
+        <div className="flex flex-col file-pane">
+            {/* Header/Breadcrumb */}
+            <div className="h-8 border-b border-gray-200 px-4 flex items-center flex-shrink-0">
+                <Breadcrumb className="m-0 h-8 leading-8 p-0 whitespace-nowrap overflow-hidden text-ellipsis">
                     {parts.map((part, idx) => (
                         <Breadcrumb.Item key={idx}>
                             <a onClick={() => handleBreadcrumbClick(idx)}>
@@ -122,17 +122,10 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                         </Breadcrumb.Item>
                     ))}
                 </Breadcrumb>
-            </Layout.Header>
-            <Layout.Content
-                style={{
-                    flex: 1,
-                    overflow: "auto",
-                    position: "relative",
-                    display: "flex",
-                    flexDirection: "column",
-                }}
-            >
-                <div style={{ flex: 1, minHeight: 0 }}>
+            </div>
+            {/* Content/Table */}
+            <div className="flex-1 min-h-0 flex flex-col">
+                <div className="flex-1 min-h-0">
                     <ResizableTable
                         key={pane.currentPath}
                         columns={columns}
@@ -149,27 +142,15 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                         pagination={false}
                         rowSelection={rowSelection}
                         size="small"
-                        scroll={{ y: "calc(100vh - 160px)" }}
+                        scroll={{ y: 400 }}
                     />
                 </div>
-                <div
-                    style={{
-                        height: 32,
-                        background: "#fafafa",
-                        borderTop: "1px solid #f0f0f0",
-                        display: "flex",
-                        alignItems: "center",
-                        padding: "0 16px",
-                        fontSize: 13,
-                        color: "#888",
-                        flexShrink: 0,
-                    }}
-                >
-                    {pane.entries.length} items, {selectedRowKeys.length}{" "}
-                    selected
-                </div>
-            </Layout.Content>
-        </Layout>
+            </div>
+            {/* Footer/Status Bar */}
+            <div className="h-8 border-t border-gray-200 flex items-center px-4 text-sm text-gray-500 flex-shrink-0">
+                {pane.entries.length} items, {selectedRowKeys.length} selected
+            </div>
+        </div>
     );
 };
 

@@ -2,7 +2,9 @@
     position: relative;
     background-clip: padding-box;
 }
-
+.file-pane {
+    height: calc(100vh - 64px);
+}
 .react-resizable-handle {
     position: absolute;
     right: -5px;
