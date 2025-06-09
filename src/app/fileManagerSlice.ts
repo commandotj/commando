@@ -44,8 +44,10 @@ const fileManagerSlice = createSlice({
             state,
             action: PayloadAction<{ paneIndex: 0 | 1; path: string }>
         ) {
-            state.panes[action.payload.paneIndex].currentPath =
-                action.payload.path;
+            if (action.payload.path) {
+                state.panes[action.payload.paneIndex].currentPath =
+                    action.payload.path;
+            }
         },
         setPaneEntries(
             state,

@@ -15,10 +15,13 @@ interface FileEntry {
 
 const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
     const dispatch = useAppDispatch();
-    const pane = useAppSelector((state) => state.fileManager.panes[paneIndex]);
+    const pane = useAppSelector((state) => {
+        return state.fileManager.panes[paneIndex];
+    });
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
-    const [columns, setColumns] = useState<ColumnsType<FileEntry>>([
+    // Define columns inline for simplicity
+    const columns: ColumnsType<FileEntry> = [
         {
             title: "Name",
             dataIndex: "name",
@@ -27,14 +30,18 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
             render: (text: string, record: FileEntry) => (
                 <a
                     onClick={() => {
+                        if (!pane.currentPath) {
+                            return;
+                        }
                         if (record.isDirectory) {
+                            const nextPath = joinPath(
+                                pane.currentPath,
+                                record.name
+                            );
                             dispatch(
                                 fetchDirectory({
                                     paneIndex,
-                                    path: joinPath(
-                                        pane.currentPath,
-                                        record.name
-                                    ),
+                                    path: nextPath,
                                 })
                             );
                         }
@@ -60,7 +67,7 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                 record.isDirectory ? "" : formatSize(size),
             align: "right",
         },
-    ]);
+    ];
 
     const rowSelection = {
         selectedRowKeys,
@@ -72,10 +79,17 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
     // Breadcrumb navigation
     const handleBreadcrumbClick = (index: number) => {
         const parts = splitPath(pane.currentPath);
-        const isWindows = /^[A-Za-z]:/.test(pane.currentPath);
-        const newPath = isWindows
-            ? parts.slice(0, index + 1).join("\\")
-            : "/" + parts.slice(0, index + 1).join("/");
+        let newPath = "";
+        if (parts.length > 0) {
+            // For Unix: join with "/" and prepend "/"
+            newPath = "/" + parts.slice(0, index + 1).join("/");
+            // For Windows: handle drive letter
+            if (/^[A-Za-z]:$/.test(parts[0])) {
+                newPath = parts.slice(0, index + 1).join("\\");
+            }
+        } else {
+            newPath = "/";
+        }
         dispatch(fetchDirectory({ paneIndex, path: newPath }));
     };
 
@@ -120,14 +134,18 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
             >
                 <div style={{ flex: 1, minHeight: 0 }}>
                     <ResizableTable
+                        key={pane.currentPath}
                         columns={columns}
-                        dataSource={pane.entries.map(
-                            (entry: FileEntry, idx: number) => ({
+                        dataSource={pane.entries
+                            .filter(
+                                (entry: FileEntry) =>
+                                    !entry.name.startsWith(".")
+                            )
+                            .map((entry: FileEntry, idx: number) => ({
                                 ...entry,
                                 key: idx,
-                            })
-                        )}
-                        onColumnsChange={setColumns}
+                            }))}
+                        onColumnsChange={() => {}}
                         pagination={false}
                         rowSelection={rowSelection}
                         size="small"
