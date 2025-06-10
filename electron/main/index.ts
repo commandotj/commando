@@ -4,7 +4,6 @@ import { join } from "node:path";
 import fs from "fs";
 import path from "path";
 import { listDirSync } from "./listDir";
-import installExtension, { REDUX_DEVTOOLS } from "electron-devtools-installer";
 
 // The built directory structure
 //
@@ -60,10 +59,10 @@ async function createWindow() {
     });
 
     if (process.env.VITE_DEV_SERVER_URL) {
-        // electron-vite-vue#298
         win.loadURL(url);
-        // Open devTool if the app is not packaged
+        // In development, open DevTools (React DevTools is often built-in)
         win.webContents.openDevTools();
+        // If you want to load a specific extension, use win.webContents.session.loadExtension(path)
     } else {
         win.loadFile(indexHtml);
     }
@@ -80,15 +79,6 @@ async function createWindow() {
     win.webContents.setWindowOpenHandler(({ url }) => {
         if (url.startsWith("https:")) shell.openExternal(url);
         return { action: "deny" };
-    });
-}
-
-// Enable Redux DevTools in development mode
-if (process.env.NODE_ENV !== "production") {
-    app.whenReady().then(() => {
-        installExtension(REDUX_DEVTOOLS)
-            .then((name) => console.log(`Added Extension:  ${name}`))
-            .catch((err) => console.log("An error occurred: ", err));
     });
 }
 

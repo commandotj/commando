@@ -1,7 +1,7 @@
 {
-    "name": "electron-vite-react",
+    "name": "commando",
     "version": "2.1.0",
-    "main": "dist-electron/main/index.js",
+    "main": "./dist-electron/main/index.js",
     "description": "Commando another alternative to Total Commander",
     "author": "Albert Li <albert_lee@hotmail.com>",
     "license": "MIT",
@@ -17,8 +17,9 @@
         "build": "tsc && vite build && electron-builder",
         "preview": "vite preview",
         "pree2e": "vite build --mode=test",
-        "e2e": "playwright test",
-        "test": "jest"
+        "e2e": "E2E_TEST=1 playwright test",
+        "test": "jest",
+        "postinstall": "playwright install --with-deps"
     },
     "devDependencies": {
         "@playwright/test": "^1.29.2",
