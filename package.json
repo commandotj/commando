@@ -69,6 +69,7 @@
         "@emotion/react": "^11.10.5",
         "@emotion/styled": "^11.10.5",
         "@reduxjs/toolkit": "^1.9.3",
+        "@tanstack/react-table": "^8.21.3",
         "@types/react-resizable": "^3.0.8",
         "antd": "^5.2.1",
         "framer-motion": "^9.0.2",

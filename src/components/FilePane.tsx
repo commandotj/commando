@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import type { ColumnsType } from "antd/es/table";
+import { ColumnDef } from "@tanstack/react-table";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { fetchDirectory } from "../app/fileManagerSlice";
 import { ResizableTable } from "./ResizableTable";
@@ -61,46 +61,52 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
         return () => window.removeEventListener("resize", updateHeight);
     }, []);
 
-    const columns: ColumnsType<FileEntry> = [
+    const columns: ColumnDef<FileEntry, any>[] = [
         {
-            title: "Name",
-            dataIndex: "name",
-            key: "name",
-            width: 200,
-            render: (text: string, record: FileEntry) => (
-                <a
-                    onClick={() => {
-                        if (!pane.currentPath) return;
-                        if (record.isDirectory) {
-                            const nextPath = joinPath(
-                                pane.currentPath,
-                                record.name
-                            );
-                            dispatch(
-                                fetchDirectory({ paneIndex, path: nextPath })
-                            );
-                        }
-                    }}
-                >
-                    {record.name}
-                </a>
-            ),
+            id: "name",
+            header: "Name",
+            accessorKey: "name",
+            size: 200,
+            cell: ({ row }) => {
+                const record = row.original;
+                return (
+                    <a
+                        onClick={() => {
+                            if (!pane.currentPath) return;
+                            if (record.isDirectory) {
+                                const nextPath = joinPath(
+                                    pane.currentPath,
+                                    record.name
+                                );
+                                dispatch(
+                                    fetchDirectory({
+                                        paneIndex,
+                                        path: nextPath,
+                                    })
+                                );
+                            }
+                        }}
+                    >
+                        {record.name}
+                    </a>
+                );
+            },
         },
         {
-            title: "Type",
-            dataIndex: "isDirectory",
-            key: "isDirectory",
-            width: 100,
-            render: (isDirectory: boolean) => (isDirectory ? "Folder" : "File"),
+            id: "isDirectory",
+            header: "Type",
+            accessorKey: "isDirectory",
+            size: 100,
+            cell: ({ getValue }) => (getValue() ? "Folder" : "File"),
         },
         {
-            title: "Size",
-            dataIndex: "size",
-            key: "size",
-            width: 100,
-            render: (size: number | undefined, record: FileEntry) =>
-                record.isDirectory ? "" : formatSize(size),
-            align: "right",
+            id: "size",
+            header: "Size",
+            accessorKey: "size",
+            size: 100,
+            cell: ({ row }) =>
+                row.original.isDirectory ? "" : formatSize(row.original.size),
+            meta: { align: "right" },
         },
     ];
 
