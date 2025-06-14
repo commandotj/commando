@@ -131,7 +131,7 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
     };
 
     return (
-        <div style={filePaneStyle}>
+        <div style={filePaneStyle} className="bg-test">
             {/* Header/Breadcrumb */}
             <div style={headerStyle}>
                 <PathBreadcrumb
@@ -152,11 +152,6 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                             ...entry,
                             key: idx,
                         }))}
-                    onColumnsChange={() => {}}
-                    pagination={false}
-                    rowSelection={rowSelection}
-                    size="small"
-                    scroll={{ y: tableHeight }}
                 />
             </div>
             {/* Footer/Status Bar */}

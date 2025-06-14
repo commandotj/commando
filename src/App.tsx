@@ -44,7 +44,7 @@ const App: React.FC = () => {
 
     return (
         <ThemeSwitcher>
-            <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
+            <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900">
                 {/* Main Content */}
                 <div className="flex-1 flex overflow-hidden">
                     <SplitterLayout primaryIndex={0} percentage>

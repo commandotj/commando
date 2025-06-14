@@ -1,6 +1,7 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
 import { ResizableTable } from "../ResizableTable";
+import { ColumnDef } from "@tanstack/react-table";
 
 // Mock window.matchMedia for Ant Design Table
 beforeAll(() => {
@@ -20,9 +21,17 @@ beforeAll(() => {
 });
 
 // Mock columns and data
-const columns = [
-    { title: "Name", dataIndex: "name", key: "name", width: 100 },
-    { title: "Size", dataIndex: "size", key: "size", width: 100 },
+const columns: ColumnDef<{ key: number; name: string; size: number }, any>[] = [
+    {
+        accessorKey: "name",
+        header: "Name",
+        size: 200,
+    },
+    {
+        accessorKey: "size",
+        header: "Size",
+        size: 100,
+    },
 ];
 const data = [
     { key: 1, name: "file1.txt", size: 123 },
@@ -36,11 +45,7 @@ describe("ResizableTable - Drag Overlay", () => {
         // For now, just render and check the overlay appears on drag start
         const handleColumnsChange = jest.fn();
         const { container } = render(
-            <ResizableTable
-                columns={columns}
-                dataSource={data}
-                onColumnsChange={handleColumnsChange}
-            />
+            <ResizableTable columns={columns} dataSource={data} />
         );
 
         // Find the resize handle (should be the last child of the first column header)
