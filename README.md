@@ -75,11 +75,11 @@ export default {
 - [dependencies vs devDependencies](https://github.com/electron-vite/vite-plugin-electron-renderer#dependencies-vs-devdependencies)
 - [C/C++ addons, Node.js modules - Pre-Bundling](https://github.com/electron-vite/vite-plugin-electron-renderer#dependency-pre-bundling)
 
-## 依赖管理与主题兼容性经验
+## Best Practice: Dependency Management & Theme Compatibility
 
-- 推荐使用 **npm** 作为唯一依赖管理工具，避免 yarn v1 或 pnpm。
-- Tailwind CSS 推荐使用 v3（如 3.4.0），与 npm 配合时所有 darkMode: 'class' 主题切换和 Tailwind 相关样式均能 100% 正常工作。
-- 避免使用 yarn v1 或 pnpm，可彻底规避 CLI、依赖冲突和 node_modules 结构兼容性问题。
-- 如遇主题切换、样式不生效、构建失败等问题，优先检查 Tailwind 版本和依赖管理工具。
+- Use **npm** as the only package manager. Avoid yarn v1 and pnpm to prevent compatibility issues.
+- Tailwind CSS v3 (e.g., 3.4.0) is recommended. With npm, all darkMode: 'class' theme switching and Tailwind styles work 100% reliably.
+- Avoid yarn v1 and pnpm to prevent CLI, dependency, and node_modules structure issues.
+- If you encounter problems with theme switching, missing styles, or build failures, first check your Tailwind version and package manager.
 
-> 经验总结：Tailwind v3 + npm 是 commando-react 项目当前最佳实践，后续开发者请严格遵循。
+> Summary: Tailwind v3 + npm is the proven best practice for the commando-react project. All contributors should strictly follow this guideline.

@@ -75,3 +75,12 @@ export default {
 ## 🍵 🍰 🍣 🍟
 
 <img width="270" src="https://github.com/caoxiemeihao/blog/blob/main/assets/$qrcode/$.png?raw=true">
+
+## 依赖管理与主题兼容性经验
+
+- 推荐使用 **npm** 作为唯一依赖管理工具，避免 yarn v1 或 pnpm。
+- Tailwind CSS 推荐使用 v3（如 3.4.0），与 npm 配合时所有 darkMode: 'class' 主题切换和 Tailwind 相关样式均能 100% 正常工作。
+- 避免使用 yarn v1 或 pnpm，可彻底规避 CLI、依赖冲突和 node_modules 结构兼容性问题。
+- 如遇主题切换、样式不生效、构建失败等问题，优先检查 Tailwind 版本和依赖管理工具。
+
+> 经验总结：Tailwind v3 + npm 是 commando-react 项目当前最佳实践，后续开发者请严格遵循。
