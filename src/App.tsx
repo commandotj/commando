@@ -1,55 +1,59 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useAppDispatch } from "./app/hooks";
 import SplitterLayout from "react-splitter-layout";
 import "react-splitter-layout/lib/index.css";
-import React from "react";
-import { ConfigProvider, Layout, Menu, theme } from "antd";
-import "antd/dist/reset.css";
 import "./App.scss";
 import FilePane from "./components/FilePane";
 import { fetchDirectory } from "./app/fileManagerSlice";
-const { Header, Content } = Layout;
+import ThemeSwitcher from "./components/ThemeSwitcher";
 
 const App: React.FC = () => {
     const dispatch = useAppDispatch();
-    const themeToken = theme.useToken();
 
     useEffect(() => {
         // @ts-ignore
         const homeDir = window.fsApi.getHomeDir();
         dispatch(fetchDirectory({ paneIndex: 0, path: homeDir }));
         dispatch(fetchDirectory({ paneIndex: 1, path: homeDir }));
+
+        // Listen for menu actions from Electron's native menu
+        if (window.menuApi?.onMenuAction) {
+            window.menuApi.onMenuAction((action: string) => {
+                switch (action) {
+                    case "new-tab":
+                        alert("New Tab (from native menu)");
+                        break;
+                    case "open":
+                        alert("Open... (from native menu)");
+                        break;
+                    case "save":
+                        alert("Save (from native menu)");
+                        break;
+                    case "reload":
+                        window.location.reload();
+                        break;
+                    case "toggle-fullscreen":
+                        alert("Toggle Full Screen (from native menu)");
+                        break;
+                    default:
+                        break;
+                }
+            });
+        }
     }, [dispatch]);
 
     return (
-        <ConfigProvider
-            theme={{
-                components: {
-                    Layout: {
-                        headerBg: "#00b96b",
-                    },
-                },
-            }}
-        >
-            <Layout>
-                <Header>
-                    <Menu
-                        mode="horizontal"
-                        defaultSelectedKeys={["2"]}
-                        items={new Array(3).fill(null).map((_, index) => ({
-                            key: String(index + 1),
-                            label: `nav ${index + 1}`,
-                        }))}
-                    />
-                </Header>
-                <Content>
+        <ThemeSwitcher>
+            <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
+                {/* Main Content */}
+                <div className="flex-1 flex overflow-hidden">
                     <SplitterLayout primaryIndex={0} percentage>
                         <FilePane paneIndex={0} />
                         <FilePane paneIndex={1} />
                     </SplitterLayout>
-                </Content>
-            </Layout>
-        </ConfigProvider>
+                </div>
+            </div>
+        </ThemeSwitcher>
     );
 };
 

@@ -1,10 +1,9 @@
-import { app, BrowserWindow, shell, ipcMain, screen } from "electron";
+import { app, BrowserWindow, shell, ipcMain, screen, Menu } from "electron";
 import { release } from "node:os";
 import { join } from "node:path";
 import fs from "fs";
 import path from "path";
 import { listDirSync } from "./listDir";
-import installExtension, { REDUX_DEVTOOLS } from "electron-devtools-installer";
 
 // The built directory structure
 //
@@ -44,6 +43,89 @@ const preload = join(__dirname, "../preload/index.js");
 const url = process.env.VITE_DEV_SERVER_URL;
 const indexHtml = join(process.env.DIST, "index.html");
 
+// --- Native OS App Menu ---
+const isMac = process.platform === "darwin";
+
+const template: Electron.MenuItemConstructorOptions[] = [
+    {
+        label: "File",
+        submenu: [
+            {
+                label: "New Tab",
+                accelerator: "CmdOrCtrl+N",
+                click: () => sendMenuAction("new-tab"),
+            },
+            {
+                label: "Open...",
+                accelerator: "CmdOrCtrl+O",
+                click: () => sendMenuAction("open"),
+            },
+            {
+                label: "Save",
+                accelerator: "CmdOrCtrl+S",
+                click: () => sendMenuAction("save"),
+            },
+            { type: "separator" as const },
+            isMac ? { role: "close" as const } : { role: "quit" as const },
+        ],
+    },
+    {
+        label: "Edit",
+        submenu: [
+            { role: "undo" as const },
+            { role: "redo" as const },
+            { type: "separator" as const },
+            { role: "cut" as const },
+            { role: "copy" as const },
+            { role: "paste" as const },
+            ...(isMac
+                ? [
+                      { role: "pasteAndMatchStyle" as const },
+                      { role: "delete" as const },
+                      { role: "selectAll" as const },
+                      { type: "separator" as const },
+                      {
+                          label: "Speech",
+                          submenu: [
+                              { role: "startSpeaking" as const },
+                              { role: "stopSpeaking" as const },
+                          ],
+                      },
+                  ]
+                : [
+                      { role: "delete" as const },
+                      { type: "separator" as const },
+                      { role: "selectAll" as const },
+                  ]),
+        ],
+    },
+    {
+        label: "View",
+        submenu: [
+            {
+                label: "Reload",
+                accelerator: "CmdOrCtrl+R",
+                click: () => sendMenuAction("reload"),
+            },
+            {
+                label: "Toggle Full Screen",
+                accelerator: "F11",
+                click: () => sendMenuAction("toggle-fullscreen"),
+            },
+            { role: "resetZoom" as const },
+            { role: "zoomIn" as const },
+            { role: "zoomOut" as const },
+        ],
+    },
+];
+
+function sendMenuAction(action: string) {
+    const win = BrowserWindow.getFocusedWindow();
+    if (win) {
+        win.webContents.send("menu-action", action);
+    }
+}
+
 async function createWindow() {
     const { width, height } = screen.getPrimaryDisplay().workAreaSize;
     win = new BrowserWindow({
@@ -60,10 +142,10 @@ async function createWindow() {
     });
 
     if (process.env.VITE_DEV_SERVER_URL) {
-        // electron-vite-vue#298
         win.loadURL(url);
-        // Open devTool if the app is not packaged
+        // In development, open DevTools (React DevTools is often built-in)
         win.webContents.openDevTools();
+        // If you want to load a specific extension, use win.webContents.session.loadExtension(path)
     } else {
         win.loadFile(indexHtml);
     }
@@ -83,16 +165,10 @@ async function createWindow() {
     });
 }
 
-// Enable Redux DevTools in development mode
-if (process.env.NODE_ENV !== "production") {
-    app.whenReady().then(() => {
-        installExtension(REDUX_DEVTOOLS)
-            .then((name) => console.log(`Added Extension:  ${name}`))
-            .catch((err) => console.log("An error occurred: ", err));
-    });
-}
-
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+    Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+    createWindow();
+});
 
 app.on("window-all-closed", () => {
     win = null;
