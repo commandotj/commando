@@ -60,9 +60,9 @@ export function ResizableTable<T extends object>({
     }, [table.getState().columnSizingInfo, table.getState().columnSizing]);
 
     return (
-        <div className="overflow-x-auto w-full">
+        <div className="w-full h-full min-w-0">
             <div
-                className="min-w-full border rounded bg-white dark:bg-gray-900"
+                className="w-full border rounded bg-white dark:bg-gray-900"
                 style={{
                     ...columnSizeVars,
                     width: table.getTotalSize(),

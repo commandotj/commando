@@ -6,37 +6,6 @@ import { ResizableTable } from "./ResizableTable";
 import { joinPath, formatSize } from "../common/path";
 import PathBreadcrumb from "./PathBreadcrumb";
 
-// --- CSS-in-JS styles ---
-const filePaneStyle: React.CSSProperties = {
-    display: "flex",
-    flexDirection: "column",
-    height: "calc(100vh - 64px)",
-};
-const headerStyle: React.CSSProperties = {
-    height: 32,
-    borderBottom: "1px solid #e5e7eb",
-    paddingLeft: 16,
-    paddingRight: 16,
-    display: "flex",
-    alignItems: "center",
-    flexShrink: 0,
-};
-const contentStyle: React.CSSProperties = {
-    flex: 1,
-    minHeight: 0,
-};
-const footerStyle: React.CSSProperties = {
-    height: 32,
-    borderTop: "1px solid #e5e7eb",
-    display: "flex",
-    alignItems: "center",
-    paddingLeft: 16,
-    paddingRight: 16,
-    fontSize: 14,
-    color: "#6b7280",
-    flexShrink: 0,
-};
-
 interface FileEntry {
     name: string;
     isDirectory: boolean;
@@ -131,16 +100,19 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
     };
 
     return (
-        <div style={filePaneStyle} className="bg-test">
+        <div className="flex flex-col h-full">
             {/* Header/Breadcrumb */}
-            <div style={headerStyle}>
+            <div className="h-8 border-b border-gray-200 dark:border-gray-700 px-4 flex items-center flex-shrink-0">
                 <PathBreadcrumb
                     path={pane.currentPath}
                     onClick={handleBreadcrumbClick}
                 />
             </div>
             {/* Content/Table */}
-            <div style={contentStyle} ref={contentRef}>
+            <div
+                className="flex-1 min-h-0 overflow-y-auto box-border"
+                ref={contentRef}
+            >
                 <ResizableTable
                     key={pane.currentPath}
                     columns={columns}
@@ -155,7 +127,7 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                 />
             </div>
             {/* Footer/Status Bar */}
-            <div style={footerStyle}>
+            <div className="flex items-center border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-300 px-4 py-0 h-auto leading-none">
                 {pane.entries.length} items, {selectedRowKeys.length} selected
             </div>
         </div>

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useAppDispatch } from "./app/hooks";
-import SplitterLayout from "react-splitter-layout";
-import "react-splitter-layout/lib/index.css";
+import SplitterLayout from "./components/SplitterLayout/SplitterLayout";
+import "./components/SplitterLayout/index.css";
 import "./App.scss";
 import FilePane from "./components/FilePane";
 import { fetchDirectory } from "./app/fileManagerSlice";
@@ -44,13 +44,15 @@ const App: React.FC = () => {
 
     return (
         <ThemeSwitcher>
-            <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900">
+            <div className="flex flex-col h-full w-full bg-white dark:bg-gray-900">
                 {/* Main Content */}
-                <div className="flex-1 flex overflow-hidden">
-                    <SplitterLayout primaryIndex={0} percentage>
-                        <FilePane paneIndex={0} />
-                        <FilePane paneIndex={1} />
-                    </SplitterLayout>
+                <div className="flex-1 flex h-full w-full overflow-hidden">
+                    <div className="h-full w-full overflow-hidden">
+                        <SplitterLayout primaryIndex={0} percentage>
+                            <FilePane paneIndex={0} />
+                            <FilePane paneIndex={1} />
+                        </SplitterLayout>
+                    </div>
                 </div>
             </div>
         </ThemeSwitcher>
