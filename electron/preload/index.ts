@@ -6,6 +6,13 @@ contextBridge.exposeInMainWorld("fsApi", {
     getHomeDir: () => os.homedir(),
 });
 
+// Expose menuApi for listening to menu actions
+contextBridge.exposeInMainWorld("menuApi", {
+    onMenuAction: (callback: (action: string) => void) => {
+        ipcRenderer.on("menu-action", (_event, action) => callback(action));
+    },
+});
+
 function domReady(
     condition: DocumentReadyState[] = ["complete", "interactive"]
 ) {

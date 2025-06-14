@@ -1,276 +1,148 @@
-import React, { useState, useRef } from "react";
+// NOTE: For best results, add the following CSS to your global styles (e.g., index.css):
+//
+// .resizer {
+//   position: absolute;
+//   right: 0;
+//   top: 0;
+//   bottom: 0;
+//   width: 6px;
+//   background: transparent;
+//   cursor: col-resize;
+//   user-select: none;
+//   touch-action: none;
+//   transition: background 0.2s;
+//   z-index: 10;
+// }
+// .resizer:hover,
+// .resizer.isResizing {
+//   background: #60a5fa; /* Tailwind blue-400 */
+// }
+
+import React from "react";
 import {
     useReactTable,
     getCoreRowModel,
     flexRender,
     ColumnDef,
-    ColumnResizeMode,
-    HeaderGroup,
-    Header,
-    Row,
-    Cell,
-    Table,
 } from "@tanstack/react-table";
-import {
-    DndContext,
-    useSensor,
-    useSensors,
-    PointerSensor,
-    DragStartEvent,
-    DragEndEvent,
-    DragMoveEvent,
-} from "@dnd-kit/core";
-import { ResizableTableOverlay } from "./ResizableTableOverlay";
 
 interface ResizableTableProps<T extends object> {
     columns: ColumnDef<T, any>[];
     dataSource: T[];
-    onColumnsChange?: (columns: ColumnDef<T, any>[]) => void;
-    pagination?: false | { pageSize: number };
-    rowSelection?: {
-        selectedRowKeys: React.Key[];
-        onChange: (selectedRowKeys: React.Key[]) => void;
-    };
-    size?: "small" | "middle" | "large";
-    scroll?: { y?: number | string };
 }
 
-export const ResizableTable = <T extends object>({
+export function ResizableTable<T extends object>({
     columns,
     dataSource,
-    onColumnsChange,
-    pagination,
-    rowSelection,
-    size,
-    scroll,
-}: ResizableTableProps<T>) => {
-    const [columnDefs, setColumnDefs] = useState<ColumnDef<T, any>[]>(columns);
-    const [activeResize, setActiveResize] = useState<string | null>(null);
-    const [currentWidth, setCurrentWidth] = useState<number>(0);
-    const initialWidthRef = useRef<number>(0);
-    const activeColumnRef = useRef<string | null>(null);
-    const [isDragging, setIsDragging] = useState(false);
-    const tableWrapperRef = useRef<HTMLDivElement>(null);
-    const [overlayX, setOverlayX] = useState<number | null>(null);
-    const initialOverlayXRef = useRef<number>(0);
-
-    // DnD-kit sensors
-    const sensors = useSensors(
-        useSensor(PointerSensor, {
-            activationConstraint: {
-                distance: 0,
-            },
-        })
-    );
-
-    // react-table instance
+}: ResizableTableProps<T>) {
     const table = useReactTable({
         data: dataSource,
-        columns: columnDefs,
+        columns,
+        columnResizeMode: "onChange",
         getCoreRowModel: getCoreRowModel(),
-        columnResizeMode: "onChange" as ColumnResizeMode,
-        onColumnSizingChange: (_updater: unknown) => {
-            setColumnDefs((old) => {
-                if (onColumnsChange) onColumnsChange(old);
-                return old;
-            });
+        defaultColumn: {
+            minSize: 60,
+            maxSize: 800,
         },
-        state: {},
     });
 
-    // DnD handlers for resizing
-    const handleDragStart = (event: DragStartEvent) => {
-        const { active } = event;
-        const columnKey = (active.id as string).replace("resize-", "");
-        const col = table
-            .getAllLeafColumns()
-            .find(
-                (c: ReturnType<typeof table.getAllLeafColumns>[number]) =>
-                    c.id === columnKey
-            );
-        if (col && tableWrapperRef.current) {
-            activeColumnRef.current = columnKey;
-            const initialWidth = col.getSize();
-            initialWidthRef.current = initialWidth;
-            setCurrentWidth(initialWidth);
-            setActiveResize(columnKey);
-            setIsDragging(true);
-            // Overlay positioning
-            const ths = tableWrapperRef.current.querySelectorAll(
-                "th[data-column-key]"
-            );
-            const th = Array.from(ths).find(
-                (th) => th.getAttribute("data-column-key") === columnKey
-            );
-            const wrapperRect = tableWrapperRef.current.getBoundingClientRect();
-            const scrollLeft = tableWrapperRef.current.scrollLeft || 0;
-            if (th) {
-                const rect = (th as HTMLElement).getBoundingClientRect();
-                const initialOverlayX =
-                    rect.right - wrapperRect.left + scrollLeft;
-                setOverlayX(initialOverlayX);
-                initialOverlayXRef.current = initialOverlayX;
-            }
+    // Compute CSS variables for column sizes
+    const columnSizeVars = React.useMemo(() => {
+        const headers = table.getFlatHeaders();
+        const colSizes: { [key: string]: number } = {};
+        for (let i = 0; i < headers.length; i++) {
+            const header = headers[i]!;
+            colSizes[`--header-${header.id}-size`] = header.getSize();
+            colSizes[`--col-${header.column.id}-size`] =
+                header.column.getSize();
         }
-    };
-
-    const handleDragEnd = (_event: DragEndEvent) => {
-        setActiveResize(null);
-        activeColumnRef.current = null;
-        setIsDragging(false);
-        setOverlayX(null);
-    };
-
-    const handleDragMove = (event: DragMoveEvent) => {
-        if (activeResize && activeColumnRef.current) {
-            const { delta } = event;
-            const newOverlayX = initialOverlayXRef.current + delta.x;
-            setOverlayX(newOverlayX);
-            // Column resizing logic
-            const minWidth = 50;
-            const col = table
-                .getAllLeafColumns()
-                .find(
-                    (c: ReturnType<typeof table.getAllLeafColumns>[number]) =>
-                        c.id === activeColumnRef.current
-                );
-            if (col) {
-                const newWidth = Math.max(
-                    minWidth,
-                    initialWidthRef.current + delta.x
-                );
-                col.setSize?.(newWidth);
-                setCurrentWidth(newWidth);
-            }
-        }
-    };
-
-    // Row selection logic
-    const handleRowSelect = (rowId: React.Key) => {
-        if (!rowSelection) return;
-        const selected = rowSelection.selectedRowKeys.includes(rowId)
-            ? rowSelection.selectedRowKeys.filter((k) => k !== rowId)
-            : [...rowSelection.selectedRowKeys, rowId];
-        rowSelection.onChange(selected);
-    };
+        return colSizes;
+    }, [table.getState().columnSizingInfo, table.getState().columnSizing]);
 
     return (
-        <DndContext
-            sensors={sensors}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-            onDragMove={handleDragMove}
-        >
+        <div className="overflow-x-auto w-full">
             <div
-                className="flex flex-col h-full"
-                ref={tableWrapperRef}
+                className="min-w-full border rounded bg-white dark:bg-gray-900"
                 style={{
-                    position: "relative",
-                    cursor: isDragging ? "col-resize" : "default",
+                    ...columnSizeVars,
+                    width: table.getTotalSize(),
                 }}
             >
-                <table className="min-w-full border-collapse table-fixed">
-                    <thead>
-                        {table
-                            .getHeaderGroups()
-                            .map((headerGroup: HeaderGroup<T>) => (
-                                <tr key={headerGroup.id}>
-                                    {headerGroup.headers.map(
-                                        (
-                                            header: Header<T, unknown>,
-                                            colIndex: number
-                                        ) => {
-                                            const isLastColumn =
-                                                colIndex ===
-                                                headerGroup.headers.length - 1;
-                                            const width = header.getSize();
-                                            return (
-                                                <th
-                                                    key={header.id}
-                                                    data-column-key={header.id}
-                                                    style={{
-                                                        position: "relative",
-                                                        width,
-                                                        transition: isDragging
-                                                            ? "none"
-                                                            : "width 0.2s ease",
-                                                        userSelect: isDragging
-                                                            ? "none"
-                                                            : undefined,
-                                                    }}
-                                                >
-                                                    {flexRender(
-                                                        header.column.columnDef
-                                                            .header,
-                                                        header.getContext()
-                                                    )}
-                                                    {/* Resize handle */}
-                                                    {!isLastColumn && (
-                                                        <div
-                                                            id={`resize-${header.id}`}
-                                                            style={{
-                                                                position:
-                                                                    "absolute",
-                                                                right: 0,
-                                                                top: 0,
-                                                                bottom: 0,
-                                                                width: "8px",
-                                                                cursor: "col-resize",
-                                                                backgroundColor:
-                                                                    isDragging &&
-                                                                    activeResize ===
-                                                                        header.id
-                                                                        ? "#1890ff33"
-                                                                        : "transparent",
-                                                                transition:
-                                                                    "background-color 0.2s ease",
-                                                                zIndex: 2,
-                                                            }}
-                                                            tabIndex={0}
-                                                            role="separator"
-                                                            aria-orientation="vertical"
-                                                            aria-label="Resize column"
-                                                            // dnd-kit drag handle
-                                                            {...{
-                                                                "data-dnd-kit":
-                                                                    true,
-                                                                "data-resize-handle":
-                                                                    true,
-                                                            }}
-                                                        />
-                                                    )}
-                                                </th>
-                                            );
-                                        }
+                {/* Table Head */}
+                <div className="thead">
+                    {table.getHeaderGroups().map((headerGroup) => (
+                        <div key={headerGroup.id} className="tr flex">
+                            {headerGroup.headers.map((header) => (
+                                <div
+                                    key={header.id}
+                                    className="th group flex items-center font-semibold text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 px-2 py-2 select-none whitespace-nowrap relative"
+                                    style={{
+                                        width: `calc(var(--header-${header.id}-size) * 1px)`,
+                                        minWidth:
+                                            header.column.columnDef.minSize ??
+                                            60,
+                                        maxWidth:
+                                            header.column.columnDef.maxSize ??
+                                            800,
+                                    }}
+                                >
+                                    {header.isPlaceholder
+                                        ? null
+                                        : flexRender(
+                                              header.column.columnDef.header,
+                                              header.getContext()
+                                          )}
+                                    {/* Resize handle */}
+                                    {header.column.getCanResize() && (
+                                        <div
+                                            onMouseDown={header.getResizeHandler()}
+                                            onTouchStart={header.getResizeHandler()}
+                                            onDoubleClick={() =>
+                                                header.column.resetSize?.()
+                                            }
+                                            className={
+                                                "absolute right-0 top-0 bottom-0 w-2 cursor-col-resize z-10 bg-gray-200/50 dark:bg-gray-700/50 hover:bg-blue-300 dark:hover:bg-blue-800 transition-colors duration-150" +
+                                                (header.column.getIsResizing()
+                                                    ? " bg-blue-400 dark:bg-blue-700"
+                                                    : "")
+                                            }
+                                            tabIndex={0}
+                                            role="separator"
+                                            aria-orientation="vertical"
+                                            aria-label="Resize column"
+                                            data-resize-handle={true}
+                                        />
                                     )}
-                                </tr>
+                                </div>
                             ))}
-                    </thead>
-                    <tbody>
-                        {table.getRowModel().rows.map((row: Row<T>) => (
-                            <tr key={row.id} className="hover:bg-gray-50">
-                                {row
-                                    .getVisibleCells()
-                                    .map((cell: Cell<T, unknown>) => (
-                                        <td
-                                            key={cell.id}
-                                            className="truncate px-2 py-1 border-b border-gray-200"
-                                        >
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext()
-                                            )}
-                                        </td>
-                                    ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                {/* Overlay for resizing */}
-                {activeResize && (
-                    <ResizableTableOverlay active={true} overlayX={overlayX} />
-                )}
+                        </div>
+                    ))}
+                </div>
+                {/* Table Body */}
+                <div className="tbody">
+                    {table.getRowModel().rows.map((row) => (
+                        <div
+                            key={row.id}
+                            className="tr flex hover:bg-gray-50 dark:hover:bg-gray-800"
+                        >
+                            {row.getVisibleCells().map((cell) => (
+                                <div
+                                    key={cell.id}
+                                    className="td truncate px-2 py-1 border-b border-gray-200 dark:border-gray-700"
+                                    style={{
+                                        width: `calc(var(--col-${cell.column.id}-size) * 1px)`,
+                                    }}
+                                >
+                                    {flexRender(
+                                        cell.column.columnDef.cell,
+                                        cell.getContext()
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    ))}
+                </div>
             </div>
-        </DndContext>
+        </div>
     );
-};
+}
