@@ -55,6 +55,7 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                                 );
                             }
                         }}
+                        className="cursor-pointer hover:underline text-blue-700 dark:text-blue-400"
                     >
                         {record.name}
                     </a>
