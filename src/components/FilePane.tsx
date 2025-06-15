@@ -190,7 +190,7 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                 />
             </div>
             {/* Footer/Status Bar */}
-            <div className="flex items-center border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-300 px-4 py-0 h-auto leading-none">
+            <div className="flex items-center border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-300 px-4 py-0 h-[2rem] leading-none">
                 {pane.entries.length} items, 已选中 {selectedRowKeys.length} 项
             </div>
         </div>

@@ -1,3 +1,14 @@
+:root {
+    --splitter-bg: #ccc;
+    --splitter-hover: #bbb;
+    --splitter-active: #aaa;
+}
+.dark {
+    --splitter-bg: #444c56;
+    --splitter-hover: #5c6370;
+    --splitter-active: #23272f;
+}
+
 .splitter-layout {
     position: absolute;
     display: flex;
@@ -22,11 +33,12 @@
     width: 4px;
     height: 100%;
     cursor: col-resize;
-    background-color: #ccc;
+    background-color: var(--splitter-bg);
+    transition: background 0.2s;
 }
 
 .splitter-layout .layout-splitter:hover {
-    background-color: #bbb;
+    background-color: var(--splitter-hover);
 }
 
 .splitter-layout.layout-changing {
@@ -34,7 +46,7 @@
 }
 
 .splitter-layout.layout-changing > .layout-splitter {
-    background-color: #aaa;
+    background-color: var(--splitter-active);
 }
 
 .splitter-layout.splitter-layout-vertical {

@@ -25,6 +25,8 @@ import {
     flexRender,
     ColumnDef,
 } from "@tanstack/react-table";
+import SimpleBar from 'simplebar-react';
+import 'simplebar/dist/simplebar.min.css';
 
 interface ResizableTableProps<T extends object> {
     columns: ColumnDef<T, any>[];
@@ -230,74 +232,68 @@ export function ResizableTable<T extends object>({
                     </div>
                 </div>
             </div>
-            {/* Body 区域，独立滚动，支持横向滚动 */}
-            <div
-                ref={bodyRef}
-                className="w-full flex-1 min-h-0 overflow-y-auto overflow-x-auto"
+            {/* Body 区域，集成 simplebar，去除多余边框/圆角类 */}
+            <SimpleBar
+                scrollableNodeProps={{ ref: bodyRef }}
+                className="flex-1 min-h-0 w-full"
+                style={{ ...columnSizeVars }}
+                autoHide={false}
             >
-                <div
-                    className="w-full border-x border-b rounded-b bg-white dark:bg-gray-900"
-                    style={{
-                        ...columnSizeVars,
-                        width: "100%",
-                    }}
-                >
-                    <div className="tbody">
-                        {table.getRowModel().rows.map((row, idx) => (
+                <div className="tbody">
+                    {table.getRowModel().rows.map((row, idx) => (
+                        <div
+                            key={row.id}
+                            className={
+                                "tr flex hover:bg-gray-50 dark:hover:bg-gray-800" +
+                                (selectedRowKeys.includes(
+                                    getRowKey(dataSource[idx], idx)
+                                )
+                                    ? " bg-blue-100 dark:bg-blue-900/40 border-l-4 border-blue-400 dark:border-blue-500"
+                                    : "")
+                            }
+                        >
+                            {/* 多选列 */}
                             <div
-                                key={row.id}
-                                className={
-                                    "tr flex hover:bg-gray-50 dark:hover:bg-gray-800" +
-                                    (selectedRowKeys.includes(
-                                        getRowKey(dataSource[idx], idx)
-                                    )
-                                        ? " bg-blue-100 dark:bg-blue-900/40 border-l-4 border-blue-400 dark:border-blue-500"
-                                        : "")
-                                }
+                                className="td flex items-center justify-center px-2 py-1 border-b border-gray-200 dark:border-gray-700"
+                                style={{ width: 36, flex: "0 0 36px" }}
                             >
-                                {/* 多选列 */}
-                                <div
-                                    className="td flex items-center justify-center px-2 py-1 border-b border-gray-200 dark:border-gray-700"
-                                    style={{ width: 36, flex: "0 0 36px" }}
-                                >
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedRowKeys.includes(
-                                            getRowKey(dataSource[idx], idx)
-                                        )}
-                                        onChange={(e) =>
-                                            handleCheckboxChange(idx, e)
-                                        }
-                                        onClick={(e) => e.stopPropagation()}
-                                        aria-label="Select row"
-                                        className="form-checkbox h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:checked:bg-blue-500 dark:checked:border-blue-500 focus:ring-blue-500 focus:ring-2 transition-colors"
-                                    />
-                                </div>
-                                {row.getVisibleCells().map((cell) => (
-                                    <div
-                                        key={cell.id}
-                                        className="td truncate px-2 py-1 border-b border-gray-200 dark:border-gray-700"
-                                        style={{
-                                            flex: `0 0 calc(var(--col-${cell.column.id}-size) * 1px)`,
-                                            minWidth:
-                                                cell.column.columnDef.minSize ??
-                                                60,
-                                            maxWidth:
-                                                cell.column.columnDef.maxSize ??
-                                                800,
-                                        }}
-                                    >
-                                        {flexRender(
-                                            cell.column.columnDef.cell,
-                                            cell.getContext()
-                                        )}
-                                    </div>
-                                ))}
+                                <input
+                                    type="checkbox"
+                                    checked={selectedRowKeys.includes(
+                                        getRowKey(dataSource[idx], idx)
+                                    )}
+                                    onChange={(e) =>
+                                        handleCheckboxChange(idx, e)
+                                    }
+                                    onClick={(e) => e.stopPropagation()}
+                                    aria-label="Select row"
+                                    className="form-checkbox h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:checked:bg-blue-500 dark:checked:border-blue-500 focus:ring-blue-500 focus:ring-2 transition-colors"
+                                />
                             </div>
-                        ))}
-                    </div>
+                            {row.getVisibleCells().map((cell) => (
+                                <div
+                                    key={cell.id}
+                                    className="td truncate px-2 py-1 border-b border-gray-200 dark:border-gray-700"
+                                    style={{
+                                        flex: `0 0 calc(var(--col-${cell.column.id}-size) * 1px)`,
+                                        minWidth:
+                                            cell.column.columnDef.minSize ??
+                                            60,
+                                        maxWidth:
+                                            cell.column.columnDef.maxSize ??
+                                            800,
+                                    }}
+                                >
+                                    {flexRender(
+                                        cell.column.columnDef.cell,
+                                        cell.getContext()
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    ))}
                 </div>
-            </div>
+            </SimpleBar>
         </div>
     );
 }
