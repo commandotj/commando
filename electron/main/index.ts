@@ -4,6 +4,10 @@ import { join } from "node:path";
 import { registerIpcHandlers } from "./ipc";
 import { createWindow } from "./window";
 import { getMenuTemplate } from "./menu";
+// @ts-ignore
+import i18next from "i18next";
+import enUS from "./i18n/en-US.json";
+import zhCN from "./i18n/zh-CN.json";
 
 // The built directory structure
 //
@@ -93,12 +97,30 @@ function sendMenuAction(action: string) {
     }
 }
 
-app.whenReady().then(() => {
-    Menu.setApplicationMenu(
-        Menu.buildFromTemplate(getMenuTemplate({ config, locale, theme }))
-    );
-    createWindow({ preload, url, indexHtml, env });
-});
+async function initI18n() {
+    await i18next.init({
+        lng: "zh-CN", // 默认语言，可根据系统或配置动态设置
+        fallbackLng: "en-US",
+        resources: {
+            "en-US": { translation: enUS },
+            "zh-CN": { translation: zhCN },
+        },
+    });
+}
+
+(async () => {
+    await initI18n();
+    app.whenReady().then(() => {
+        Menu.setApplicationMenu(Menu.buildFromTemplate(getMenuTemplate({})));
+        createWindow({ preload, url, indexHtml, env });
+    });
+
+    // 支持运行时切换语言
+    ipcMain.handle("set-language", async (_event, lang) => {
+        await i18next.changeLanguage(lang);
+        Menu.setApplicationMenu(Menu.buildFromTemplate(getMenuTemplate({})));
+    });
+})();
 
 app.on("window-all-closed", () => {
     win = null;

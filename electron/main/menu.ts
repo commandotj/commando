@@ -1,4 +1,6 @@
 import { Menu, BrowserWindow } from "electron";
+// @ts-ignore
+import i18next from "i18next";
 
 // 默认 i18n 资源
 const defaultLocale = {
@@ -46,99 +48,123 @@ const defaultTheme = {
 
 export function getMenuTemplate({
     config = defaultConfig,
-    locale = defaultLocale,
     theme = defaultTheme,
 } = {}) {
     const platform = (process as any).platform;
     const template = [
         {
-            label: locale.file,
+            label: i18next.t("menu.file.label"),
             submenu: [
                 {
-                    label: locale.newTab,
+                    label: i18next.t("menu.file.newTab"),
                     accelerator: config.shortcutNewTab,
                     visible: config.showNewTab,
                     click: () => sendMenuAction("new-tab"),
                 },
                 {
-                    label: locale.open,
+                    label: i18next.t("menu.file.open"),
                     accelerator: config.shortcutOpen,
                     visible: config.showOpen,
                     click: () => sendMenuAction("open"),
                 },
                 {
-                    label: locale.save,
+                    label: i18next.t("menu.file.save"),
                     accelerator: config.shortcutSave,
                     visible: config.showSave,
                     click: () => sendMenuAction("save"),
                 },
                 { type: "separator" as const },
                 platform === "darwin"
-                    ? { label: locale.close, role: "close" as const }
-                    : { label: locale.quit, role: "quit" as const },
+                    ? {
+                          label: i18next.t("menu.file.close"),
+                          role: "close" as const,
+                      }
+                    : {
+                          label: i18next.t("menu.file.quit"),
+                          role: "quit" as const,
+                      },
             ],
         },
         {
-            label: locale.edit,
+            label: i18next.t("menu.edit.label"),
             submenu: [
-                { label: locale.undo, role: "undo" as const },
-                { label: locale.redo, role: "redo" as const },
+                { label: i18next.t("menu.edit.undo"), role: "undo" as const },
+                { label: i18next.t("menu.edit.redo"), role: "redo" as const },
                 { type: "separator" as const },
-                { label: locale.cut, role: "cut" as const },
-                { label: locale.copy, role: "copy" as const },
-                { label: locale.paste, role: "paste" as const },
+                { label: i18next.t("menu.edit.cut"), role: "cut" as const },
+                { label: i18next.t("menu.edit.copy"), role: "copy" as const },
+                { label: i18next.t("menu.edit.paste"), role: "paste" as const },
                 ...(platform === "darwin"
                     ? [
                           {
-                              label: locale.pasteAndMatchStyle,
+                              label: i18next.t("menu.edit.pasteAndMatchStyle"),
                               role: "pasteAndMatchStyle" as const,
                           },
-                          { label: locale.delete, role: "delete" as const },
                           {
-                              label: locale.selectAll,
+                              label: i18next.t("menu.edit.delete"),
+                              role: "delete" as const,
+                          },
+                          {
+                              label: i18next.t("menu.edit.selectAll"),
                               role: "selectAll" as const,
                           },
                           { type: "separator" as const },
                           {
-                              label: locale.speech,
+                              label: i18next.t("menu.edit.speech"),
                               submenu: [
                                   {
-                                      label: locale.startSpeaking,
+                                      label: i18next.t(
+                                          "menu.edit.startSpeaking"
+                                      ),
                                       role: "startSpeaking" as const,
                                   },
                                   {
-                                      label: locale.stopSpeaking,
+                                      label: i18next.t(
+                                          "menu.edit.stopSpeaking"
+                                      ),
                                       role: "stopSpeaking" as const,
                                   },
                               ],
                           },
                       ]
                     : [
-                          { label: locale.delete, role: "delete" as const },
+                          {
+                              label: i18next.t("menu.edit.delete"),
+                              role: "delete" as const,
+                          },
                           { type: "separator" as const },
                           {
-                              label: locale.selectAll,
+                              label: i18next.t("menu.edit.selectAll"),
                               role: "selectAll" as const,
                           },
                       ]),
             ],
         },
         {
-            label: locale.view,
+            label: i18next.t("menu.view.label"),
             submenu: [
                 {
-                    label: locale.reload,
+                    label: i18next.t("menu.view.reload"),
                     accelerator: "CmdOrCtrl+R",
                     click: () => sendMenuAction("reload"),
                 },
                 {
-                    label: locale.toggleFullscreen,
+                    label: i18next.t("menu.view.toggleFullscreen"),
                     accelerator: "F11",
                     click: () => sendMenuAction("toggle-fullscreen"),
                 },
-                { label: locale.resetZoom, role: "resetZoom" as const },
-                { label: locale.zoomIn, role: "zoomIn" as const },
-                { label: locale.zoomOut, role: "zoomOut" as const },
+                {
+                    label: i18next.t("menu.view.resetZoom"),
+                    role: "resetZoom" as const,
+                },
+                {
+                    label: i18next.t("menu.view.zoomIn"),
+                    role: "zoomIn" as const,
+                },
+                {
+                    label: i18next.t("menu.view.zoomOut"),
+                    role: "zoomOut" as const,
+                },
             ],
         },
     ];
@@ -149,7 +175,9 @@ export function getMenuTemplate({
     // 导致"文件"菜单项消失。正确做法是在 macOS 下首位插入 { role: 'appMenu' }，
     // 这样"文件"、"编辑"、"视图"等自定义菜单才会独立显示，顺序与原生应用一致。
     return [
-        ...(platform === "darwin" ? [{ role: "appMenu" }] : []),
+        ...(platform === "darwin"
+            ? [{ role: "appMenu" } as Electron.MenuItemConstructorOptions]
+            : []),
         ...template,
     ];
 }
