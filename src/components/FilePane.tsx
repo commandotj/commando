@@ -5,11 +5,13 @@ import { fetchDirectory } from "../app/fileManagerSlice";
 import { ResizableTable } from "./ResizableTable";
 import { joinPath, formatSize } from "../common/path";
 import PathBreadcrumb from "./PathBreadcrumb";
+import DeviceBar, { DeviceInfo } from "./DeviceBar";
 
 interface FileEntry {
     name: string;
     isDirectory: boolean;
     size?: number;
+    mtime?: number;
 }
 
 const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
@@ -18,6 +20,7 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const contentRef = useRef<HTMLDivElement>(null);
     const [tableHeight, setTableHeight] = useState<number>(400);
+    const [devices, setDevices] = useState<DeviceInfo[]>([]);
 
     useEffect(() => {
         function updateHeight() {
@@ -28,6 +31,41 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
         updateHeight();
         window.addEventListener("resize", updateHeight);
         return () => window.removeEventListener("resize", updateHeight);
+    }, []);
+
+    useEffect(() => {
+        window.fsApi.listDrives().then((data) => {
+            // 只保留逻辑磁盘
+            const filterLogicalDisks = (devices: DeviceInfo[]) =>
+                devices
+                    .map((dev) => ({
+                        ...dev,
+                        mountpoints: dev.mountpoints.filter(
+                            (mp) =>
+                                (mp.path === "/" ||
+                                    mp.path.startsWith("/Volumes/")) &&
+                                !/^\/Volumes\/(Preboot|Recovery|VM)$/.test(
+                                    mp.path
+                                ) &&
+                                !mp.path.startsWith("/System/Volumes/")
+                        ),
+                    }))
+                    .filter((dev) => dev.mountpoints.length > 0);
+            let logicalDisks = filterLogicalDisks(data);
+            // 全局去重挂载点 path
+            const seen = new Set<string>();
+            logicalDisks = logicalDisks
+                .map((dev) => ({
+                    ...dev,
+                    mountpoints: dev.mountpoints.filter((mp) => {
+                        if (seen.has(mp.path)) return false;
+                        seen.add(mp.path);
+                        return true;
+                    }),
+                }))
+                .filter((dev) => dev.mountpoints.length > 0);
+            setDevices(logicalDisks);
+        });
     }, []);
 
     const columns: ColumnDef<FileEntry, any>[] = [
@@ -63,11 +101,16 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
             },
         },
         {
-            id: "isDirectory",
-            header: "Type",
-            accessorKey: "isDirectory",
-            size: 100,
-            cell: ({ getValue }) => (getValue() ? "Folder" : "File"),
+            id: "mtime",
+            header: "Date Modified",
+            accessorKey: "mtime",
+            size: 180,
+            cell: ({ row }) => {
+                const mtime = row.original.mtime;
+                if (!mtime) return "";
+                const date = new Date(mtime);
+                return date.toLocaleString();
+            },
         },
         {
             id: "size",
@@ -77,6 +120,13 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
             cell: ({ row }) =>
                 row.original.isDirectory ? "" : formatSize(row.original.size),
             meta: { align: "right" },
+        },
+        {
+            id: "isDirectory",
+            header: "Type",
+            accessorKey: "isDirectory",
+            size: 100,
+            cell: ({ getValue }) => (getValue() ? "Folder" : "File"),
         },
     ];
 
@@ -100,8 +150,18 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
         dispatch(fetchDirectory({ paneIndex, path: newPath }));
     };
 
+    const handleDeviceClick = (mountPath: string) => {
+        dispatch(fetchDirectory({ paneIndex, path: mountPath }));
+    };
+
     return (
         <div className="flex flex-col h-full">
+            {/* DeviceBar 设备栏 */}
+            <DeviceBar
+                devices={devices}
+                currentPath={pane.currentPath}
+                onDeviceClick={handleDeviceClick}
+            />
             {/* Header/Breadcrumb */}
             <div className="h-8 border-b border-gray-200 dark:border-gray-700 px-4 flex items-center flex-shrink-0">
                 <PathBreadcrumb
@@ -125,11 +185,13 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                             ...entry,
                             key: idx,
                         }))}
+                    selectedRowKeys={selectedRowKeys}
+                    onRowSelectionChange={setSelectedRowKeys}
                 />
             </div>
             {/* Footer/Status Bar */}
             <div className="flex items-center border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-300 px-4 py-0 h-auto leading-none">
-                {pane.entries.length} items, {selectedRowKeys.length} selected
+                {pane.entries.length} items, 已选中 {selectedRowKeys.length} 项
             </div>
         </div>
     );

@@ -4,6 +4,7 @@ const os = require("os");
 contextBridge.exposeInMainWorld("fsApi", {
     listDir: (path: string) => ipcRenderer.invoke("list-dir", path),
     getHomeDir: () => os.homedir(),
+    listDrives: () => ipcRenderer.invoke("list-drives"),
 });
 
 // Expose menuApi for listening to menu actions

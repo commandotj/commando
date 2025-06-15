@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Theme } from "@radix-ui/themes";
+import { SunIcon, MoonIcon } from "@radix-ui/react-icons";
 
 const THEME_KEY = "app-theme";
 
@@ -32,35 +33,9 @@ export default function ThemeSwitcher({
                 aria-label="Toggle theme"
             >
                 {theme === "dark" ? (
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 text-yellow-300"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.07l-.71.71M21 12h-1M4 12H3m16.66 5.66l-.71-.71M4.05 4.93l-.71-.71M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                        />
-                    </svg>
+                    <SunIcon className="h-5 w-5 text-yellow-300" />
                 ) : (
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 text-gray-800"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"
-                        />
-                    </svg>
+                    <MoonIcon className="h-5 w-5 text-gray-800" />
                 )}
             </button>
             {children}

@@ -1,9 +1,9 @@
 import { app, BrowserWindow, shell, ipcMain, screen, Menu } from "electron";
 import { release } from "node:os";
 import { join } from "node:path";
-import fs from "fs";
-import path from "path";
-import { listDirSync } from "./listDir";
+import { registerIpcHandlers } from "./ipc";
+import { createWindow } from "./window";
+import { getMenuTemplate } from "./menu";
 
 // The built directory structure
 //
@@ -15,21 +15,21 @@ import { listDirSync } from "./listDir";
 // ├─┬ dist
 // │ └── index.html    > Electron-Renderer
 //
-process.env.DIST_ELECTRON = join(__dirname, "../");
-process.env.DIST = join(process.env.DIST_ELECTRON, "../dist");
-process.env.PUBLIC = process.env.VITE_DEV_SERVER_URL
-    ? join(process.env.DIST_ELECTRON, "../public")
-    : process.env.DIST;
+(process as any).env.DIST_ELECTRON = join(__dirname, "../");
+(process as any).env.DIST = join((process as any).env.DIST_ELECTRON, "../dist");
+(process as any).env.PUBLIC = (process as any).env.VITE_DEV_SERVER_URL
+    ? join((process as any).env.DIST_ELECTRON, "../public")
+    : (process as any).env.DIST;
 
 // Disable GPU Acceleration for Windows 7
 if (release().startsWith("6.1")) app.disableHardwareAcceleration();
 
 // Set application name for Windows 10+ notifications
-if (process.platform === "win32") app.setAppUserModelId(app.getName());
+if ((process as any).platform === "win32") app.setAppUserModelId(app.getName());
 
 if (!app.requestSingleInstanceLock()) {
     app.quit();
-    process.exit(0);
+    (process as any).exit(0);
 }
 
 // Remove electron security warnings
@@ -40,84 +40,51 @@ if (!app.requestSingleInstanceLock()) {
 let win: BrowserWindow | null = null;
 // Here, you can also use other preload
 const preload = join(__dirname, "../preload/index.js");
-const url = process.env.VITE_DEV_SERVER_URL;
-const indexHtml = join(process.env.DIST, "index.html");
+const url = (process as any).env.VITE_DEV_SERVER_URL;
+const indexHtml = join((process as any).env.DIST, "index.html");
+const env = (process as any).env;
 
 // --- Native OS App Menu ---
-const isMac = process.platform === "darwin";
+const isMac = (process as any).platform === "darwin";
 
-const template: Electron.MenuItemConstructorOptions[] = [
-    {
-        label: "File",
-        submenu: [
-            {
-                label: "New Tab",
-                accelerator: "CmdOrCtrl+N",
-                click: () => sendMenuAction("new-tab"),
-            },
-            {
-                label: "Open...",
-                accelerator: "CmdOrCtrl+O",
-                click: () => sendMenuAction("open"),
-            },
-            {
-                label: "Save",
-                accelerator: "CmdOrCtrl+S",
-                click: () => sendMenuAction("save"),
-            },
-            { type: "separator" as const },
-            isMac ? { role: "close" as const } : { role: "quit" as const },
-        ],
-    },
-    {
-        label: "Edit",
-        submenu: [
-            { role: "undo" as const },
-            { role: "redo" as const },
-            { type: "separator" as const },
-            { role: "cut" as const },
-            { role: "copy" as const },
-            { role: "paste" as const },
-            ...(isMac
-                ? [
-                      { role: "pasteAndMatchStyle" as const },
-                      { role: "delete" as const },
-                      { role: "selectAll" as const },
-                      { type: "separator" as const },
-                      {
-                          label: "Speech",
-                          submenu: [
-                              { role: "startSpeaking" as const },
-                              { role: "stopSpeaking" as const },
-                          ],
-                      },
-                  ]
-                : [
-                      { role: "delete" as const },
-                      { type: "separator" as const },
-                      { role: "selectAll" as const },
-                  ]),
-        ],
-    },
-    {
-        label: "View",
-        submenu: [
-            {
-                label: "Reload",
-                accelerator: "CmdOrCtrl+R",
-                click: () => sendMenuAction("reload"),
-            },
-            {
-                label: "Toggle Full Screen",
-                accelerator: "F11",
-                click: () => sendMenuAction("toggle-fullscreen"),
-            },
-            { role: "resetZoom" as const },
-            { role: "zoomIn" as const },
-            { role: "zoomOut" as const },
-        ],
-    },
-];
+// 示例：动态配置、i18n、主题对象（实际可从配置文件、store、全局状态等获取）
+const config = {
+    shortcutNewTab: "CmdOrCtrl+N",
+    shortcutOpen: "CmdOrCtrl+O",
+    shortcutSave: "CmdOrCtrl+S",
+    showNewTab: true,
+    showOpen: true,
+    showSave: true,
+};
+const locale = {
+    file: "文件",
+    newTab: "新建标签页",
+    open: "打开...",
+    save: "保存",
+    close: "关闭",
+    quit: "退出",
+    edit: "编辑",
+    undo: "撤销",
+    redo: "重做",
+    cut: "剪切",
+    copy: "复制",
+    paste: "粘贴",
+    pasteAndMatchStyle: "粘贴并匹配样式",
+    delete: "删除",
+    selectAll: "全选",
+    speech: "语音",
+    startSpeaking: "开始朗读",
+    stopSpeaking: "停止朗读",
+    view: "视图",
+    reload: "重新加载",
+    toggleFullscreen: "切换全屏",
+    resetZoom: "重置缩放",
+    zoomIn: "放大",
+    zoomOut: "缩小",
+};
+const theme = {
+    iconType: "dark", // 示例，可扩展更多主题属性
+};
 
 function sendMenuAction(action: string) {
     const win = BrowserWindow.getFocusedWindow();
@@ -126,53 +93,16 @@ function sendMenuAction(action: string) {
     }
 }
 
-async function createWindow() {
-    const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-    win = new BrowserWindow({
-        title: "Main window",
-        icon: join(process.env.PUBLIC, "favicon.ico"),
-        width: (width * 2) / 3,
-        height: height - 200,
-        webPreferences: {
-            preload,
-            contextIsolation: true,
-            nodeIntegration: false,
-            sandbox: false,
-        },
-    });
-
-    if (process.env.VITE_DEV_SERVER_URL) {
-        win.loadURL(url);
-        // In development, open DevTools (React DevTools is often built-in)
-        win.webContents.openDevTools();
-        // If you want to load a specific extension, use win.webContents.session.loadExtension(path)
-    } else {
-        win.loadFile(indexHtml);
-    }
-
-    // Test actively push message to the Electron-Renderer
-    win.webContents.on("did-finish-load", () => {
-        win?.webContents.send(
-            "main-process-message",
-            new Date().toLocaleString()
-        );
-    });
-
-    // Make all links open with the browser, not with the application
-    win.webContents.setWindowOpenHandler(({ url }) => {
-        if (url.startsWith("https:")) shell.openExternal(url);
-        return { action: "deny" };
-    });
-}
-
 app.whenReady().then(() => {
-    Menu.setApplicationMenu(Menu.buildFromTemplate(template));
-    createWindow();
+    Menu.setApplicationMenu(
+        Menu.buildFromTemplate(getMenuTemplate({ config, locale, theme }))
+    );
+    createWindow({ preload, url, indexHtml, env });
 });
 
 app.on("window-all-closed", () => {
     win = null;
-    if (process.platform !== "darwin") app.quit();
+    if ((process as any).platform !== "darwin") app.quit();
 });
 
 app.on("second-instance", () => {
@@ -188,33 +118,12 @@ app.on("activate", () => {
     if (allWindows.length) {
         allWindows[0].focus();
     } else {
-        createWindow();
+        createWindow({ preload, url, indexHtml, env });
     }
 });
 
-// New window example arg: new windows url
-ipcMain.handle("open-win", (_, arg) => {
-    const childWindow = new BrowserWindow({
-        webPreferences: {
-            preload,
-            contextIsolation: true,
-            nodeIntegration: false,
-            sandbox: false,
-        },
-    });
+registerIpcHandlers({ preload, url, indexHtml, env });
 
-    if (process.env.VITE_DEV_SERVER_URL) {
-        childWindow.loadURL(`${url}#${arg}`);
-    } else {
-        childWindow.loadFile(indexHtml, { hash: arg });
-    }
-});
-
-// IPC handler for directory listing
-ipcMain.handle("list-dir", async (_event, dirPath) => {
-    try {
-        return listDirSync(dirPath);
-    } catch (err) {
-        return [];
-    }
-});
+// 预留：监听配置、语言、主题变化事件，动态刷新菜单
+// 例如：eventEmitter.on('localeChanged', (newLocale) => { ... })
+// Menu.setApplicationMenu(Menu.buildFromTemplate(getMenuTemplate({ config, locale: newLocale, theme })));

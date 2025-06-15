@@ -251,4 +251,61 @@ describe("FilePane", () => {
             expect(mockDispatch).toHaveBeenCalled();
         });
     });
+
+    it("supports Ctrl/Cmd 增量多选和取消选择", () => {
+        render(
+            <Provider store={store}>
+                <FilePane paneIndex={0} />
+            </Provider>
+        );
+        const checkboxes = screen.getAllByRole("checkbox");
+        const rowCheckbox1 = checkboxes[1];
+        const rowCheckbox2 = checkboxes[2];
+        // 先选第一个
+        fireEvent.click(rowCheckbox1, { ctrlKey: true });
+        expect(rowCheckbox1).toBeChecked();
+        // 增量选第二个
+        fireEvent.click(rowCheckbox2, { metaKey: true });
+        expect(rowCheckbox2).toBeChecked();
+        // 再次点击第一个取消
+        fireEvent.click(rowCheckbox1, { ctrlKey: true });
+        expect(rowCheckbox1).not.toBeChecked();
+    });
+
+    it("supports Shift 区间多选", () => {
+        render(
+            <Provider store={store}>
+                <FilePane paneIndex={0} />
+            </Provider>
+        );
+        const checkboxes = screen.getAllByRole("checkbox");
+        const rowCheckbox1 = checkboxes[1];
+        const rowCheckbox2 = checkboxes[2];
+        // 先选第一个
+        fireEvent.click(rowCheckbox1);
+        // Shift 选区间
+        fireEvent.click(rowCheckbox2, { shiftKey: true });
+        expect(rowCheckbox1).toBeChecked();
+        expect(rowCheckbox2).toBeChecked();
+    });
+
+    it("supports 全选和全不选", () => {
+        render(
+            <Provider store={store}>
+                <FilePane paneIndex={0} />
+            </Provider>
+        );
+        const checkboxes = screen.getAllByRole("checkbox");
+        const selectAll = checkboxes[0];
+        const rowCheckbox1 = checkboxes[1];
+        const rowCheckbox2 = checkboxes[2];
+        // 全选
+        fireEvent.click(selectAll);
+        expect(rowCheckbox1).toBeChecked();
+        expect(rowCheckbox2).toBeChecked();
+        // 全不选
+        fireEvent.click(selectAll);
+        expect(rowCheckbox1).not.toBeChecked();
+        expect(rowCheckbox2).not.toBeChecked();
+    });
 });
