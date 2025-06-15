@@ -5,11 +5,11 @@ import "./components/SplitterLayout/index.css";
 import "./App.scss";
 import FilePane from "./components/FilePane";
 import { fetchDirectory } from "./app/fileManagerSlice";
-import ThemeSwitcher from "./components/ThemeSwitcher";
+import { ThemeProvider } from "./components/ThemeSwitcher";
+import FunctionBar  from './components/FunctionBar';
 
 const App: React.FC = () => {
     const dispatch = useAppDispatch();
-
     useEffect(() => {
         // @ts-ignore
         const homeDir = window.fsApi.getHomeDir();
@@ -43,11 +43,13 @@ const App: React.FC = () => {
     }, [dispatch]);
 
     return (
-        <ThemeSwitcher>
+        <ThemeProvider>
             <div className="flex flex-col h-full w-full bg-white dark:bg-gray-900">
                 {/* Main Content */}
                 <div className="flex-1 flex h-full w-full overflow-hidden">
                     <div className="h-full w-full overflow-hidden">
+                        {/* FunctionBar 工具栏放在 SplitterLayout 内部顶部 */}
+                        <FunctionBar />
                         <SplitterLayout primaryIndex={0} percentage>
                             <FilePane paneIndex={0} />
                             <FilePane paneIndex={1} />
@@ -55,7 +57,7 @@ const App: React.FC = () => {
                     </div>
                 </div>
             </div>
-        </ThemeSwitcher>
+        </ThemeProvider>
     );
 };
 
