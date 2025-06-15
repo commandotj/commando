@@ -76,7 +76,7 @@ export const DeviceBar: React.FC<DeviceBarProps> = ({
             <button
                 key={dev.mountPath}
                 className={
-                    "flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors max-w-[110px] truncate " +
+                    "flex items-center gap-1 px-2 h-8 rounded text-xs font-medium transition-colors max-w-[110px] truncate justify-center items-center " +
                     (isActive(dev.mountPath)
                         ? "bg-blue-600 text-white shadow"
                         : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-blue-900")
