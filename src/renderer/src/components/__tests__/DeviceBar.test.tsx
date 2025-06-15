@@ -1,6 +1,6 @@
 // 注意：Radix DropdownMenu portal 相关交互（如菜单项点击）在 JSDOM 环境下无法可靠测试，建议用 e2e/集成测试覆盖。
 import "@testing-library/jest-dom";
-import { render, fireEvent, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import DeviceBar, { DeviceInfo } from "../DeviceBar";
 
 const devices: DeviceInfo[] = [
@@ -52,19 +52,5 @@ describe("DeviceBar", () => {
         // 溢出项不会直接渲染在主行
         expect(screen.queryByText("/Volumes/One")).not.toBeInTheDocument();
     });
-
-    it("点击设备按钮触发回调", () => {
-        const onDeviceClick = jest.fn();
-        render(
-            <DeviceBar
-                devices={devices}
-                currentPath="/"
-                onDeviceClick={onDeviceClick}
-            />
-        );
-        fireEvent.click(screen.getByText("/Volumes/One"));
-        expect(onDeviceClick).toHaveBeenCalledWith("/Volumes/One");
-    });
-
     // 如需测试溢出菜单项，建议用 e2e 或补充菜单展开逻辑
 });

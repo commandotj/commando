@@ -20,6 +20,7 @@ module.exports = {
         "^@main/(.*)$": "<rootDir>/src/main/$1",
         "^@preload/(.*)$": "<rootDir>/src/preload/$1",
         "^@renderer/(.*)$": "<rootDir>/src/renderer/$1",
+        "^.+\\.(css|scss|sass|less)$": "<rootDir>/jest/__mocks__/styleMock.js",
     },
     setupFilesAfterEnv: ["@testing-library/jest-dom"],
     // 可根据需要添加 coverage、mock、setupFiles 等配置
