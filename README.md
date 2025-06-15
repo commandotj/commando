@@ -1,85 +1,34 @@
-# Commando
+# my-app2
 
-[![awesome-vite](https://awesome.re/mentioned-badge.svg)](https://github.com/vitejs/awesome-vite)
-![GitHub stars](https://img.shields.io/github/stars/caoxiemeihao/vite-react-electron?color=fa6470)
-![GitHub issues](https://img.shields.io/github/issues/caoxiemeihao/vite-react-electron?color=d8b22d)
-![GitHub license](https://img.shields.io/github/license/caoxiemeihao/vite-react-electron)
-[![Required Node.JS >= 14.18.0 || >=16.0.0](https://img.shields.io/static/v1?label=node&message=14.18.0%20||%20%3E=16.0.0&logo=node.js&color=3f893e)](https://nodejs.org/about/releases)
+An Electron application with React and TypeScript
 
-English | [简体中文](README.zh-CN.md)
+## Recommended IDE Setup
 
-## 👀 Overview
+- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 
-📦 Ready out of the box
-🎯 Based on the official [template-react-ts](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts), project structure will be familiar to you
-🌱 Easily extendable and customizable
-💪 Supports Node.js API in the renderer process
-🔩 Supports C/C++ native addons
-🐞 Debugger configuration included
-🖥 Easy to implement multiple windows
+## Project Setup
 
-## 🛫 Quick start
+### Install
 
-```sh
-npm create electron-vite
+```bash
+$ npm install
 ```
 
-![electron-vite-react.gif](/public/electron-vite-react.gif)
+### Development
 
-## 🐞 Debug
-
-![electron-vite-react-debug.gif](/public/electron-vite-react-debug.gif)
-
-## 📂 Directory structure
-
-Familiar React application structure, just with `electron` folder on the top :wink:
-*Files in this folder will be separated from your React application and built into `dist-electron`*
-
-```tree
-├── electron                                 Electron-related code
-│   ├── main                                 Main-process source code
-│   └── preload                              Preload-scripts source code
-│
-├── release                                  Generated after production build, contains executables
-│   └── {version}
-│       ├── {os}-{os_arch}                   Contains unpacked application executable
-│       └── {app_name}_{version}.{ext}       Installer for the application
-│
-├── public                                   Static assets
-└── src                                      Renderer source code, your React application
+```bash
+$ npm run dev
 ```
 
-## 🚨 Be aware
+### Build
 
-This template integrates Node.js API to the renderer process by default. If you want to follow **Electron Security Concerns** you might want to disable this feature. You will have to expose needed API by yourself.
+```bash
+# For windows
+$ npm run build:win
 
-To get started, remove the option as shown below. This will [modify the Vite configuration and disable this feature](https://github.com/electron-vite/vite-plugin-electron-renderer#config-presets-opinionated).
+# For macOS
+$ npm run build:mac
 
-```diff
-# vite.config.ts
-
-export default {
-  plugins: [
-    ...
--   // Use Node.js API in the Renderer-process
--   renderer({
--     nodeIntegration: true,
--   }),
-    ...
-  ],
-}
+# For Linux
+$ npm run build:linux
 ```
-
-## ❔ FAQ
-
-- [dependencies vs devDependencies](https://github.com/electron-vite/vite-plugin-electron-renderer#dependencies-vs-devdependencies)
-- [C/C++ addons, Node.js modules - Pre-Bundling](https://github.com/electron-vite/vite-plugin-electron-renderer#dependency-pre-bundling)
-
-## Best Practice: Dependency Management & Theme Compatibility
-
-- Use **npm** as the only package manager. Avoid yarn v1 and pnpm to prevent compatibility issues.
-- Tailwind CSS v3 (e.g., 3.4.0) is recommended. With npm, all darkMode: 'class' theme switching and Tailwind styles work 100% reliably.
-- Avoid yarn v1 and pnpm to prevent CLI, dependency, and node_modules structure issues.
-- If you encounter problems with theme switching, missing styles, or build failures, first check your Tailwind version and package manager.
-
-> Summary: Tailwind v3 + npm is the proven best practice for the commando-react project. All contributors should strictly follow this guideline.

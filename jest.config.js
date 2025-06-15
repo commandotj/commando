@@ -1,20 +1,26 @@
 module.exports = {
-    preset: "ts-jest",
     testEnvironment: "jsdom",
-    testMatch: [
-        "<rootDir>/src/**/**/__tests__/**/*.test.(ts|tsx)",
-        "<rootDir>/electron/main/**/__tests__/**/*.test.(ts|tsx|js)",
-    ],
-    moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
+    preset: "ts-jest",
+    roots: ["<rootDir>/src"],
+    moduleFileExtensions: ["ts", "tsx", "js", "json"],
     transform: {
-        "^.+\\.(ts|tsx)$": [
-            "ts-jest",
-            {
-                tsconfig: "tsconfig.json",
-            },
-        ],
+        "^.+\\.(ts|tsx)$": "ts-jest",
+    },
+    testMatch: [
+        "**/__tests__/**/*.(spec|test).(ts|tsx|js)",
+        "**/?(*.)+(spec|test).(ts|tsx|js)",
+    ],
+    globals: {
+        "ts-jest": {
+            tsconfig: "tsconfig.json",
+        },
     },
     moduleNameMapper: {
-        "\\.(css|less|scss|sass)$": "identity-obj-proxy",
+        // 支持绝对路径别名（如有需要可补充）
+        "^@main/(.*)$": "<rootDir>/src/main/$1",
+        "^@preload/(.*)$": "<rootDir>/src/preload/$1",
+        "^@renderer/(.*)$": "<rootDir>/src/renderer/$1",
     },
+    setupFilesAfterEnv: ["@testing-library/jest-dom"],
+    // 可根据需要添加 coverage、mock、setupFiles 等配置
 };
