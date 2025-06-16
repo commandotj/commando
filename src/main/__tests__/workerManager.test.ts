@@ -18,12 +18,13 @@ import {
     getCopyQueueStatus,
     cancelCopyTask,
 } from "../workerManager";
+import type { IpcMainInvokeEvent } from "electron";
 
 // Mock Worker
 jest.mock("worker_threads", () => {
     return {
         Worker: class extends EventEmitter {
-            constructor(path: string, opts: Record<string, any>) {
+            constructor(_: string, opts: { workerData?: { id?: string } }) {
                 super();
                 setTimeout(() => {
                     this.emit("message", {
@@ -59,7 +60,7 @@ jest.mock("p-queue", () => {
 describe("workerManager", () => {
     const mockEvent = {
         sender: { send: jest.fn() },
-    } as any;
+    } as unknown as Partial<IpcMainInvokeEvent> as IpcMainInvokeEvent;
 
     it("addCopyTask 应返回唯一 taskId 并加入队列", async () => {
         const id = addCopyTask({ src: "/a", dest: "/b" }, mockEvent);
