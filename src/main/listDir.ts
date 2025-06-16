@@ -1,11 +1,18 @@
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
-export function listDirSync(dirPath: string) {
+export interface ListDirEntry {
+    name: string;
+    isDirectory: boolean;
+    size: number | undefined;
+    mtime: number | undefined;
+}
+
+export function listDirSync(dirPath: string): ListDirEntry[] {
     const entries = fs.readdirSync(dirPath, { withFileTypes: true });
     return entries.map((entry) => {
-        let size = undefined;
-        let mtime = undefined;
+        let size;
+        let mtime;
         try {
             const stat = fs.statSync(path.join(dirPath, entry.name));
             if (!entry.isDirectory()) {
@@ -20,7 +27,7 @@ export function listDirSync(dirPath: string) {
             name: entry.name,
             isDirectory: entry.isDirectory(),
             size,
-            mtime
+            mtime,
         };
     });
 }

@@ -16,8 +16,8 @@ export function registerIpcHandlers({
     preload: string;
     url: string;
     indexHtml: string;
-    env: any;
-}) {
+    env: Record<string, string>;
+}): void {
     // IPC handler for directory listing
     ipcMain.handle("list-dir", async (_event, dirPath) => {
         try {
