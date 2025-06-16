@@ -23,5 +23,6 @@ module.exports = {
         "^.+\\.(css|scss|sass|less)$": "<rootDir>/jest/__mocks__/styleMock.js",
     },
     setupFilesAfterEnv: ["@testing-library/jest-dom"],
+    resolver: "./jest/resolver/workerModulePathResolver.js",
     // 可根据需要添加 coverage、mock、setupFiles 等配置
 };

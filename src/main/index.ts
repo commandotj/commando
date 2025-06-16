@@ -1,14 +1,14 @@
-import { app, BrowserWindow, shell, ipcMain, screen, Menu } from "electron";
+import { app, BrowserWindow, ipcMain, Menu } from "electron";
 import { release } from "os";
 import { join } from "path";
-import { electronApp, optimizer, is } from "@electron-toolkit/utils";
+import { electronApp } from "@electron-toolkit/utils";
 import "./ipc";
-import { createWindow } from "./window";
+import { createWindow, getMainWindow } from "./window";
 import { getMenuTemplate } from "./menu";
-// @ts-ignore
 import i18next from "i18next";
 import enUS from "./i18n/en-US.json";
 import zhCN from "./i18n/zh-CN.json";
+
 (process as any).env.DIST_ELECTRON = join(__dirname, "../");
 (process as any).env.DIST = join((process as any).env.DIST_ELECTRON, "../dist");
 (process as any).env.PUBLIC = (process as any).env.VITE_DEV_SERVER_URL
@@ -28,63 +28,13 @@ if (!app.requestSingleInstanceLock()) {
 // Read more on https://www.electronjs.org/docs/latest/tutorial/security
 // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
-let win: BrowserWindow | null = null;
 // Here, you can also use other preload
 const preload = join(__dirname, "../preload/index.js");
 const url = (process as any).env.VITE_DEV_SERVER_URL;
 const indexHtml = join((process as any).env.DIST, "index.html");
 const env = (process as any).env;
 
-// --- Native OS App Menu ---
-const isMac = (process as any).platform === "darwin";
-
-// 示例：动态配置、i18n、主题对象（实际可从配置文件、store、全局状态等获取）
-const config = {
-    shortcutNewTab: "CmdOrCtrl+N",
-    shortcutOpen: "CmdOrCtrl+O",
-    shortcutSave: "CmdOrCtrl+S",
-    showNewTab: true,
-    showOpen: true,
-    showSave: true,
-};
-const locale = {
-    file: "文件",
-    newTab: "新建标签页",
-    open: "打开...",
-    save: "保存",
-    close: "关闭",
-    quit: "退出",
-    edit: "编辑",
-    undo: "撤销",
-    redo: "重做",
-    cut: "剪切",
-    copy: "复制",
-    paste: "粘贴",
-    pasteAndMatchStyle: "粘贴并匹配样式",
-    delete: "删除",
-    selectAll: "全选",
-    speech: "语音",
-    startSpeaking: "开始朗读",
-    stopSpeaking: "停止朗读",
-    view: "视图",
-    reload: "重新加载",
-    toggleFullscreen: "切换全屏",
-    resetZoom: "重置缩放",
-    zoomIn: "放大",
-    zoomOut: "缩小",
-};
-const theme = {
-    iconType: "dark", // 示例，可扩展更多主题属性
-};
-
-function sendMenuAction(action: string) {
-    const win = BrowserWindow.getFocusedWindow();
-    if (win) {
-        win.webContents.send("menu-action", action);
-    }
-}
-
-async function initI18n() {
+async function initI18n(): Promise<void> {
     await i18next.init({
         lng: "zh-CN", // 默认语言，可根据系统或配置动态设置
         fallbackLng: "en-US",
@@ -113,11 +63,12 @@ async function initI18n() {
 })();
 
 app.on("window-all-closed", () => {
-    win = null;
     if ((process as any).platform !== "darwin") app.quit();
 });
 
 app.on("second-instance", () => {
+    const win = getMainWindow();
+
     if (win) {
         // Focus on the main window if the user tried to open another
         if (win.isMinimized()) win.restore();

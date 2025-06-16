@@ -1,4 +1,3 @@
-import React from "react";
 import { render, fireEvent } from "@testing-library/react";
 import { ResizableTable } from "../ResizableTable";
 import { ColumnDef } from "@tanstack/react-table";
@@ -43,7 +42,6 @@ describe("ResizableTable - Drag Overlay", () => {
         // We'll need to simulate drag start, move, and check overlay position
         // This is a placeholder for the actual implementation, which will depend on the overlay logic
         // For now, just render and check the overlay appears on drag start
-        const handleColumnsChange = jest.fn();
         const { container } = render(
             <ResizableTable columns={columns} dataSource={data} />
         );

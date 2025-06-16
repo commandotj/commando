@@ -1,18 +1,17 @@
-declare global {
-    interface Window {
-        fsApi: any;
-    }
-}
-
 import "@testing-library/jest-dom";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+    render,
+    screen,
+    fireEvent,
+    waitFor,
+    act,
+} from "@testing-library/react";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
 import FilePane from "../FilePane";
 import * as redux from "../../app/hooks";
 import { fetchDirectory } from "../../app/fileManagerSlice";
 import type { RootState } from "../../app/store";
-import { DragEndEvent } from "@dnd-kit/core";
 
 const mockStore = configureStore<RootState>([]);
 
@@ -84,8 +83,20 @@ beforeAll(() => {
         },
     });
 
-    // @ts-ignore
-    window.fsApi = { listDrives: () => Promise.resolve([]) };
+    window.fsApi = {
+        listDir: jest.fn().mockResolvedValue([]),
+        listDrives: jest.fn().mockResolvedValue([
+            {
+                device: "/dev/disk1",
+                description: "Mock Disk",
+                size: 1000000000,
+                mountpoints: [{ path: "/" }],
+                isSystem: true,
+                isRemovable: false,
+            },
+        ]),
+        // ...mock 其他方法
+    } as unknown as typeof window.fsApi;
 });
 
 describe("FilePane", () => {
@@ -120,6 +131,27 @@ describe("FilePane", () => {
             fn(store.getState())
         );
         (fetchDirectory as unknown as jest.Mock).mockClear();
+
+        window.fsApi = {
+            listDir: jest.fn().mockResolvedValue([
+                {
+                    name: "file.txt",
+                    isDirectory: false,
+                    size: 1234,
+                    path: "/file.txt",
+                },
+            ]),
+            listDrives: jest.fn().mockResolvedValue([
+                {
+                    device: "/dev/disk1",
+                    description: "Mock Disk",
+                    size: 1000000000,
+                    mountpoints: [{ path: "/" }],
+                    isSystem: true,
+                    isRemovable: false,
+                },
+            ]),
+        } as unknown as typeof window.fsApi;
     });
 
     it("renders breadcrumb and table", async () => {
@@ -150,14 +182,11 @@ describe("FilePane", () => {
         });
     });
 
-    it("does not dispatch fetchDirectory when file is clicked", () => {
-        const { container } = render(
-            <Provider store={store}>
-                <FilePane paneIndex={0} />
-            </Provider>
-        );
-        const fileLink = screen.getByText("file.txt");
-        fireEvent.click(fileLink);
+    it("does not dispatch fetchDirectory when file is clicked", async () => {
+        const fileLink = await screen.findByText("file.txt");
+        await act(async () => {
+            fireEvent.click(fileLink);
+        });
         expect(dispatch).not.toHaveBeenCalled();
         expect(fetchDirectory).not.toHaveBeenCalled();
     });
