@@ -7,15 +7,29 @@ contextBridge.exposeInMainWorld("fsApi", {
     getHomeDir: () => os.homedir(),
     listDrives: () => ipcRenderer.invoke("list-drives"),
     /**
-     * 发起复制任务，返回 taskId
+     * 发起复制任务，支持单个，返回 taskId 或 taskId[]
      */
-    copyFile: (params: { src: string; dest: string }) =>
-        ipcRenderer.invoke("copy-file", params),
+    copyFile: (src: string, dest: string) => {
+        return ipcRenderer.invoke("copy-file", { src, dest });
+    },
+    /**
+     * 批量复制任务，推荐新接口
+     */
+    copyBatch: (srcs: string[], dest: string) =>
+        ipcRenderer.invoke("copy-batch", { srcs, dest }),
     /**
      * 监听复制进度事件（多任务支持，msg 带 taskId）
      */
-    onCopyProgress: (cb: (msg: any) => void) => {
+    onCopyProgress: (cb: (msg: ProgressMsg | DoneMsg | ErrorMsg) => void) => {
         ipcRenderer.on("copy-progress", (_event, msg) => cb(msg));
+    },
+    /**
+     * 监听批量复制进度事件
+     */
+    onCopyBatchProgress: (
+        cb: (msg: ProgressMsg | DoneMsg | ErrorMsg) => void
+    ) => {
+        ipcRenderer.on("copy-batch-progress", (_event, msg) => cb(msg));
     },
     /**
      * 查询复制队列状态

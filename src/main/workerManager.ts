@@ -114,6 +114,43 @@ export function cancelCopyTask(taskId: string): void {
     }
 }
 
+/**
+ * 单文件复制任务，支持进度回调（用于批量复制）
+ */
+export function addCopyTaskWithProgress(
+    src: string,
+    dest: string,
+    onProgress: (msg: ProgressMsg | DoneMsg | ErrorMsg) => void
+): Promise<void> {
+    return new Promise((resolve, reject) => {
+        const worker = new Worker(workerPath, { workerData: { src, dest } });
+        worker.on("message", (msg) => {
+            onProgress(msg);
+            if (msg.type === "done") {
+                resolve();
+                worker.terminate();
+            } else if (msg.type === "error") {
+                reject(new Error(msg.error));
+                worker.terminate();
+            }
+        });
+        worker.on("error", (err) => {
+            onProgress({ type: "error", error: err.message });
+            reject(err);
+            worker.terminate();
+        });
+        worker.on("exit", (code) => {
+            if (code !== 0) {
+                onProgress({
+                    type: "error",
+                    error: `Worker exited with code ${code}`,
+                });
+                reject(new Error(`Worker exited with code ${code}`));
+            }
+        });
+    });
+}
+
 // 详细注释：
 // 1. 所有复制请求通过 addCopyTask 加入队列，自动排队串行执行。
 // 2. 每个任务分配唯一 taskId，进度/完成/异常均带 taskId 推送到前端。

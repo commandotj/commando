@@ -2,28 +2,6 @@ import { parentPort, workerData } from "worker_threads";
 import fs from "fs";
 // import path from "path"; // 未使用，移除
 
-// 复制参数类型
-interface CopyParams {
-    src: string;
-    dest: string;
-}
-
-// 进度消息类型
-interface ProgressMsg {
-    type: "progress";
-    copied: number;
-    total: number;
-}
-
-// 完成/错误消息类型
-interface DoneMsg {
-    type: "done";
-}
-interface ErrorMsg {
-    type: "error";
-    error: string;
-}
-
 const { src, dest } = workerData as CopyParams;
 
 let readStream: fs.ReadStream | null = null;
@@ -47,14 +25,20 @@ parentPort?.on("message", (msg) => {
         // 关闭流
         try {
             readStream?.destroy();
-        } catch {}
+        } catch {
+            void 0;
+        }
         try {
             writeStream?.destroy();
-        } catch {}
+        } catch {
+            void 0;
+        }
         // 删除未完成目标文件
         try {
             fs.unlinkSync(dest);
-        } catch {}
+        } catch {
+            void 0;
+        }
         sendError("canceled");
         process.exit(0);
     }

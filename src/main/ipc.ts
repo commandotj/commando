@@ -7,6 +7,7 @@ import {
     cancelCopyTask,
 } from "./workerManager";
 import logger from "./logger";
+import { batchCopy } from "./batchCopyService";
 
 export function registerIpcHandlers({
     preload,
@@ -95,5 +96,15 @@ export function registerIpcHandlers({
         } else {
             logger.info(message, meta);
         }
+    });
+
+    // 批量复制请求 handler（队列化，返回 taskId）
+    ipcMain.handle("copy-batch", async (event, { srcs, dest }) => {
+        // 参数校验
+        if (!Array.isArray(srcs) || typeof dest !== "string") {
+            throw new Error("Invalid parameters for copy-batch");
+        }
+        // 只做分发，具体逻辑交给 batchCopyService
+        return batchCopy({ srcs, dest, event });
     });
 }

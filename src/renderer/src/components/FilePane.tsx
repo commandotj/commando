@@ -1,7 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { fetchDirectory } from "../app/fileManagerSlice";
+import {
+    fetchDirectory,
+    setPaneSelectedKeys,
+    setActivePane,
+} from "../app/fileManagerSlice";
 import { ResizableTable } from "./ResizableTable";
 import { joinPath, formatSize } from "../common/path";
 import PathBreadcrumb from "./PathBreadcrumb";
@@ -18,16 +22,14 @@ interface FileEntry {
 const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
     const dispatch = useAppDispatch();
     const pane = useAppSelector((state) => state.fileManager.panes[paneIndex]);
-    const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const contentRef = useRef<HTMLDivElement>(null);
-    const [tableHeight, setTableHeight] = useState<number>(400);
     const [devices, setDevices] = useState<DeviceInfo[]>([]);
 
     useEffect(() => {
         logger.info("FilePane mounted", { paneIndex });
         function updateHeight(): void {
             if (contentRef.current) {
-                setTableHeight(contentRef.current.clientHeight);
+                // setTableHeight(contentRef.current.clientHeight);
             }
         }
         updateHeight();
@@ -38,7 +40,7 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
     useEffect(() => {
         window.fsApi.listDrives().then((data) => {
             // 只保留逻辑磁盘
-            const filterLogicalDisks = (devices: DeviceInfo[]) =>
+            const filterLogicalDisks = (devices: DeviceInfo[]): DeviceInfo[] =>
                 devices
                     .map((dev) => ({
                         ...dev,
@@ -70,7 +72,14 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
         });
     }, []);
 
-    const columns: ColumnDef<FileEntry, any>[] = [
+    useEffect(() => {
+        logger.info("selectedRowKeys changed", {
+            paneIndex,
+            selectedRowKeys: pane.selectedKeys,
+        });
+    }, [pane.selectedKeys, paneIndex]);
+
+    const columns: ColumnDef<FileEntry, FileEntry>[] = [
         {
             id: "name",
             header: "Name",
@@ -132,13 +141,25 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
         },
     ];
 
-    const rowSelection = {
-        selectedRowKeys,
-        onChange: (newSelectedRowKeys: React.Key[]) =>
-            setSelectedRowKeys(newSelectedRowKeys),
+    const selectedRowKeys = pane.selectedKeys;
+    // 复制按钮禁用逻辑：无选中项时禁用
+    const copyDisabled = !selectedRowKeys || selectedRowKeys.length === 0;
+    const handleRowSelectionChange = (
+        newSelectedRowKeys: React.Key[]
+    ): void => {
+        dispatch(
+            setPaneSelectedKeys({
+                paneIndex,
+                selectedKeys: newSelectedRowKeys.map(String),
+            })
+        );
     };
 
-    const handleBreadcrumbClick = (index: number) => {
+    const handleFocus = (): void => {
+        dispatch(setActivePane(paneIndex));
+    };
+
+    const handleBreadcrumbClick = (index: number): void => {
         logger.info("Breadcrumb click", {
             paneIndex,
             index,
@@ -157,7 +178,7 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
         dispatch(fetchDirectory({ paneIndex, path: newPath }));
     };
 
-    const handleDeviceClick = (mountPath: string) => {
+    const handleDeviceClick = (mountPath: string): void => {
         logger.info("Device click", { paneIndex, mountPath });
         dispatch(fetchDirectory({ paneIndex, path: mountPath }));
     };
@@ -181,6 +202,8 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
             <div
                 className="flex-1 min-h-0 overflow-y-auto box-border"
                 ref={contentRef}
+                tabIndex={0}
+                onFocus={handleFocus}
             >
                 <ResizableTable
                     key={pane.currentPath}
@@ -191,10 +214,12 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                         )
                         .map((entry: FileEntry, idx: number) => ({
                             ...entry,
-                            key: idx,
+                            // 关键注释：必须保证 dataSource 的 key 字段类型与 selectedRowKeys 完全一致（均为 string），否则 React diff 机制会导致多选/高亮失效。
+                            // 历史问题：将选中项迁移到 Redux 后，若 key 为 number 而 selectedRowKeys 为 string，导致 UI 不同步。强制 key 为 string 可彻底解决。
+                            key: String(idx),
                         }))}
                     selectedRowKeys={selectedRowKeys}
-                    onRowSelectionChange={setSelectedRowKeys}
+                    onRowSelectionChange={handleRowSelectionChange}
                 />
             </div>
             {/* Footer/Status Bar */}
