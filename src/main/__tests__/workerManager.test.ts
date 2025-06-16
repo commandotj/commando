@@ -34,7 +34,6 @@ jest.mock("worker_threads", () => {
             }
             postMessage = jest.fn();
             terminate = jest.fn();
-            on = EventEmitter.prototype.on;
         },
         isMainThread: true,
         parentPort: null,

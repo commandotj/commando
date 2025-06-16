@@ -4,17 +4,18 @@ module.exports = {
     roots: ["<rootDir>/src"],
     moduleFileExtensions: ["ts", "tsx", "js", "json"],
     transform: {
-        "^.+\\.(ts|tsx)$": "ts-jest",
+        "^.+\\.(ts|tsx)$": [
+            "ts-jest",
+            {
+                tsconfig: "tsconfig.json",
+                // 如有其他 ts-jest 配置项，补充于此
+            },
+        ],
     },
     testMatch: [
         "**/__tests__/**/*.(spec|test).(ts|tsx|js)",
         "**/?(*.)+(spec|test).(ts|tsx|js)",
     ],
-    globals: {
-        "ts-jest": {
-            tsconfig: "tsconfig.json",
-        },
-    },
     moduleNameMapper: {
         // 支持绝对路径别名（如有需要可补充）
         "^@main/(.*)$": "<rootDir>/src/main/$1",
