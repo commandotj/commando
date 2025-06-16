@@ -1,6 +1,15 @@
-const drivelist = require('drivelist');
+import drivelist from "drivelist";
 
-export async function listDrives() {
+export interface DriveInfo {
+    device: string;
+    description: string;
+    size: number;
+    mountpoints: { path: string }[];
+    isSystem: boolean;
+    isRemovable: boolean;
+}
+
+export async function listDrives(): Promise<DriveInfo[]> {
     try {
         const drives = await drivelist.list();
         // 只返回有挂载点的设备，简化前端处理
@@ -12,11 +21,14 @@ export async function listDrives() {
                 size: d.size,
                 mountpoints: d.mountpoints, // [{ path }]
                 isSystem: d.system,
-                isRemovable: d.isRemovable
+                isRemovable: d.isRemovable,
             }));
     } catch (err) {
-        console.error('[drivelist] error:', err);
-        console.error('[drivelist] process.env.PATH:', (process as any).env.PATH);
+        console.error("[drivelist] error:", err);
+        console.error(
+            "[drivelist] process.env.PATH:",
+            (process as any).env.PATH
+        );
         return [];
     }
 }

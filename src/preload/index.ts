@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from "electron";
 import os from "os";
+import "./logger";
 
 contextBridge.exposeInMainWorld("fsApi", {
     listDir: (path: string) => ipcRenderer.invoke("list-dir", path),

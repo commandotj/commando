@@ -1,0 +1,15 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+1. 主进程与渲染进程分离，主进程负责窗口管理、系统操作、worker 管理、IPC 通信，渲染进程负责 UI 交互和业务逻辑，通过 preload 脚本暴露安全 API。
+2. 主进程通过 workerManager 管理 Node.js worker threads，实现如文件复制等重型任务的异步处理，worker 启动即执行，主进程监听 worker 状态、进度、异常，通过 IPC 推送到前端。
+3. 主进程 workerManager 内部采用 p-queue 实现任务队列，支持串行/并发、任务状态跟踪、进度推送、任务取消，每个任务有唯一 taskId，所有事件均带 taskId 传递。
+4. 前端通过 preload 层暴露的 fsApi、logApi 等接口与主进程通信，所有文件操作、日志归档、任务管理等均通过 IPC 实现，保证安全隔离。
+5. 关键类型集中声明于 typings 目录，tsconfig.json 配置 typeRoots，保证 IDE、tsc、jest/ts-jest 全流程类型一致。
+6. 主进程、worker、前端组件均有自动化测试，测试中对 worker_threads、p-queue、window.fsApi 等进行 mock，确保主流程可测，测试文件有详细修复历史注释。
+7. 主进程采用 winston 日志模块，支持多级别、控制台+文件归档，渲染进程日志通过 IPC 归档到主进程，保证日志统一管理和安全。
+8. 所有样式均通过 CSS 变量、Tailwind CSS utility class 管理，支持自定义主题，禁止硬编码色值，保证主题可扩展和 run-time 动态切换。
+9. 所有设计、实现、优化必须以上述架构为基础，确保系统可扩展、可维护、可验证。
+10. 所有设计文档、API 文档等按 feature name 目录管理，并在顶部标注作者、创建时间、修改历史，遇“记录在案”指令自动按此规范归档。

@@ -1,11 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { ColumnDef } from '@tanstack/react-table';
-import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { fetchDirectory } from '../app/fileManagerSlice';
-import { ResizableTable } from './ResizableTable';
-import { joinPath, formatSize } from '../common/path';
-import PathBreadcrumb from './PathBreadcrumb';
-import DeviceBar, { DeviceInfo } from './DeviceBar';
+import React, { useState, useRef, useEffect } from "react";
+import { ColumnDef } from "@tanstack/react-table";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { fetchDirectory } from "../app/fileManagerSlice";
+import { ResizableTable } from "./ResizableTable";
+import { joinPath, formatSize } from "../common/path";
+import PathBreadcrumb from "./PathBreadcrumb";
+import DeviceBar, { DeviceInfo } from "./DeviceBar";
+import logger from "../logger";
 
 interface FileEntry {
     name: string;
@@ -23,14 +24,15 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
     const [devices, setDevices] = useState<DeviceInfo[]>([]);
 
     useEffect(() => {
-        function updateHeight() {
+        logger.info("FilePane mounted", { paneIndex });
+        function updateHeight(): void {
             if (contentRef.current) {
                 setTableHeight(contentRef.current.clientHeight);
             }
         }
         updateHeight();
-        window.addEventListener('resize', updateHeight);
-        return () => window.removeEventListener('resize', updateHeight);
+        window.addEventListener("resize", updateHeight);
+        return () => window.removeEventListener("resize", updateHeight);
     }, []);
 
     useEffect(() => {
@@ -42,10 +44,13 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                         ...dev,
                         mountpoints: dev.mountpoints.filter(
                             (mp) =>
-                                (mp.path === '/' || mp.path.startsWith('/Volumes/')) &&
-                                !/^\/Volumes\/(Preboot|Recovery|VM)$/.test(mp.path) &&
-                                !mp.path.startsWith('/System/Volumes/')
-                        )
+                                (mp.path === "/" ||
+                                    mp.path.startsWith("/Volumes/")) &&
+                                !/^\/Volumes\/(Preboot|Recovery|VM)$/.test(
+                                    mp.path
+                                ) &&
+                                !mp.path.startsWith("/System/Volumes/")
+                        ),
                     }))
                     .filter((dev) => dev.mountpoints.length > 0);
             let logicalDisks = filterLogicalDisks(data);
@@ -58,7 +63,7 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                         if (seen.has(mp.path)) return false;
                         seen.add(mp.path);
                         return true;
-                    })
+                    }),
                 }))
                 .filter((dev) => dev.mountpoints.length > 0);
             setDevices(logicalDisks);
@@ -67,9 +72,9 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
 
     const columns: ColumnDef<FileEntry, any>[] = [
         {
-            id: 'name',
-            header: 'Name',
-            accessorKey: 'name',
+            id: "name",
+            header: "Name",
+            accessorKey: "name",
             size: 200,
             cell: ({ row }) => {
                 const record = row.original;
@@ -78,11 +83,14 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                         onClick={() => {
                             if (!pane.currentPath) return;
                             if (record.isDirectory) {
-                                const nextPath = joinPath(pane.currentPath, record.name);
+                                const nextPath = joinPath(
+                                    pane.currentPath,
+                                    record.name
+                                );
                                 dispatch(
                                     fetchDirectory({
                                         paneIndex,
-                                        path: nextPath
+                                        path: nextPath,
                                     })
                                 );
                             }
@@ -92,57 +100,65 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                         {record.name}
                     </a>
                 );
-            }
+            },
         },
         {
-            id: 'mtime',
-            header: 'Date Modified',
-            accessorKey: 'mtime',
+            id: "mtime",
+            header: "Date Modified",
+            accessorKey: "mtime",
             size: 180,
             cell: ({ row }) => {
                 const mtime = row.original.mtime;
-                if (!mtime) return '';
+                if (!mtime) return "";
                 const date = new Date(mtime);
                 return date.toLocaleString();
-            }
+            },
         },
         {
-            id: 'size',
-            header: 'Size',
-            accessorKey: 'size',
+            id: "size",
+            header: "Size",
+            accessorKey: "size",
             size: 100,
-            cell: ({ row }) => (row.original.isDirectory ? '' : formatSize(row.original.size)),
-            meta: { align: 'right' }
+            cell: ({ row }) =>
+                row.original.isDirectory ? "" : formatSize(row.original.size),
+            meta: { align: "right" },
         },
         {
-            id: 'isDirectory',
-            header: 'Type',
-            accessorKey: 'isDirectory',
+            id: "isDirectory",
+            header: "Type",
+            accessorKey: "isDirectory",
             size: 100,
-            cell: ({ getValue }) => (getValue() ? 'Folder' : 'File')
-        }
+            cell: ({ getValue }) => (getValue() ? "Folder" : "File"),
+        },
     ];
 
     const rowSelection = {
         selectedRowKeys,
-        onChange: (newSelectedRowKeys: React.Key[]) => setSelectedRowKeys(newSelectedRowKeys)
+        onChange: (newSelectedRowKeys: React.Key[]) =>
+            setSelectedRowKeys(newSelectedRowKeys),
     };
 
     const handleBreadcrumbClick = (index: number) => {
+        logger.info("Breadcrumb click", {
+            paneIndex,
+            index,
+            currentPath: pane.currentPath,
+        });
         const parts = pane.currentPath.split(/[\\/]/).filter(Boolean);
-        let newPath = '';
+        let newPath = "";
         if (parts.length > 0) {
-            newPath = '/' + parts.slice(0, index + 1).join('/');
+            newPath = "/" + parts.slice(0, index + 1).join("/");
             if (/^[A-Za-z]:$/.test(parts[0])) {
-                newPath = parts.slice(0, index + 1).join('\\');
+                newPath = parts.slice(0, index + 1).join("\\");
             }
         } else {
-            newPath = '/';
+            newPath = "/";
         }
         dispatch(fetchDirectory({ paneIndex, path: newPath }));
     };
 
     const handleDeviceClick = (mountPath: string) => {
+        logger.info("Device click", { paneIndex, mountPath });
         dispatch(fetchDirectory({ paneIndex, path: mountPath }));
     };
 
@@ -156,18 +172,26 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
             />
             {/* Header/Breadcrumb */}
             <div className="h-8 border-b border-gray-200 dark:border-gray-700 px-4 flex items-center flex-shrink-0">
-                <PathBreadcrumb path={pane.currentPath} onClick={handleBreadcrumbClick} />
+                <PathBreadcrumb
+                    path={pane.currentPath}
+                    onClick={handleBreadcrumbClick}
+                />
             </div>
             {/* Content/Table */}
-            <div className="flex-1 min-h-0 overflow-y-auto box-border" ref={contentRef}>
+            <div
+                className="flex-1 min-h-0 overflow-y-auto box-border"
+                ref={contentRef}
+            >
                 <ResizableTable
                     key={pane.currentPath}
                     columns={columns}
                     dataSource={pane.entries
-                        .filter((entry: FileEntry) => !entry.name.startsWith('.'))
+                        .filter(
+                            (entry: FileEntry) => !entry.name.startsWith(".")
+                        )
                         .map((entry: FileEntry, idx: number) => ({
                             ...entry,
-                            key: idx
+                            key: idx,
                         }))}
                     selectedRowKeys={selectedRowKeys}
                     onRowSelectionChange={setSelectedRowKeys}

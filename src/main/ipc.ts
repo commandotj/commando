@@ -6,6 +6,7 @@ import {
     getCopyQueueStatus,
     cancelCopyTask,
 } from "./workerManager";
+import logger from "./logger";
 
 export function registerIpcHandlers({
     preload,
@@ -23,13 +24,33 @@ export function registerIpcHandlers({
         try {
             return listDirSync(dirPath);
         } catch (err) {
+            logger.error("list-dir 失败", {
+                time: new Date().toISOString(),
+                error: err instanceof Error ? err.message : String(err),
+            });
             return [];
         }
     });
 
     // IPC handler for listing drives
     ipcMain.handle("list-drives", async () => {
-        return await listDrives();
+        const start = Date.now();
+        try {
+            const drives = await listDrives();
+            const durationMs = Date.now() - start;
+            logger.info("list-drives 请求", {
+                time: new Date().toISOString(),
+                count: drives.length,
+                durationMs,
+            });
+            return drives;
+        } catch (err) {
+            logger.error("list-drives 失败", {
+                time: new Date().toISOString(),
+                error: err instanceof Error ? err.message : String(err),
+            });
+            return [];
+        }
     });
 
     // New window example arg: new windows url
@@ -65,5 +86,14 @@ export function registerIpcHandlers({
     ipcMain.handle("cancel-copy-task", (_event, taskId) => {
         cancelCopyTask(taskId);
         return true;
+    });
+
+    // 日志 handler：接收渲染进程日志，归档到主进程
+    ipcMain.handle("log:message", (_event, { level, message, meta }) => {
+        if (typeof logger[level] === "function") {
+            logger[level](message, meta);
+        } else {
+            logger.info(message, meta);
+        }
     });
 }

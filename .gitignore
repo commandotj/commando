@@ -23,6 +23,7 @@ release
 *.njsproj
 *.sln
 *.sw?
+out
 
 #lockfile
 /test-results/

@@ -45,12 +45,13 @@
         "framer-motion": "^9.0.2",
         "i18next": "^25.2.1",
         "klaw": "^4.1.0",
-        "p-queue": "^8.1.0",
+        "p-queue": "^6.6.2",
         "react-redux": "^8.0.5",
         "react-resizable": "^3.0.5",
         "redux": "^4.2.1",
         "simplebar": "^6.3.1",
-        "simplebar-react": "^3.3.1"
+        "simplebar-react": "^3.3.1",
+        "winston": "^3.17.0"
     },
     "devDependencies": {
         "@electron-toolkit/eslint-config-ts": "^3.0.0",

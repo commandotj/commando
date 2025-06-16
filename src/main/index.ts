@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain, Menu } from "electron";
 import { release } from "os";
 import { join } from "path";
 import { electronApp } from "@electron-toolkit/utils";
-import "./ipc";
+import { registerIpcHandlers } from "./ipc";
 import { createWindow, getMainWindow } from "./window";
 import { getMenuTemplate } from "./menu";
 import i18next from "i18next";
@@ -48,6 +48,9 @@ async function initI18n(): Promise<void> {
 (async () => {
     await initI18n();
     app.whenReady().then(() => {
+        // 注册所有 IPC handler
+        registerIpcHandlers({ preload, url, indexHtml, env });
+
         // Set app user model id for windows
         electronApp.setAppUserModelId("com.electron");
 

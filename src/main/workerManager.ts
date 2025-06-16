@@ -1,4 +1,6 @@
-import PQueue from "p-queue";
+// @ts-ignore
+const PQueue = require("p-queue");
+const QueueCtor = PQueue.default || PQueue;
 import { Worker } from "worker_threads";
 import { IpcMainInvokeEvent } from "electron";
 import { randomUUID } from "crypto";
@@ -16,7 +18,7 @@ interface TaskMeta {
 }
 
 // 全局队列和任务状态表
-const queue = new PQueue({ concurrency: 1 }); // 串行队列
+const queue = new QueueCtor({ concurrency: 1 }); // 串行队列
 const tasks: Map<string, TaskMeta> = new Map();
 const activeWorkers: Map<string, Worker> = new Map(); // 活跃 worker
 
