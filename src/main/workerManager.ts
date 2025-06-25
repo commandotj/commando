@@ -1,20 +1,26 @@
-// @ts-ignore
-const PQueue = require("p-queue");
-const QueueCtor = PQueue.default || PQueue;
+import PQueue from "p-queue";
+/**
+ * 解决 p-queue 类型错误
+ * PQueue 是默认导出的，所以需要使用 default 属性, 但是 typescript 会报错，所以需要使用 any 类型
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const QueueCtor = (PQueue as any).default || PQueue;
+
 import { Worker } from "worker_threads";
 import { IpcMainInvokeEvent } from "electron";
 import { randomUUID } from "crypto";
 import workerPath from "./copyWorker?modulePath";
+import type { CopyParams, CopyWorkerMessage } from "../../typings/copy";
 
 // 复制任务类型
-type CopyTaskParams = { src: string; dest: string };
 export type CopyTaskStatus = "pending" | "running" | "done" | "error";
 
 interface TaskMeta {
     id: string;
-    params: CopyTaskParams;
+    params: CopyParams;
     status: CopyTaskStatus;
     error?: string;
+    onProgress?: (msg: CopyWorkerMessage) => void;
 }
 
 // 全局队列和任务状态表
@@ -22,19 +28,32 @@ const queue = new QueueCtor({ concurrency: 1 }); // 串行队列
 const tasks: Map<string, TaskMeta> = new Map();
 const activeWorkers: Map<string, Worker> = new Map(); // 活跃 worker
 
+type AddTaskOptions =
+    | {
+          params: CopyParams;
+          event: IpcMainInvokeEvent;
+          onProgress?: never; // onProgress 和 event 互斥
+      }
+    | {
+          params: CopyParams;
+          event?: never;
+          onProgress: (msg: CopyWorkerMessage) => void;
+      };
+
 /**
  * 添加复制任务到队列，返回唯一 taskId
- * @param params 复制参数
- * @param event IPC 事件对象（用于推送进度）
+ * @param options 包含复制参数、onProgress 回调或 IPC 事件对象
  */
-export function addCopyTask(
-    params: CopyTaskParams,
-    event: IpcMainInvokeEvent
-): string {
+export function addCopyTask(options: AddTaskOptions): string {
     const id = randomUUID();
-    const meta: TaskMeta = { id, params, status: "pending" };
+    const meta: TaskMeta = {
+        id,
+        params: options.params,
+        status: "pending",
+        onProgress: options.onProgress,
+    };
     tasks.set(id, meta);
-    queue.add(() => runCopyWorker(id, params, event));
+    queue.add(() => runCopyWorker(id, options.params, options.event));
     return id;
 }
 
@@ -43,55 +62,81 @@ export function addCopyTask(
  */
 async function runCopyWorker(
     id: string,
-    params: CopyTaskParams,
-    event: IpcMainInvokeEvent
+    params: CopyParams,
+    event?: IpcMainInvokeEvent
 ): Promise<void> {
     const meta = tasks.get(id);
     if (!meta) return;
+
     meta.status = "running";
+
+    const cleanup = (): void => {
+        tasks.delete(id);
+        activeWorkers.delete(id);
+    };
+
     return new Promise((resolve) => {
         const worker = new Worker(workerPath, { workerData: params });
         activeWorkers.set(id, worker);
-        worker.on("message", (msg) => {
-            // 进度/完成/异常均带上 taskId
-            event.sender.send("copy-progress", { taskId: id, ...msg });
+
+        const handleMessage = (msg: CopyWorkerMessage): void => {
+            // 优先使用 onProgress 回调
+            if (meta.onProgress) {
+                meta.onProgress(msg);
+            } else if (event) {
+                // 其次使用 IPC event 推送
+                event.sender.send("copy-progress", { taskId: id, ...msg });
+            }
+
             if (msg.type === "done") {
                 meta.status = "done";
                 resolve();
                 worker.terminate();
-                activeWorkers.delete(id);
+                cleanup();
             } else if (msg.type === "error") {
                 meta.status = "error";
                 meta.error = msg.error;
                 resolve();
                 worker.terminate();
-                activeWorkers.delete(id);
+                cleanup();
             }
-        });
+        };
+
+        worker.on("message", handleMessage);
+
         worker.on("error", (err) => {
             meta.status = "error";
             meta.error = err.message;
-            event.sender.send("copy-progress", {
-                taskId: id,
+            const errorMsg: CopyWorkerMessage = {
                 type: "error",
                 error: err.message,
-            });
+            };
+
+            // 统一处理错误消息
+            handleMessage(errorMsg);
+
             resolve();
             worker.terminate();
-            activeWorkers.delete(id);
+            cleanup();
         });
+
         worker.on("exit", (code) => {
-            if (code !== 0 && meta.status !== "error") {
+            if (
+                code !== 0 &&
+                meta.status !== "done" &&
+                meta.status !== "error"
+            ) {
                 meta.status = "error";
                 meta.error = `Worker exited with code ${code}`;
-                event.sender.send("copy-progress", {
-                    taskId: id,
+                const errorMsg: CopyWorkerMessage = {
                     type: "error",
                     error: meta.error,
-                });
+                };
+                // 统一处理退出消息
+                handleMessage(errorMsg);
             }
             resolve();
-            activeWorkers.delete(id);
+            cleanup();
         });
     });
 }
@@ -99,8 +144,9 @@ async function runCopyWorker(
 /**
  * 查询所有任务状态
  */
-export function getCopyQueueStatus(): TaskMeta[] {
-    return Array.from(tasks.values());
+export function getCopyQueueStatus(): Omit<TaskMeta, "onProgress">[] {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    return Array.from(tasks.values()).map(({ onProgress, ...rest }) => rest);
 }
 
 /**
@@ -110,49 +156,6 @@ export function cancelCopyTask(taskId: string): void {
     const worker = activeWorkers.get(taskId);
     if (worker) {
         worker.postMessage({ type: "cancel" });
-        // worker 退出后会自动清理 activeWorkers 引用
+        // worker 退出后会自动清理 activeWorkers 和 tasks 引用
     }
 }
-
-/**
- * 单文件复制任务，支持进度回调（用于批量复制）
- */
-export function addCopyTaskWithProgress(
-    src: string,
-    dest: string,
-    onProgress: (msg: ProgressMsg | DoneMsg | ErrorMsg) => void
-): Promise<void> {
-    return new Promise((resolve, reject) => {
-        const worker = new Worker(workerPath, { workerData: { src, dest } });
-        worker.on("message", (msg) => {
-            onProgress(msg);
-            if (msg.type === "done") {
-                resolve();
-                worker.terminate();
-            } else if (msg.type === "error") {
-                reject(new Error(msg.error));
-                worker.terminate();
-            }
-        });
-        worker.on("error", (err) => {
-            onProgress({ type: "error", error: err.message });
-            reject(err);
-            worker.terminate();
-        });
-        worker.on("exit", (code) => {
-            if (code !== 0) {
-                onProgress({
-                    type: "error",
-                    error: `Worker exited with code ${code}`,
-                });
-                reject(new Error(`Worker exited with code ${code}`));
-            }
-        });
-    });
-}
-
-// 详细注释：
-// 1. 所有复制请求通过 addCopyTask 加入队列，自动排队串行执行。
-// 2. 每个任务分配唯一 taskId，进度/完成/异常均带 taskId 推送到前端。
-// 3. cancelCopyTask 可精确中断指定任务，worker 端会清理流和未完成文件。
-// 4. 支持后续扩展多 worker 并发、优先级、任务取消等。

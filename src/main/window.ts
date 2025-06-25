@@ -6,14 +6,10 @@ let mainWindow: BrowserWindow | null = null;
 
 export async function createWindow({
     preload,
-    url,
-    indexHtml,
     env,
 }: {
     preload: string;
-    url: string;
-    indexHtml: string;
-    env: any;
+    env: { PUBLIC: string };
 }): Promise<void> {
     const { width, height } = screen.getPrimaryDisplay().workAreaSize;
     mainWindow = new BrowserWindow({

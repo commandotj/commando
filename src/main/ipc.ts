@@ -7,7 +7,7 @@ import {
     cancelCopyTask,
 } from "./workerManager";
 import logger from "./logger";
-import { batchCopy } from "./batchCopyService";
+import { batchCopy, cancelBatchCopy } from "./batchCopyService";
 
 export function registerIpcHandlers({
     preload,
@@ -75,7 +75,7 @@ export function registerIpcHandlers({
     // 复制请求 handler（队列化，返回 taskId）
     ipcMain.handle("copy-file", (event, { src, dest }) => {
         // 参数校验可根据需要补充
-        return addCopyTask({ src, dest }, event);
+        return addCopyTask({ params: { src, dest }, event });
     });
 
     // 查询复制队列状态 handler
@@ -98,13 +98,22 @@ export function registerIpcHandlers({
         }
     });
 
-    // 批量复制请求 handler（队列化，返回 taskId）
+    // 批量复制请求 handler（队列化，返回 batchId）
     ipcMain.handle("copy-batch", async (event, { srcs, dest }) => {
         // 参数校验
         if (!Array.isArray(srcs) || typeof dest !== "string") {
             throw new Error("Invalid parameters for copy-batch");
         }
-        // 只做分发，具体逻辑交给 batchCopyService
+        // 分发给 batchCopyService 处理
         return batchCopy({ srcs, dest, event });
+    });
+
+    // 取消批量复制任务 handler
+    ipcMain.handle("cancel-copy-batch", (_event, batchId: string) => {
+        if (typeof batchId === "string") {
+            cancelBatchCopy(batchId);
+            return true;
+        }
+        return false;
     });
 }

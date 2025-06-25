@@ -18,6 +18,21 @@ type FileProgress = {
 
 type BatchStatus = "running" | "done" | "canceled" | "error";
 
+// 定义进度消息类型
+interface BatchProgressMsg {
+    taskId: string;
+    type: "progress" | "done";
+    current: number;
+    total: number;
+    file?: string;
+    fileProgress?: {
+        copied?: number;
+        total?: number;
+        error?: string;
+    };
+    status?: "running" | "done" | "canceled" | "error";
+}
+
 const BatchCopyProgressModal: React.FC<BatchCopyProgressModalProps> = ({
     open,
     srcs,
@@ -31,6 +46,7 @@ const BatchCopyProgressModal: React.FC<BatchCopyProgressModalProps> = ({
     const [status, setStatus] = useState<BatchStatus>("running");
     const [canceling, setCanceling] = useState(false);
     const progressRef = useRef<Record<string, FileProgress>>({});
+    const [errorModal, setErrorModal] = useState<string | null>(null);
 
     // 发起批量复制请求
     useEffect(() => {
@@ -56,43 +72,50 @@ const BatchCopyProgressModal: React.FC<BatchCopyProgressModalProps> = ({
 
     // 监听进度事件
     useEffect(() => {
-        if (!open) return;
-        function onProgress(_: unknown, msg: any): void {
+        if (!open) {
+            return;
+        }
+        function onProgress(_: unknown, msg: BatchProgressMsg): void {
             if (!msg || !msg.taskId || msg.taskId !== taskId) return;
             if (msg.type === "progress") {
-                const percent =
-                    msg.fileProgress &&
-                    typeof msg.fileProgress.copied === "number" &&
-                    typeof msg.fileProgress.total === "number"
-                        ? Math.floor(
-                              (msg.fileProgress.copied /
-                                  msg.fileProgress.total) *
-                                  100
-                          )
-                        : msg.fileProgress && msg.fileProgress.error
-                          ? 0
-                          : 100;
-                progressRef.current[msg.file] = {
-                    file: msg.file,
-                    status:
-                        msg.status === "error"
-                            ? "error"
-                            : percent === 100
-                              ? "done"
-                              : "running",
-                    progress: percent,
-                    error: msg.fileProgress && msg.fileProgress.error,
-                };
-                setFileProgressList(
-                    srcs.map(
-                        (f) =>
-                            progressRef.current[f] || {
-                                file: f,
-                                status: "pending",
-                                progress: 0,
-                            }
-                    )
-                );
+                if (msg.file) {
+                    const percent =
+                        msg.fileProgress &&
+                        typeof msg.fileProgress.copied === "number" &&
+                        typeof msg.fileProgress.total === "number"
+                            ? Math.floor(
+                                  (msg.fileProgress.copied /
+                                      msg.fileProgress.total) *
+                                      100
+                              )
+                            : msg.fileProgress && msg.fileProgress.error
+                              ? 0
+                              : 100;
+                    progressRef.current[msg.file] = {
+                        file: msg.file,
+                        status:
+                            msg.status === "error"
+                                ? "error"
+                                : percent === 100
+                                  ? "done"
+                                  : "running",
+                        progress: percent,
+                        error: msg.fileProgress && msg.fileProgress.error,
+                    };
+                    setFileProgressList(
+                        srcs.map(
+                            (f) =>
+                                progressRef.current[f] || {
+                                    file: f,
+                                    status: "pending",
+                                    progress: 0,
+                                }
+                        )
+                    );
+                    if (msg.status === "error" && msg.fileProgress?.error) {
+                        setErrorModal(msg.fileProgress.error);
+                    }
+                }
             } else if (msg.type === "done") {
                 setStatus(msg.status === "canceled" ? "canceled" : "done");
             }
@@ -149,7 +172,7 @@ const BatchCopyProgressModal: React.FC<BatchCopyProgressModalProps> = ({
                     </Dialog.Title>
                     <div className="mb-4">
                         <div className="flex justify-between mb-1">
-                            <span>总进度</span>
+                            <span>批次进度</span>
                             <span>{overallPercent}%</span>
                         </div>
                         <Progress.Root
@@ -163,7 +186,10 @@ const BatchCopyProgressModal: React.FC<BatchCopyProgressModalProps> = ({
                             />
                         </Progress.Root>
                     </div>
-                    <div className="max-h-64 overflow-y-auto mb-4">
+                    <div className="max-h-48 overflow-y-auto mb-4 border border-gray-100 dark:border-gray-700 rounded p-2 bg-gray-50 dark:bg-gray-900">
+                        <div className="mb-2 font-semibold text-sm">
+                            文件进度
+                        </div>
                         {fileProgressList.map((fp) => (
                             <div key={fp.file} className="mb-2">
                                 <div className="flex justify-between text-sm">
@@ -215,11 +241,6 @@ const BatchCopyProgressModal: React.FC<BatchCopyProgressModalProps> = ({
                                         }}
                                     />
                                 </Progress.Root>
-                                {fp.error && (
-                                    <div className="text-xs text-red-500 mt-1">
-                                        {fp.error}
-                                    </div>
-                                )}
                             </div>
                         ))}
                     </div>
@@ -252,13 +273,33 @@ const BatchCopyProgressModal: React.FC<BatchCopyProgressModalProps> = ({
                             全部完成
                         </div>
                     )}
-                    {status === "error" && (
-                        <div className="text-center text-red-600 mt-2">
-                            发生错误
-                        </div>
-                    )}
                 </Dialog.Content>
             </Dialog.Portal>
+            {/* 错误确认弹窗 */}
+            <Dialog.Root
+                open={!!errorModal}
+                onOpenChange={(v) => !v && setErrorModal(null)}
+            >
+                <Dialog.Portal>
+                    <Dialog.Overlay className="fixed inset-0 z-60 bg-black/40" />
+                    <Dialog.Content className="fixed z-60 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-sm p-6 focus:outline-none">
+                        <Dialog.Title className="text-lg font-bold mb-4 text-red-600">
+                            复制错误
+                        </Dialog.Title>
+                        <div className="mb-4 text-sm text-red-500 break-all">
+                            {errorModal}
+                        </div>
+                        <div className="flex justify-end">
+                            <button
+                                className="px-4 py-2 bg-red-500 text-white rounded"
+                                onClick={() => setErrorModal(null)}
+                            >
+                                确认
+                            </button>
+                        </div>
+                    </Dialog.Content>
+                </Dialog.Portal>
+            </Dialog.Root>
         </Dialog.Root>
     );
 };

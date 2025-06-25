@@ -141,20 +141,6 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
         },
     ];
 
-    const selectedRowKeys = pane.selectedKeys;
-    // 复制按钮禁用逻辑：无选中项时禁用
-    const copyDisabled = !selectedRowKeys || selectedRowKeys.length === 0;
-    const handleRowSelectionChange = (
-        newSelectedRowKeys: React.Key[]
-    ): void => {
-        dispatch(
-            setPaneSelectedKeys({
-                paneIndex,
-                selectedKeys: newSelectedRowKeys.map(String),
-            })
-        );
-    };
-
     const handleFocus = (): void => {
         dispatch(setActivePane(paneIndex));
     };
@@ -212,19 +198,25 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                         .filter(
                             (entry: FileEntry) => !entry.name.startsWith(".")
                         )
-                        .map((entry: FileEntry, idx: number) => ({
+                        .map((entry: FileEntry) => ({
                             ...entry,
-                            // 关键注释：必须保证 dataSource 的 key 字段类型与 selectedRowKeys 完全一致（均为 string），否则 React diff 机制会导致多选/高亮失效。
-                            // 历史问题：将选中项迁移到 Redux 后，若 key 为 number 而 selectedRowKeys 为 string，导致 UI 不同步。强制 key 为 string 可彻底解决。
-                            key: String(idx),
+                            key: joinPath(pane.currentPath, entry.name),
                         }))}
-                    selectedRowKeys={selectedRowKeys}
-                    onRowSelectionChange={handleRowSelectionChange}
+                    selectedRowKeys={pane.selectedKeys}
+                    onRowSelectionChange={(newSelectedRowKeys: React.Key[]) => {
+                        dispatch(
+                            setPaneSelectedKeys({
+                                paneIndex,
+                                selectedKeys: newSelectedRowKeys.map(String),
+                            })
+                        );
+                    }}
                 />
             </div>
             {/* Footer/Status Bar */}
             <div className="flex items-center border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-300 px-4 py-0 h-[2rem] leading-none">
-                {pane.entries.length} items, 已选中 {selectedRowKeys.length} 项
+                {pane.entries.length} items, 已选中 {pane.selectedKeys.length}{" "}
+                项
             </div>
         </div>
     );

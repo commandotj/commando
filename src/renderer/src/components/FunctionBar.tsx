@@ -9,7 +9,6 @@ import {
 } from "@radix-ui/react-icons";
 import IconButton from "./IconButton"; // 独立组件文件
 import { useAppSelector, useAppDispatch } from "../app/hooks";
-import { useCopyToOtherPane } from "../hooks/useCopyToOtherPane";
 import BatchCopyProgressModal from "./BatchCopyProgressModal";
 import { fetchDirectory } from "../app/fileManagerSlice";
 
@@ -24,18 +23,16 @@ const FunctionBar: React.FC = () => {
     const [modalDest, setModalDest] = useState<string>("");
 
     // 复制到另一侧
-    const handleCopyToOtherPane = () => {
+    const handleCopyToOtherPane = (): void => {
         if (copyDisabled) return;
         const srcPane = panes[activePane];
         const dstPaneIndex = activePane === 0 ? 1 : 0;
         const dstPane = panes[dstPaneIndex];
-        if (!srcPane || !dstPane || !srcPane.selectedKeys.length) return;
-        // 组装源文件绝对路径数组
-        const sources: string[] = srcPane.selectedKeys.map((name) =>
-            srcPane.currentPath.endsWith("/")
-                ? srcPane.currentPath + name
-                : srcPane.currentPath + "/" + name
-        );
+        if (!srcPane || !dstPane || !srcPane.selectedKeys.length) {
+            return;
+        }
+        // 直接用 selectedKeys 作为绝对路径数组
+        const sources: string[] = srcPane.selectedKeys;
         const targetDir: string = dstPane.currentPath;
         setModalSrcs(sources);
         setModalDest(targetDir);
@@ -43,7 +40,7 @@ const FunctionBar: React.FC = () => {
     };
 
     // Modal 关闭后刷新目标 pane
-    const handleModalClose = () => {
+    const handleModalClose = (): void => {
         setModalOpen(false);
         // 复制完成后刷新目标 pane
         const dstPaneIndex = activePane === 0 ? 1 : 0;

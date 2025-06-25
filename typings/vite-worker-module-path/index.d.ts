@@ -1,9 +1,5 @@
-// vite-worker-module-path.d.ts (auto-generated)
-declare module "./copyWorker?modulePath" {
-  const workerPath: string;
-  export default workerPath;
-}
+// vite-worker-module-path.d.ts
 declare module "*?modulePath" {
-  const workerPath: string;
-  export default workerPath;
+    const path: string;
+    export default path;
 }

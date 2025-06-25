@@ -55,7 +55,7 @@ async function initI18n(): Promise<void> {
         electronApp.setAppUserModelId("com.electron");
 
         Menu.setApplicationMenu(Menu.buildFromTemplate(getMenuTemplate({})));
-        createWindow({ preload, url, indexHtml, env });
+        createWindow({ preload, env });
     });
 
     // 支持运行时切换语言
@@ -84,7 +84,7 @@ app.on("activate", () => {
     if (allWindows.length) {
         allWindows[0].focus();
     } else {
-        createWindow({ preload, url, indexHtml, env });
+        createWindow({ preload, env });
     }
 });
 

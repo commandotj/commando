@@ -63,7 +63,10 @@ describe("workerManager", () => {
     } as Partial<IpcMainInvokeEvent> as IpcMainInvokeEvent;
 
     it("addCopyTask 应返回唯一 taskId 并加入队列", async () => {
-        const id = addCopyTask({ src: "/a", dest: "/b" }, mockEvent);
+        const id = addCopyTask({
+            params: { src: "/a", dest: "/b" },
+            event: mockEvent,
+        });
         expect(typeof id).toBe("string");
         // 等待 worker 执行完成
         await new Promise((r) => setTimeout(r, 300));

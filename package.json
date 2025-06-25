@@ -14,13 +14,11 @@
         "start": "electron-vite preview",
         "dev": "electron-vite dev",
         "build": "npm run typecheck && electron-vite build",
-        "gen:worker-support": "node scripts/genWorkerModuleSupport.js",
-        "postinstall": "npm run gen:worker-support",
         "build:unpack": "npm run build && electron-builder --dir",
         "build:win": "npm run build && electron-builder --win",
         "build:mac": "electron-vite build && electron-builder --mac",
         "build:linux": "electron-vite build && electron-builder --linux",
-        "test": "npm run gen:worker-support && jest --runInBand",
+        "test": "jest --runInBand",
         "test:coverage": "jest --coverage --runInBand"
     },
     "dependencies": {

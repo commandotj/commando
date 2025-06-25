@@ -5,7 +5,7 @@ import { fetchDirectory } from "../app/fileManagerSlice";
 /**
  * useCopyToOtherPane
  * 用于"复制到另一侧"功能，自动读取当前激活 pane 的选中项和路径，
- * 组装参数并调用 window.fsApi.copyFile，复制完成后刷新目标 pane。
+ * 组装参数并调用 window.fsApi.copyBatch，复制完成后刷新目标 pane。
  * 支持批量复制和异常提示。
  */
 export function useCopyToOtherPane(): () => Promise<void> {
@@ -26,7 +26,7 @@ export function useCopyToOtherPane(): () => Promise<void> {
             );
             const targetDir: string = dstPane.currentPath;
             // 调用 preload 层 API，支持批量
-            await window.fsApi.copyFile(sources, targetDir);
+            await window.fsApi.copyBatch(sources, targetDir);
             // 刷新目标 pane
             dispatch(
                 fetchDirectory({ paneIndex: dstPaneIndex, path: targetDir })

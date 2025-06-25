@@ -4,25 +4,24 @@
 // 创建时间：2025-06-15
 // 用于主进程、worker、渲染端类型安全共享
 
-declare global {
-    interface CopyParams {
-        src: string;
-        dest: string;
-    }
-
-    interface ProgressMsg {
-        type: "progress";
-        copied: number;
-        total: number;
-    }
-
-    interface DoneMsg {
-        type: "done";
-    }
-
-    interface ErrorMsg {
-        type: "error";
-        error: string;
-    }
+export interface CopyParams {
+    src: string;
+    dest: string;
 }
-export {};
+
+export interface ProgressMsg {
+    type: "progress";
+    copied: number;
+    total: number;
+}
+
+export interface DoneMsg {
+    type: "done";
+}
+
+export interface ErrorMsg {
+    type: "error";
+    error: string;
+}
+
+export type CopyWorkerMessage = ProgressMsg | DoneMsg | ErrorMsg;

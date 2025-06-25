@@ -1,5 +1,11 @@
 import { parentPort, workerData } from "worker_threads";
 import fs from "fs";
+import type {
+    CopyParams,
+    ProgressMsg,
+    DoneMsg,
+    ErrorMsg,
+} from "../../typings/copy";
 // import path from "path"; // 未使用，移除
 
 const { src, dest } = workerData as CopyParams;

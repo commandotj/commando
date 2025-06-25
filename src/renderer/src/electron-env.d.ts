@@ -1,9 +1,12 @@
+import type { CopyWorkerMessage } from "../../../typings/copy";
+
 export {};
 
 declare global {
     interface Window {
         fsApi: {
-            listDir: (path: string) => Promise<any>;
+            listDir: (path: string) => Promise<unknown>;
+            getHomeDir: () => string;
             listDrives: () => Promise<
                 Array<{
                     device: string;
@@ -14,13 +17,25 @@ declare global {
                     isRemovable: boolean;
                 }>
             >;
-            /**
-             * 复制文件或目录，支持单个或批量
-             * @param src 源文件/目录路径或路径数组
-             * @param dest 目标目录路径
-             */
-            copyFile: (src: string | string[], dest: string) => Promise<any>;
-            // Add other methods as needed
+            copyFile: (src: string, dest: string) => Promise<string>;
+            copyBatch: (srcs: string[], dest: string) => Promise<string>;
+            onCopyProgress: (cb: (msg: CopyWorkerMessage) => void) => void;
+            onCopyBatchProgress: (cb: (msg: CopyWorkerMessage) => void) => void;
+            getCopyQueueStatus: () => Promise<unknown>;
+            cancelCopyTask: (taskId: string) => Promise<boolean>;
+            cancelCopyBatch: (batchId: string) => Promise<boolean>;
+        };
+        electron: {
+            ipcRenderer: {
+                on: (
+                    channel: string,
+                    listener: (event: unknown, ...args: unknown[]) => void
+                ) => void;
+                removeListener: (
+                    channel: string,
+                    listener: (...args: unknown[]) => void
+                ) => void;
+            };
         };
     }
 }
