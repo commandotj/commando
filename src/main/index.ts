@@ -9,18 +9,18 @@ import i18next from "i18next";
 import enUS from "./i18n/en-US.json";
 import zhCN from "./i18n/zh-CN.json";
 
-(process as any).env.DIST_ELECTRON = join(__dirname, "../");
-(process as any).env.DIST = join((process as any).env.DIST_ELECTRON, "../dist");
-(process as any).env.PUBLIC = (process as any).env.VITE_DEV_SERVER_URL
-    ? join((process as any).env.DIST_ELECTRON, "../public")
-    : (process as any).env.DIST;
+process.env.DIST_ELECTRON = join(__dirname, "../");
+process.env.DIST = join(process.env.DIST_ELECTRON, "../dist");
+process.env.PUBLIC = process.env.VITE_DEV_SERVER_URL
+    ? join(process.env.DIST_ELECTRON, "../public")
+    : process.env.DIST;
 
 // Disable GPU Acceleration for Windows 7
 if (release().startsWith("6.1")) app.disableHardwareAcceleration();
 
 if (!app.requestSingleInstanceLock()) {
     app.quit();
-    (process as any).exit(0);
+    process.exit(0);
 }
 
 // Remove electron security warnings
@@ -30,9 +30,9 @@ if (!app.requestSingleInstanceLock()) {
 
 // Here, you can also use other preload
 const preload = join(__dirname, "../preload/index.js");
-const url = (process as any).env.VITE_DEV_SERVER_URL;
-const indexHtml = join((process as any).env.DIST, "index.html");
-const env = (process as any).env;
+const url = process.env.VITE_DEV_SERVER_URL || "";
+const indexHtml = join(process.env.DIST, "index.html");
+const env = process.env as unknown as { PUBLIC: string };
 
 async function initI18n(): Promise<void> {
     await i18next.init({
@@ -66,7 +66,7 @@ async function initI18n(): Promise<void> {
 })();
 
 app.on("window-all-closed", () => {
-    if ((process as any).platform !== "darwin") app.quit();
+    if (process.platform !== "darwin") app.quit();
 });
 
 app.on("second-instance", () => {
