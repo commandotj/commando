@@ -75,32 +75,33 @@ const BatchCopyProgressModal: React.FC<BatchCopyProgressModalProps> = ({
         if (!open) {
             return;
         }
-        function onProgress(_: unknown, msg: BatchProgressMsg): void {
-            if (!msg || !msg.taskId || msg.taskId !== taskId) return;
-            if (msg.type === "progress") {
-                if (msg.file) {
+        function onProgress(_: unknown, msg: unknown): void {
+            const batchMsg = msg as BatchProgressMsg;
+            if (!batchMsg || !batchMsg.taskId || batchMsg.taskId !== taskId) return;
+            if (batchMsg.type === "progress") {
+                if (batchMsg.file) {
                     const percent =
-                        msg.fileProgress &&
-                        typeof msg.fileProgress.copied === "number" &&
-                        typeof msg.fileProgress.total === "number"
+                        batchMsg.fileProgress &&
+                        typeof batchMsg.fileProgress.copied === "number" &&
+                        typeof batchMsg.fileProgress.total === "number"
                             ? Math.floor(
-                                  (msg.fileProgress.copied /
-                                      msg.fileProgress.total) *
+                                  (batchMsg.fileProgress.copied /
+                                      batchMsg.fileProgress.total) *
                                       100
                               )
-                            : msg.fileProgress && msg.fileProgress.error
+                            : batchMsg.fileProgress && batchMsg.fileProgress.error
                               ? 0
                               : 100;
-                    progressRef.current[msg.file] = {
-                        file: msg.file,
+                    progressRef.current[batchMsg.file] = {
+                        file: batchMsg.file,
                         status:
-                            msg.status === "error"
+                            batchMsg.status === "error"
                                 ? "error"
                                 : percent === 100
                                   ? "done"
                                   : "running",
                         progress: percent,
-                        error: msg.fileProgress && msg.fileProgress.error,
+                        error: batchMsg.fileProgress && batchMsg.fileProgress.error,
                     };
                     setFileProgressList(
                         srcs.map(
@@ -112,12 +113,12 @@ const BatchCopyProgressModal: React.FC<BatchCopyProgressModalProps> = ({
                                 }
                         )
                     );
-                    if (msg.status === "error" && msg.fileProgress?.error) {
-                        setErrorModal(msg.fileProgress.error);
+                    if (batchMsg.status === "error" && batchMsg.fileProgress?.error) {
+                        setErrorModal(batchMsg.fileProgress.error);
                     }
                 }
-            } else if (msg.type === "done") {
-                setStatus(msg.status === "canceled" ? "canceled" : "done");
+            } else if (batchMsg.type === "done") {
+                setStatus(batchMsg.status === "canceled" ? "canceled" : "done");
             }
         }
         // @ts-ignore: electron API

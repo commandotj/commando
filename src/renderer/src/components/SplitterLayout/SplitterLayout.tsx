@@ -2,15 +2,16 @@ import React, { ReactNode } from 'react';
 import Pane from './Pane';
 
 function clearSelection() {
-    if (document.body.createTextRange) {
-        const range = document.body.createTextRange();
+    if ((document.body as any).createTextRange) {
+        const range = (document.body as any).createTextRange();
         range.collapse();
         range.select();
     } else if (window.getSelection) {
-        if ((window.getSelection() as any).empty) {
-            (window.getSelection() as any).empty();
-        } else if (window.getSelection().removeAllRanges) {
-            window.getSelection().removeAllRanges();
+        const selection = window.getSelection();
+        if (selection && (selection as any).empty) {
+            (selection as any).empty();
+        } else if (selection && selection.removeAllRanges) {
+            selection.removeAllRanges();
         }
     } else if ((document as any).selection) {
         (document as any).selection.empty();
@@ -105,7 +106,7 @@ class SplitterLayout extends React.Component<SplitterLayoutProps, SplitterLayout
         this.setState({ secondaryPaneSize });
     }
 
-    componentDidUpdate(prevProps: SplitterLayoutProps, prevState: SplitterLayoutState) {
+    componentDidUpdate(_prevProps: SplitterLayoutProps, prevState: SplitterLayoutState) {
         if (
             prevState.secondaryPaneSize !== this.state.secondaryPaneSize &&
             this.props.onSecondaryPaneSizeChange
@@ -251,14 +252,14 @@ class SplitterLayout extends React.Component<SplitterLayoutProps, SplitterLayout
         if (children.length === 0) {
             children.push(<div />);
         }
-        const wrappedChildren = [];
+        const wrappedChildren: React.ReactElement[] = [];
         const primaryIndex =
             this.props.primaryIndex !== 0 && this.props.primaryIndex !== 1
                 ? 0
                 : this.props.primaryIndex;
         for (let i = 0; i < children.length; ++i) {
             let primary = true;
-            let size = undefined;
+            let size: number | undefined = undefined;
             if (children.length > 1 && i !== primaryIndex) {
                 primary = false;
                 size = this.state.secondaryPaneSize;

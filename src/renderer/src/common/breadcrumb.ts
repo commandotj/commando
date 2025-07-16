@@ -33,7 +33,7 @@ export function calculateVisibleBreadcrumbSegments(
         }
     }
     // 折叠剩余未显示的中间层级
-    const folded = [];
+    const folded: number[] = [];
     for (let i = 1; i < segments.length - 1; i++) {
         if (!visible.includes(i)) folded.push(i);
     }

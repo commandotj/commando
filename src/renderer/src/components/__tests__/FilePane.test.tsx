@@ -128,12 +128,15 @@ describe("FilePane", () => {
                                 size: 123456,
                             },
                         ],
+                        selectedKeys: [],
                     },
                     {
                         currentPath: "/Users/test",
                         entries: [],
+                        selectedKeys: [],
                     },
                 ],
+                activePane: 0,
             },
         });
         dispatch = jest.fn();
