@@ -7,6 +7,8 @@ import { BrowserWindow } from "electron";
 import { serviceRegistry } from "./core/ServiceDecorator";
 import CopyService from "./CopyService";
 import FileService from "./FileService";
+import DirectoryService from "./DirectoryService";
+import DriveService from "./DriveService";
 import logger from "@main/log/logger";
 import type { ServiceRegistry } from "./core/ServiceDecorator";
 
@@ -31,6 +33,12 @@ export async function initializeServices(
 
         logger.info("Registering FileService");
         serviceRegistry.register(FileService);
+
+        logger.info("Registering DirectoryService");
+        serviceRegistry.register(DirectoryService);
+
+        logger.info("Registering DriveService");
+        serviceRegistry.register(DriveService);
 
         // Initialize all registered services
         await serviceRegistry.initializeAll();

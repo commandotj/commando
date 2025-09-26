@@ -1,6 +1,4 @@
 import { ipcMain, BrowserWindow } from "electron";
-import { listDirSync } from "./listDir";
-import { listDrives } from "./drive";
 import {
     addCopyTask,
     getCopyQueueStatus,
@@ -20,39 +18,11 @@ export function registerIpcHandlers({
     indexHtml: string;
     env: Record<string, string>;
 }): void {
-    // IPC handler for directory listing
-    ipcMain.handle("list-dir", async (_event, dirPath) => {
-        try {
-            return listDirSync(dirPath);
-        } catch (err) {
-            logger.error("list-dir 失败", {
-                time: new Date().toISOString(),
-                error: err instanceof Error ? err.message : String(err),
-            });
-            return [];
-        }
-    });
+    // IPC handler for directory listing is now handled by DirectoryService
+    // The directory:list channel is automatically registered by DirectoryService
 
-    // IPC handler for listing drives
-    ipcMain.handle("list-drives", async () => {
-        const start = Date.now();
-        try {
-            const drives = await listDrives();
-            const durationMs = Date.now() - start;
-            logger.info("list-drives 请求", {
-                time: new Date().toISOString(),
-                count: drives.length,
-                durationMs,
-            });
-            return drives;
-        } catch (err) {
-            logger.error("list-drives 失败", {
-                time: new Date().toISOString(),
-                error: err instanceof Error ? err.message : String(err),
-            });
-            return [];
-        }
-    });
+    // IPC handler for drive operations is now handled by DriveService
+    // The drive:list, drive:details, drive:refresh channels are automatically registered by DriveService
 
     // New window example arg: new windows url
     ipcMain.handle("open-win", (_, arg) => {

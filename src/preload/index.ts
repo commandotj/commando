@@ -4,9 +4,43 @@ import type { CopyWorkerMessage } from "../../typings/copy";
 import "./logger";
 
 contextBridge.exposeInMainWorld("fsApi", {
-    listDir: (path: string) => ipcRenderer.invoke("list-dir", path),
+    // 目录操作 - 使用新的DirectoryService
+    listDir: (
+        path: string,
+        options?: {
+            includeHidden?: boolean;
+            sortBy?: "name" | "size" | "mtime" | "type";
+            sortOrder?: "asc" | "desc";
+            includePermissions?: boolean;
+        }
+    ) => ipcRenderer.invoke("directory:list", { path, options }),
+
+    // 目录导航
+    navigate: (path: string, addToHistory?: boolean) =>
+        ipcRenderer.invoke("directory:navigate", { path, addToHistory }),
+
+    // 获取当前目录
+    getCurrentDir: () => ipcRenderer.invoke("directory:current"),
+
+    // 导航到父目录
+    goToParent: () => ipcRenderer.invoke("directory:parent"),
+
+    // 获取导航历史
+    getHistory: () => ipcRenderer.invoke("directory:history"),
+
+    // 刷新当前目录
+    refresh: () => ipcRenderer.invoke("directory:refresh"),
+
+    // 监听目录变化
+    onDirectoryChanged: (
+        cb: (data: { path: string; entryCount: number }) => void
+    ) => {
+        ipcRenderer.on("directory:changed", (_event, data) => cb(data));
+    },
+
+    // 其他文件系统操作
     getHomeDir: () => os.homedir(),
-    listDrives: () => ipcRenderer.invoke("list-drives"),
+    listDrives: () => ipcRenderer.invoke("drive:list"),
     /**
      * 发起复制任务，支持单个，返回 taskId 或 taskId[]
      */

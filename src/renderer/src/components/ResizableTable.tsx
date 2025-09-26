@@ -13,7 +13,11 @@ interface ResizableTableProps<T extends object> {
     dataSource: T[];
     selectedRowKeys?: React.Key[];
     onRowSelectionChange?: (selected: React.Key[]) => void;
-    renderRowContextMenu?: (row: T, rowIndex: number, rowElement: React.ReactNode) => React.ReactNode;
+    renderRowContextMenu?: (
+        row: T,
+        rowIndex: number,
+        rowElement: React.ReactNode
+    ) => React.ReactNode;
 }
 
 function getRowKey<T extends object>(row: T, idx: number): React.Key {
@@ -27,7 +31,7 @@ export function ResizableTable<T extends object>({
     selectedRowKeys = [],
     onRowSelectionChange,
     renderRowContextMenu,
-}: ResizableTableProps<T>) {
+}: ResizableTableProps<T>): JSX.Element {
     const [lastSelected, setLastSelected] = React.useState<number | null>(null);
     // 选中项 state 由父组件控制
     const handleCheckboxChange = (
@@ -229,7 +233,6 @@ export function ResizableTable<T extends object>({
                     {table.getRowModel().rows.map((row, idx) => {
                         const rowElement = (
                             <div
-                                key={row.id}
                                 className={
                                     "tr flex hover:bg-gray-50 dark:hover:bg-gray-800" +
                                     (selectedRowKeys.includes(
@@ -264,7 +267,8 @@ export function ResizableTable<T extends object>({
                                         style={{
                                             flex: `0 0 calc(var(--col-${cell.column.id}-size) * 1px)`,
                                             minWidth:
-                                                cell.column.columnDef.minSize ?? 60,
+                                                cell.column.columnDef.minSize ??
+                                                60,
                                             maxWidth:
                                                 cell.column.columnDef.maxSize ??
                                                 800,
@@ -280,9 +284,17 @@ export function ResizableTable<T extends object>({
                         );
 
                         // Wrap with context menu if provided
-                        return renderRowContextMenu 
-                            ? renderRowContextMenu(dataSource[idx], idx, rowElement)
-                            : rowElement;
+                        return (
+                            <React.Fragment key={row.id}>
+                                {renderRowContextMenu
+                                    ? renderRowContextMenu(
+                                          dataSource[idx],
+                                          idx,
+                                          rowElement
+                                      )
+                                    : rowElement}
+                            </React.Fragment>
+                        );
                     })}
                 </div>
             </SimpleBar>
