@@ -5,9 +5,11 @@ import { electronApp } from "@electron-toolkit/utils";
 import { registerIpcHandlers } from "./ipc";
 import { createWindow, getMainWindow } from "./window";
 import { getMenuTemplate } from "./menu";
+import { initializeServices, cleanupServices } from "./services";
 import i18next from "i18next";
 import enUS from "./i18n/en-US.json";
 import zhCN from "./i18n/zh-CN.json";
+import logger from "@main/log/logger";
 
 process.env.DIST_ELECTRON = join(__dirname, "../");
 process.env.DIST = join(process.env.DIST_ELECTRON, "../dist");
@@ -47,25 +49,53 @@ async function initI18n(): Promise<void> {
 
 (async () => {
     await initI18n();
-    app.whenReady().then(() => {
-        // 注册所有 IPC handler
-        registerIpcHandlers({ preload, url, indexHtml, env });
+    app.whenReady().then(async () => {
+        try {
+            // 注册所有 IPC handler
+            registerIpcHandlers({ preload, url, indexHtml, env });
 
-        // Set app user model id for windows
-        electronApp.setAppUserModelId("com.electron");
+            // Set app user model id for windows
+            electronApp.setAppUserModelId("me.systembug.commando");
 
-        Menu.setApplicationMenu(Menu.buildFromTemplate(getMenuTemplate({})));
-        createWindow({ preload, env });
+            Menu.setApplicationMenu(Menu.buildFromTemplate(getMenuTemplate({})));
+
+            // Create the main window
+            await createWindow({ preload, env });
+
+            // Initialize services after window is created
+            const mainWindow = getMainWindow();
+            if (mainWindow) {
+                await initializeServices(mainWindow);
+                logger.info("Application services initialized successfully");
+            } else {
+                logger.error("Failed to get main window for services initialization");
+            }
+
+        } catch (error) {
+            logger.error("Failed to initialize application", {
+                error: error instanceof Error ? error.message : String(error)
+            });
+        }
     });
 
     // 支持运行时切换语言
-    ipcMain.handle("set-language", async (_event, lang) => {
+    ipcMain.handle("set-language", async (_event, lang): Promise<void> => {
         await i18next.changeLanguage(lang);
         Menu.setApplicationMenu(Menu.buildFromTemplate(getMenuTemplate({})));
     });
 })();
 
-app.on("window-all-closed", () => {
+app.on("window-all-closed", async () => {
+    try {
+        // Cleanup services before quitting
+        await cleanupServices();
+        logger.info("Services cleaned up successfully");
+    } catch (error) {
+        logger.error("Failed to cleanup services", {
+            error: error instanceof Error ? error.message : String(error)
+        });
+    }
+
     if (process.platform !== "darwin") app.quit();
 });
 

@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { IpcMainInvokeEvent } from "electron";
 import { addCopyTask, cancelCopyTask } from "./workerManager";
-import logger from "./logger";
+import logger from "./log/logger";
 import type { CopyWorkerMessage } from "../../typings/copy";
 
 interface BatchTask {

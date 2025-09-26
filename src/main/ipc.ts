@@ -6,7 +6,7 @@ import {
     getCopyQueueStatus,
     cancelCopyTask,
 } from "./workerManager";
-import logger from "./logger";
+import logger from "./log/logger";
 import { batchCopy, cancelBatchCopy } from "./batchCopyService";
 
 export function registerIpcHandlers({

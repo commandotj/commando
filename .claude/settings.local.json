@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:electron-vite.org)",
+      "WebSearch",
+      "WebFetch(domain:newsletter.pragmaticengineer.com)",
+      "WebFetch(domain:fuchsia.dev)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

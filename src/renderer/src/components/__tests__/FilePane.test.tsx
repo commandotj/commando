@@ -108,6 +108,11 @@ beforeAll(() => {
         ]),
         // ...mock 其他方法
     } as unknown as typeof window.fsApi;
+
+    // Mock window.logApi
+    window.logApi = {
+        log: jest.fn(),
+    } as unknown as typeof window.logApi;
 });
 
 describe("FilePane", () => {
@@ -137,6 +142,17 @@ describe("FilePane", () => {
                     },
                 ],
                 activePane: 0,
+            },
+            clipboard: {
+                items: [],
+                operation: null,
+                sourcePane: null,
+                timestamp: 0,
+            },
+            fileOperations: {
+                activeOperations: {},
+                batchOperations: {},
+                operationHistory: [],
             },
         });
         dispatch = jest.fn();

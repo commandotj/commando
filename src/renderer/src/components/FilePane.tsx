@@ -10,6 +10,7 @@ import { ResizableTable } from "./ResizableTable";
 import { joinPath, formatSize } from "../common/path";
 import PathBreadcrumb from "./PathBreadcrumb";
 import DeviceBar, { DeviceInfo } from "./DeviceBar";
+import FileContextMenu from "./FileContextMenu";
 import logger from "../logger";
 
 interface FileEntry {
@@ -169,6 +170,21 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
         dispatch(fetchDirectory({ paneIndex, path: mountPath }));
     };
 
+    const handleDelete = (files: string[]) => {
+        // TODO: Implement delete functionality
+        console.log('Delete files:', files);
+    };
+
+    const handleRename = (file: string) => {
+        // TODO: Implement rename functionality
+        console.log('Rename file:', file);
+    };
+
+    const handleNewFolder = () => {
+        // TODO: Implement new folder functionality
+        console.log('Create new folder in:', pane.currentPath);
+    };
+
     return (
         <div className="flex flex-col h-full">
             {/* DeviceBar 设备栏 */}
@@ -191,7 +207,15 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                 tabIndex={0}
                 onFocus={handleFocus}
             >
-                <ResizableTable
+                <FileContextMenu
+                    selectedFiles={[]}
+                    currentPath={pane.currentPath}
+                    currentPane={paneIndex}
+                    onDelete={handleDelete}
+                    onRename={handleRename}
+                    onNewFolder={handleNewFolder}
+                >
+                    <ResizableTable
                     key={pane.currentPath}
                     columns={columns}
                     dataSource={pane.entries
@@ -211,7 +235,20 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                             })
                         );
                     }}
+                    renderRowContextMenu={(_row, _rowIndex, rowElement) => (
+                        <FileContextMenu
+                            selectedFiles={pane.selectedKeys}
+                            currentPath={pane.currentPath}
+                            currentPane={paneIndex}
+                            onDelete={handleDelete}
+                            onRename={handleRename}
+                            onNewFolder={handleNewFolder}
+                        >
+                            {rowElement}
+                        </FileContextMenu>
+                    )}
                 />
+                </FileContextMenu>
             </div>
             {/* Footer/Status Bar */}
             <div className="flex items-center border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-300 px-4 py-0 h-[2rem] leading-none">

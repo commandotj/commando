@@ -1,17 +1,16 @@
-import React, { useEffect } from 'react';
-import { useAppDispatch } from './app/hooks';
-import SplitterLayout from './components/SplitterLayout/SplitterLayout';
-import './components/SplitterLayout/index.css';
-import './App.css';
-import FilePane from './components/FilePane';
-import { fetchDirectory } from './app/fileManagerSlice';
-import { ThemeProvider } from './components/ThemeSwitcher';
-import FunctionBar from './components/FunctionBar';
+import React, { useEffect } from "react";
+import { useAppDispatch } from "./app/hooks";
+import SplitterLayout from "./components/SplitterLayout/SplitterLayout";
+import "./components/SplitterLayout/index.css";
+import "./App.css";
+import FilePane from "./components/FilePane";
+import { fetchDirectory } from "./app/fileManagerSlice";
+import { ThemeProvider } from "./theme";
+import FunctionBar from "./components/FunctionBar";
 
 const App: React.FC = () => {
     const dispatch = useAppDispatch();
     useEffect(() => {
-        // @ts-ignore
         const homeDir = window.fsApi.getHomeDir();
         dispatch(fetchDirectory({ paneIndex: 0, path: homeDir }));
         dispatch(fetchDirectory({ paneIndex: 1, path: homeDir }));
@@ -20,20 +19,20 @@ const App: React.FC = () => {
         if (window.menuApi?.onMenuAction) {
             window.menuApi.onMenuAction((action: string) => {
                 switch (action) {
-                    case 'new-tab':
-                        alert('New Tab (from native menu)');
+                    case "new-tab":
+                        alert("New Tab (from native menu)");
                         break;
-                    case 'open':
-                        alert('Open... (from native menu)');
+                    case "open":
+                        alert("Open... (from native menu)");
                         break;
-                    case 'save':
-                        alert('Save (from native menu)');
+                    case "save":
+                        alert("Save (from native menu)");
                         break;
-                    case 'reload':
+                    case "reload":
                         window.location.reload();
                         break;
-                    case 'toggle-fullscreen':
-                        alert('Toggle Full Screen (from native menu)');
+                    case "toggle-fullscreen":
+                        alert("Toggle Full Screen (from native menu)");
                         break;
                     default:
                         break;

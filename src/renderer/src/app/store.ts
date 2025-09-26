@@ -1,10 +1,14 @@
-import { configureStore } from '@reduxjs/toolkit';
-import fileManagerReducer from './fileManagerSlice';
+import { configureStore } from "@reduxjs/toolkit";
+import fileManagerReducer from "./fileManagerSlice";
+import clipboardReducer from "./clipboardSlice";
+import fileOperationsReducer from "./fileOperationsSlice";
 
 const store = configureStore({
     reducer: {
-        fileManager: fileManagerReducer
-    }
+        fileManager: fileManagerReducer,
+        clipboard: clipboardReducer,
+        fileOperations: fileOperationsReducer,
+    },
 });
 
 export type RootState = ReturnType<typeof store.getState>;

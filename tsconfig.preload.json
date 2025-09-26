@@ -1,0 +1,20 @@
+{
+    "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
+    "include": [
+        "src/preload/**/*",
+        "src/shared/**/*",
+        "src/common/**/*",
+        "typings/**/*.d.ts"
+    ],
+    "compilerOptions": {
+        "composite": true,
+        "types": ["jest"],
+        "typeRoots": ["./node_modules/@types", "./typings"],
+        "baseUrl": ".",
+        "paths": {
+            "@shared/*": ["src/shared/*"],
+            "@preload/*": ["src/preload/*"],
+            "@common/*": ["src/common/*"]
+        }
+    }
+}

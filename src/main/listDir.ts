@@ -19,7 +19,7 @@ export function listDirSync(dirPath: string): ListDirEntry[] {
                 size = stat.size;
             }
             mtime = stat.mtimeMs; // 以 ms 时间戳返回
-        } catch (e) {
+        } catch {
             size = undefined;
             mtime = undefined;
         }

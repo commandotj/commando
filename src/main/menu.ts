@@ -1,9 +1,17 @@
-import { BrowserWindow } from "electron";
-// @ts-ignore
+import { BrowserWindow, MenuItemConstructorOptions } from "electron";
 import i18next from "i18next";
 
 // 默认配置
-const defaultConfig = {
+interface MenuConfig {
+    shortcutNewTab: string;
+    shortcutOpen: string;
+    shortcutSave: string;
+    showNewTab: boolean;
+    showOpen: boolean;
+    showSave: boolean;
+}
+
+const defaultConfig: MenuConfig = {
     shortcutNewTab: "CmdOrCtrl+N",
     shortcutOpen: "CmdOrCtrl+O",
     shortcutSave: "CmdOrCtrl+S",
@@ -12,8 +20,10 @@ const defaultConfig = {
     showSave: true,
 };
 
-export function getMenuTemplate({ config = defaultConfig } = {}) {
-    const platform = (process as any).platform;
+export function getMenuTemplate({
+    config = defaultConfig,
+}: { config?: MenuConfig } = {}): MenuItemConstructorOptions[] {
+    const platform = process.platform;
     const template = [
         {
             label: i18next.t("menu.file.label"),
@@ -139,13 +149,13 @@ export function getMenuTemplate({ config = defaultConfig } = {}) {
     // 这样"文件"、"编辑"、"视图"等自定义菜单才会独立显示，顺序与原生应用一致。
     return [
         ...(platform === "darwin"
-            ? [{ role: "appMenu" } as Electron.MenuItemConstructorOptions]
+            ? [{ role: "appMenu" } as MenuItemConstructorOptions]
             : []),
         ...template,
     ];
 }
 
-export function sendMenuAction(action: string) {
+export function sendMenuAction(action: string): void {
     const win = BrowserWindow.getFocusedWindow();
     if (win) {
         win.webContents.send("menu-action", action);

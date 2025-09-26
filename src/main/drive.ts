@@ -14,21 +14,28 @@ export async function listDrives(): Promise<DriveInfo[]> {
         const drives = await drivelist.list();
         // 只返回有挂载点的设备，简化前端处理
         return drives
-            .filter((d: any) => d.mountpoints && d.mountpoints.length > 0)
-            .map((d: any) => ({
-                device: d.device,
-                description: d.description,
-                size: d.size,
-                mountpoints: d.mountpoints, // [{ path }]
-                isSystem: d.system,
-                isRemovable: d.isRemovable,
-            }));
+            .filter((d: unknown) => {
+                const drive = d as Record<string, unknown>;
+                return (
+                    drive.mountpoints &&
+                    Array.isArray(drive.mountpoints) &&
+                    drive.mountpoints.length > 0
+                );
+            })
+            .map((d: unknown) => {
+                const drive = d as Record<string, unknown>;
+                return {
+                    device: drive.device as string,
+                    description: drive.description as string,
+                    size: drive.size as number,
+                    mountpoints: drive.mountpoints as { path: string }[],
+                    isSystem: drive.system as boolean,
+                    isRemovable: drive.isRemovable as boolean,
+                };
+            });
     } catch (err) {
         console.error("[drivelist] error:", err);
-        console.error(
-            "[drivelist] process.env.PATH:",
-            (process as any).env.PATH
-        );
+        console.error("[drivelist] process.env.PATH:", process.env.PATH);
         return [];
     }
 }
