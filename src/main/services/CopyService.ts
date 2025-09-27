@@ -75,7 +75,7 @@ export default class CopyService implements BaseService {
      * @param error - Optional error state boolean
      */
     sendLoadingState(loading: boolean, message?: string, error?: boolean): void {
-        if (this.mainWindow) {
+        if (this.mainWindow && !this.mainWindow.isDestroyed()) {
             this.mainWindow.webContents.send("service:loading", {
                 service: this.getMetadata().name,
                 loading,
@@ -114,7 +114,7 @@ export default class CopyService implements BaseService {
         const progressCallback = (progress: WorkerProgress): void => {
             // Send progress updates directly to renderer via mainWindow
             // This ensures consistent communication channel regardless of IPC event source
-            if (this.mainWindow) {
+            if (this.mainWindow && !this.mainWindow.isDestroyed()) {
                 this.mainWindow.webContents.send("copy:progress", {
                     ...progress,
                     operation: "file", // Override operation type for UI differentiation
@@ -145,7 +145,7 @@ export default class CopyService implements BaseService {
         const progressCallback = (progress: WorkerProgress): void => {
             // Send batch progress updates directly to renderer
             // MainWindow provides reliable communication channel
-            if (this.mainWindow) {
+            if (this.mainWindow && !this.mainWindow.isDestroyed()) {
                 this.mainWindow.webContents.send("copy:progress", {
                     ...progress,
                     operation: "batch", // Mark as batch operation for UI handling
@@ -184,7 +184,7 @@ export default class CopyService implements BaseService {
 
             // Send response directly via mainWindow instead of event.reply
             // This ensures consistent communication channel
-            if (this.mainWindow) {
+            if (this.mainWindow && !this.mainWindow.isDestroyed()) {
                 this.mainWindow.webContents.send("copy:status:response", status)
             }
         } catch (error) {

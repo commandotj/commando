@@ -131,7 +131,7 @@ export default class FileService implements BaseService {
      * @param error - Optional error state boolean
      */
     sendLoadingState(loading: boolean, message?: string, error?: boolean): void {
-        if (this.mainWindow) {
+        if (this.mainWindow && !this.mainWindow.isDestroyed()) {
             this.mainWindow.webContents.send("service:loading", {
                 service: this.getMetadata().name,
                 loading,
@@ -243,7 +243,7 @@ export default class FileService implements BaseService {
         this.validateCopyMoveParams(params)
 
         const progressCallback = (progress: WorkerProgress): void => {
-            if (this.mainWindow) {
+            if (this.mainWindow && !this.mainWindow.isDestroyed()) {
                 this.mainWindow.webContents.send("file:progress", {
                     ...progress,
                     operation: "copy",
@@ -274,7 +274,7 @@ export default class FileService implements BaseService {
         this.validateCopyMoveParams(params)
 
         const progressCallback = (progress: WorkerProgress): void => {
-            if (this.mainWindow) {
+            if (this.mainWindow && !this.mainWindow.isDestroyed()) {
                 this.mainWindow.webContents.send("file:progress", {
                     ...progress,
                     operation: "move",
@@ -305,7 +305,7 @@ export default class FileService implements BaseService {
         this.validateDeleteParams(params)
 
         const progressCallback = (progress: WorkerProgress): void => {
-            if (this.mainWindow) {
+            if (this.mainWindow && !this.mainWindow.isDestroyed()) {
                 this.mainWindow.webContents.send("file:progress", {
                     ...progress,
                     operation: "delete",
@@ -482,7 +482,7 @@ export default class FileService implements BaseService {
         }
 
         const progressCallback = (progress: WorkerProgress): void => {
-            if (this.mainWindow) {
+            if (this.mainWindow && !this.mainWindow.isDestroyed()) {
                 this.mainWindow.webContents.send("file:progress", {
                     ...progress,
                     operation: "batch",
@@ -511,7 +511,7 @@ export default class FileService implements BaseService {
         try {
             logger.info("Started watching path", { path: params.path })
 
-            if (this.mainWindow) {
+            if (this.mainWindow && !this.mainWindow.isDestroyed()) {
                 this.mainWindow.webContents.send("file:watch:started", {
                     path: params.path,
                     recursive: params.recursive || false,
@@ -535,7 +535,7 @@ export default class FileService implements BaseService {
         try {
             logger.info("Stopped watching path", { path: params.path })
 
-            if (this.mainWindow) {
+            if (this.mainWindow && !this.mainWindow.isDestroyed()) {
                 this.mainWindow.webContents.send("file:watch:stopped", {
                     path: params.path,
                 })

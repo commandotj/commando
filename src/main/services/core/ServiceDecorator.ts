@@ -74,12 +74,9 @@ class ServiceRegistry {
         const instance = new serviceClass(this.mainWindow || undefined)
         const metadata = instance.getMetadata()
 
-        logger.info(`Registering service: ${metadata.name}`, {
-            version: metadata.version,
-            channels: metadata.ipcChannels,
-            description: metadata.description,
-        })
+        logger.info(`Registering service: ${metadata.name} v${metadata.version}`)
 
+        // Store service instance in both maps
         this.services.set(metadata.name, instance)
         this.serviceInstances.set(metadata.name, instance)
 
@@ -118,10 +115,9 @@ class ServiceRegistry {
                             const result = await method.call(service, event, ...args)
                             return result
                         } catch (error) {
-                            logger.error(`Service ${metadata.name} error on ${config.channel}`, {
-                                error: error instanceof Error ? error.message : String(error),
-                                args: args.length,
-                            })
+                            logger.error(
+                                `Service ${metadata.name} error on ${config.channel}: ${error instanceof Error ? error.message : String(error)}`
+                            )
                             throw error
                         }
                     })
@@ -131,10 +127,9 @@ class ServiceRegistry {
                         try {
                             await method.call(service, event, ...args)
                         } catch (error) {
-                            logger.error(`Service ${metadata.name} error on ${config.channel}`, {
-                                error: error instanceof Error ? error.message : String(error),
-                                args: args.length,
-                            })
+                            logger.error(
+                                `Service ${metadata.name} error on ${config.channel}: ${error instanceof Error ? error.message : String(error)}`
+                            )
                             // Send error back to renderer for 'on' pattern
                             if (this.mainWindow) {
                                 this.mainWindow.webContents.send(`${config.channel}:error`, {
@@ -165,16 +160,16 @@ class ServiceRegistry {
     }
 
     async initializeAll(): Promise<void> {
-        logger.info("Initializing all services", { count: this.services.size })
+        logger.info(`Initializing all services (${this.services.size} services)`)
 
         const initPromises = Array.from(this.services.values()).map(async service => {
             try {
                 await service.initialize()
                 logger.info(`Service ${service.getMetadata().name} initialized`)
             } catch (error) {
-                logger.error(`Failed to initialize service ${service.getMetadata().name}`, {
-                    error: error instanceof Error ? error.message : String(error),
-                })
+                logger.error(
+                    `Failed to initialize service ${service.getMetadata().name}: ${error instanceof Error ? error.message : String(error)}`
+                )
             }
         })
 
@@ -188,9 +183,9 @@ class ServiceRegistry {
             try {
                 await service.cleanup()
             } catch (error) {
-                logger.error(`Failed to cleanup service ${service.getMetadata().name}`, {
-                    error: error instanceof Error ? error.message : String(error),
-                })
+                logger.error(
+                    `Failed to cleanup service ${service.getMetadata().name}: ${error instanceof Error ? error.message : String(error)}`
+                )
             }
         })
 
@@ -237,10 +232,8 @@ export function Service(metadata: Omit<ServiceMetadata, "ipcChannels"> & { ipcCh
                     ipcChannels: channels,
                 })
 
-                // Auto-register this service
-                setTimeout(() => {
-                    ServiceRegistry.getInstance().register(constructor as new () => BaseService)
-                }, 0)
+                // Auto-register this service immediately
+                ServiceRegistry.getInstance().register(constructor as new () => BaseService)
             }
 
             private autoDetectIpcChannels(): string[] {

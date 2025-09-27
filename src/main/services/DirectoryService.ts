@@ -83,7 +83,7 @@ export default class DirectoryService implements BaseService {
      * @param error - Optional error state boolean
      */
     sendLoadingState(loading: boolean, message?: string, error?: boolean): void {
-        if (this.mainWindow) {
+        if (this.mainWindow && !this.mainWindow.isDestroyed()) {
             this.mainWindow.webContents.send("service:loading", {
                 service: this.getMetadata().name,
                 loading,
@@ -186,7 +186,7 @@ export default class DirectoryService implements BaseService {
             this.currentPath = params.path
 
             // 发送目录变化通知
-            if (this.mainWindow) {
+            if (this.mainWindow && !this.mainWindow.isDestroyed()) {
                 this.mainWindow.webContents.send("directory:changed", {
                     path: params.path,
                     entryCount: results.length,
@@ -343,7 +343,7 @@ export default class DirectoryService implements BaseService {
                     recursive: params.recursive,
                 })
 
-                if (this.mainWindow) {
+                if (this.mainWindow && !this.mainWindow.isDestroyed()) {
                     this.mainWindow.webContents.send("directory:watch:started", {
                         path: params.path,
                         recursive: params.recursive || false,
@@ -371,7 +371,7 @@ export default class DirectoryService implements BaseService {
 
                 logger.info("停止监控目录", { path: params.path })
 
-                if (this.mainWindow) {
+                if (this.mainWindow && !this.mainWindow.isDestroyed()) {
                     this.mainWindow.webContents.send("directory:watch:stopped", {
                         path: params.path,
                     })

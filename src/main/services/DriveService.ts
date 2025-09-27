@@ -89,7 +89,7 @@ export default class DriveService implements BaseService {
      * @param error - Optional error state boolean
      */
     sendLoadingState(loading: boolean, message?: string, error?: boolean): void {
-        if (this.mainWindow) {
+        if (this.mainWindow && !this.mainWindow.isDestroyed()) {
             this.mainWindow.webContents.send("service:loading", {
                 service: this.getMetadata().name,
                 loading,
@@ -148,7 +148,7 @@ export default class DriveService implements BaseService {
 
             // 发送加载完成和磁盘列表变化通知
             this.sendLoadingState(false)
-            if (this.mainWindow) {
+            if (this.mainWindow && !this.mainWindow.isDestroyed()) {
                 this.mainWindow.webContents.send("drive:list:changed", {
                     drives: result,
                     timestamp: Date.now(),
@@ -226,7 +226,7 @@ export default class DriveService implements BaseService {
 
             // 发送加载完成通知
             this.sendLoadingState(false)
-            if (this.mainWindow) {
+            if (this.mainWindow && !this.mainWindow.isDestroyed()) {
                 this.mainWindow.webContents.send("drive:refreshed", {
                     drives: this.driveCache,
                     timestamp: Date.now(),
@@ -274,7 +274,7 @@ export default class DriveService implements BaseService {
                             newCount: this.driveCache.length,
                         })
 
-                        if (this.mainWindow) {
+                        if (this.mainWindow && !this.mainWindow.isDestroyed()) {
                             this.mainWindow.webContents.send("drive:changed", {
                                 drives: this.driveCache,
                                 timestamp: Date.now(),
@@ -288,7 +288,7 @@ export default class DriveService implements BaseService {
                 }
             }, interval)
 
-            if (this.mainWindow) {
+            if (this.mainWindow && !this.mainWindow.isDestroyed()) {
                 this.mainWindow.webContents.send("drive:watch:started", {
                     interval,
                 })
@@ -313,7 +313,7 @@ export default class DriveService implements BaseService {
 
                 logger.info("停止磁盘监控")
 
-                if (this.mainWindow) {
+                if (this.mainWindow && !this.mainWindow.isDestroyed()) {
                     this.mainWindow.webContents.send("drive:watch:stopped", {
                         timestamp: Date.now(),
                     })
@@ -342,12 +342,8 @@ export default class DriveService implements BaseService {
 
             const fetchTime = Date.now() - startTime
 
-            // 先记录原始数据用于调试
-            logger.debug("systeminformation原始数据", {
-                fetchTime: `${fetchTime}ms`,
-                fsSize: JSON.stringify(fsSize, null, 2),
-                diskLayout: JSON.stringify(diskLayout, null, 2),
-            })
+            // 记录获取时间用于性能监控
+            logger.debug(`获取驱动器信息耗时: ${fetchTime}ms，找到 ${fsSize.length} 个文件系统`)
 
             // 转换systeminformation数据格式为DriveInfo
             this.driveCache = fsSize
