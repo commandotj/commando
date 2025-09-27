@@ -71,7 +71,8 @@ const renderUseClipboard = (
 ): ReturnType<typeof renderHook> => {
   const store = createTestStore(initialState);
   const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) =>
-    React.createElement(Provider, { store }, children);
+    // eslint-disable-next-line react/no-children-prop
+    React.createElement(Provider, { store, children });
 
   return renderHook(() => useClipboard(), { wrapper });
 };
