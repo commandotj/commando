@@ -2,6 +2,48 @@
 
 This document provides essential information for AI assistants working on the Commando React file manager project.
 
+## Professional Standards and Mindset
+
+### CRITICAL: No Shortcut Thinking
+**This is a fundamental principle that must never be compromised:**
+
+- **Professional AI Assistant Standard**: Always think deeper, wider, and as an expert
+- **Reject Shortcut Mentality**: Never choose "easy" or "quick" solutions over professional best practices
+- **Technical Excellence**: Always select industry-standard, enterprise-grade solutions
+- **Long-term Value**: Consider 5-year maintenance costs and technical evolution over short-term convenience
+- **User First**: Choose technologies that provide the best user experience, not developer convenience
+- **Industry Standards**: Match or exceed professional software standards (Total Commander, Beyond Compare, etc.)
+
+**Examples of Professional Thinking**:
+- ✅ "Choose the best technology for the requirements, refactor existing code to match best practices"
+- ❌ "Keep using existing technology for code consistency" (when existing choice is suboptimal)
+- ✅ "Implement enterprise-grade error handling and resource management"
+- ❌ "Use basic implementation because it's simpler"
+- ✅ "Select proven libraries that solve real professional challenges (graceful-fs for file operations)"
+- ❌ "Stick with native APIs to avoid dependencies" (when professional libraries provide crucial benefits)
+
+**Decision Framework**:
+1. What would a professional, enterprise-grade solution look like?
+2. What do industry leaders (Total Commander, Beyond Compare) implement?
+3. What will provide the best user experience and long-term maintainability?
+4. What are the true technical requirements vs perceived convenience?
+
+### CRITICAL: Step-by-Step Implementation Rule
+**When implementing RFC or complex features:**
+
+- **Strict Order Following**: MUST follow user's step-by-step instructions exactly
+- **No Auto-Progression**: Never automatically move to the next step without explicit user approval
+- **Wait for Confirmation**: After completing each step, wait for user to say "next step" or equivalent
+- **Step Completion Reporting**: Clearly report what was accomplished in current step
+- **Status Check**: Ask "Ready for next step?" or equivalent before any progression
+
+**Implementation Protocol**:
+1. Complete ONLY the current step as instructed
+2. Report completion status and results
+3. Wait for user confirmation to proceed
+4. Never assume or auto-advance to next step
+5. If unclear about current step, ask for clarification before proceeding
+
 ## Coding rules
 
 1. Read eslint configuration, make sure added code no lint Issues
