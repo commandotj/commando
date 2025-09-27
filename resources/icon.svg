@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景圆形 -->
+  <circle cx="256" cy="256" r="240" fill="#1e3a8a" stroke="#1e40af" stroke-width="8"/>
+  
+  <!-- 左侧面板 -->
+  <rect x="80" y="120" width="140" height="280" rx="12" fill="#3b82f6" stroke="#60a5fa" stroke-width="2"/>
+  
+  <!-- 右侧面板 -->
+  <rect x="292" y="120" width="140" height="280" rx="12" fill="#3b82f6" stroke="#60a5fa" stroke-width="2"/>
+  
+  <!-- 左侧面板内容 - 文件夹图标 -->
+  <rect x="100" y="140" width="100" height="80" rx="4" fill="#dbeafe"/>
+  <rect x="100" y="140" width="100" height="20" rx="4" fill="#93c5fd"/>
+  <rect x="100" y="180" width="100" height="40" rx="4" fill="#dbeafe"/>
+  
+  <!-- 右侧面板内容 - 文件夹图标 -->
+  <rect x="312" y="140" width="100" height="80" rx="4" fill="#dbeafe"/>
+  <rect x="312" y="140" width="100" height="20" rx="4" fill="#93c5fd"/>
+  <rect x="312" y="180" width="100" height="40" rx="4" fill="#dbeafe"/>
+  
+  <!-- 同步箭头 - 连接两个面板 -->
+  <path d="M220 200 L292 200" stroke="#fbbf24" stroke-width="6" stroke-linecap="round"/>
+  <path d="M292 200 L280 190" stroke="#fbbf24" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M292 200 L280 210" stroke="#fbbf24" stroke-width="4" stroke-linecap="round" fill="none"/>
+  
+  <!-- 文件图标 -->
+  <rect x="110" y="240" width="80" height="100" rx="2" fill="#e5e7eb"/>
+  <rect x="110" y="240" width="80" height="15" rx="2" fill="#9ca3af"/>
+  <rect x="110" y="265" width="80" height="75" rx="2" fill="#e5e7eb"/>
+  
+  <rect x="322" y="240" width="80" height="100" rx="2" fill="#e5e7eb"/>
+  <rect x="322" y="240" width="80" height="15" rx="2" fill="#9ca3af"/>
+  <rect x="322" y="265" width="80" height="75" rx="2" fill="#e5e7eb"/>
+  
+  <!-- 同步指示器 -->
+  <circle cx="256" cy="320" r="8" fill="#fbbf24"/>
+  <circle cx="256" cy="320" r="4" fill="#1e3a8a"/>
+</svg>

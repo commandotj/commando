@@ -2,6 +2,18 @@
 
 This document provides essential information for AI assistants working on the Commando React file manager project.
 
+## Coding rules
+
+1. Read eslint configuration, make sure added code no lint Issues
+2. Always add jsdoc and detailed comments
+
+## Git rules
+
+1. Never commit or push without asking
+2. Never commit or push with --no-verify
+3. Fix any issue blocking commit/push
+4. Never turn off config in order to pass
+
 ## Project Overview
 
 **Commando React** is a dual-panel file manager built with Electron, React, and TypeScript. It implements a service-oriented architecture for file operations with background worker processing.
@@ -67,37 +79,40 @@ src/
 ### Creating a New Service
 
 1. **Define the service class**:
+
 ```typescript
 @Service({
-    name: ServiceIdentifiers.MY_SERVICE,
-    version: ServiceVersions.V1_0_0,
-    workerScript: WorkerScripts.MY_WORKER,  // Optional
-    maxWorkers: 2                 // Optional
+  name: ServiceIdentifiers.MY_SERVICE,
+  version: ServiceVersions.V1_0_0,
+  workerScript: WorkerScripts.MY_WORKER, // Optional
+  maxWorkers: 2, // Optional
 })
 export default class MyService implements BaseService {
-    async handleOperation(event: IpcMainInvokeEvent, params: any): Promise<any> {
-        // Implementation
-    }
+  async handleOperation(event: IpcMainInvokeEvent, params: any): Promise<any> {
+    // Implementation
+  }
 }
 ```
 
 2. **Create worker file** (if needed):
+
 ```typescript
 // src/main/services/workers/myWorker.ts
-import { parentPort } from 'node:worker_threads';
+import { parentPort } from "node:worker_threads";
 
 parentPort?.on(WorkerEvents.MESSAGE, async (message) => {
-    // Handle worker operations
+  // Handle worker operations
 });
 ```
 
 3. **Add tests**:
+
 ```typescript
 // src/main/services/__tests__/MyService.test.ts
 describe(ServiceIdentifiers.MY_SERVICE, () => {
-    it(TestMessages.SHOULD_HANDLE_OPERATION_CORRECTLY, async () => {
-        // Test implementation
-    });
+  it(TestMessages.SHOULD_HANDLE_OPERATION_CORRECTLY, async () => {
+    // Test implementation
+  });
 });
 ```
 
@@ -107,15 +122,16 @@ describe(ServiceIdentifiers.MY_SERVICE, () => {
 - Service methods starting with `handle` automatically bind to IPC channels
 - `handleCopyFile` → uses constant from IPCChannels.FILE_OPERATIONS.COPY.REQUEST
 - Example proper usage:
+
 ```typescript
 // src/common/constants/IPCChannels.ts
 export namespace IPCChannels {
-    export namespace FILE_OPERATIONS {
-        export namespace COPY {
-            export const REQUEST = 'file.operations.copy.request' as const;
-            export const PROGRESS = 'file.operations.copy.progress' as const;
-        }
+  export namespace FILE_OPERATIONS {
+    export namespace COPY {
+      export const REQUEST = "file.operations.copy.request" as const;
+      export const PROGRESS = "file.operations.copy.progress" as const;
     }
+  }
 }
 
 // In service: event.sender.send(IPCChannels.FILE_OPERATIONS.COPY.PROGRESS, data);
@@ -124,12 +140,14 @@ export namespace IPCChannels {
 ## Worker Architecture (Professional Implementation)
 
 ### Current Implementation (Enterprise-Grade)
+
 - Professional WorkerPool with comprehensive lifecycle management
 - Service-layer WorkerFactory pattern for electron-vite integration
 - Task scheduling with priority queues and retry policies
 - Complete monitoring and diagnostics system
 
 ### Architecture Principles (Per RFC-2025-001)
+
 - **WorkerPool**: Professional worker pooling with min/max/idle configuration
 - **TaskScheduler**: Priority-based task scheduling with backoff strategies
 - **WorkerFactory**: Service responsibility for electron-vite `?modulePath` imports
@@ -138,17 +156,17 @@ export namespace IPCChannels {
 ```typescript
 // Professional WorkerFactory implementation
 export class CopyWorkerFactory implements WorkerFactory<CopyParams> {
-    create(workerData: CopyParams): Worker {
-        return new Worker(copyWorkerPath, { workerData });
-    }
+  create(workerData: CopyParams): Worker {
+    return new Worker(copyWorkerPath, { workerData });
+  }
 }
 
 // Service registers professional worker pool
 const config: WorkerPoolConfiguration = {
-    workerFactory: new CopyWorkerFactory(),
-    poolSize: { min: 1, max: 4, idle: 2 },
-    lifecycle: { idleTimeout: 300000, maxRetries: 3 },
-    monitoring: { enableMetrics: true, logLevel: LogLevels.INFO }
+  workerFactory: new CopyWorkerFactory(),
+  poolSize: { min: 1, max: 4, idle: 2 },
+  lifecycle: { idleTimeout: 300000, maxRetries: 3 },
+  monitoring: { enableMetrics: true, logLevel: LogLevels.INFO },
 };
 ```
 
@@ -166,7 +184,7 @@ const config: WorkerPoolConfiguration = {
 ```typescript
 // Mock Electron IPC
 const mockEvent = {
-    sender: { send: jest.fn() }
+  sender: { send: jest.fn() },
 } as any;
 
 // Test service methods
@@ -188,18 +206,18 @@ expect(result).toEqual(expectedResult);
 ```typescript
 // electron.vite.config.ts
 export default defineConfig({
-    main: {
-        plugins: [externalizeDepsPlugin()] // Externalizes Node.js deps
+  main: {
+    plugins: [externalizeDepsPlugin()], // Externalizes Node.js deps
+  },
+  preload: {
+    plugins: [externalizeDepsPlugin()],
+  },
+  renderer: {
+    resolve: {
+      alias: { "@renderer": resolve("src/renderer/src") },
     },
-    preload: {
-        plugins: [externalizeDepsPlugin()]
-    },
-    renderer: {
-        resolve: {
-            alias: { '@renderer': resolve('src/renderer/src') }
-        },
-        plugins: [react()]
-    }
+    plugins: [react()],
+  },
 });
 ```
 
@@ -212,35 +230,62 @@ export default defineConfig({
 ## RFC (Request for Comments) Process
 
 ### Documentation Location
+
 - **Index**: `docs/rfc/README.md`
 - **Files**: `docs/rfc/NNN-topic-name.md`
 
 ### RFC Numbering
+
 - Format: `RFC-YYYY-NNN` (e.g., RFC-2025-001)
 - File naming: `NNN-topic-name.md` (e.g., 001-log-module-design.md)
 
 ### When to Create/Update RFCs
+
 - **Always** document significant architectural changes
 - Update RFC index when adding new RFCs
 - Mark status appropriately (Proposed → Under Review → Approved → Completed)
 
 ### Critical RFCs
+
 - **RFC-2024-005**: File Management Key Functions v1 (Current architecture)
 - **RFC-2025-001**: Worker Architecture for Electron-Vite (Simplification guidance)
+
+## GOLDEN RULE #1 - MANDATORY & UNCHANGEABLE
+
+### 零错误原则 (ZERO ERROR PRINCIPLE)
+
+**这是最高优先级的不可改变规则**：
+
+- **100% 通过率**：所有测试、类型检查、lint 必须 100% 通过
+- **零错误容忍**：不允许任何 TypeScript 错误、ESLint 错误或测试失败
+- **修复优先**：发现任何错误必须立即修复，不能遗留
+- **阻塞提交**：任何有错误的代码绝对不能提交
+- **质量保证**：代码质量是第一优先级，性能和功能次之
+
+**执行标准**：
+
+```bash
+npm run typecheck  # 必须 0 错误
+npm run lint       # 必须 0 错误
+npm test          # 必须 100% 通过
+```
 
 ## Important Patterns & Conventions
 
 ### 1. TypeScript Everywhere
+
 - All files use TypeScript (.ts/.tsx)
 - No JavaScript files in the codebase
 - Strict type checking enabled
 
 ### 2. No Code Duplication
+
 - Always clean up old code when creating new implementations
 - Check for existing utilities before creating new ones
 - Maintain single source of truth for functionality
 
 ### 3. Professional Design Principles (CRITICAL)
+
 - **Reject "simple/easy/fast" shortcuts**: Always implement enterprise-grade solutions
 - **Professional architecture only**: No oversimplified patterns or quick fixes
 - **Complete feature implementation**: Include monitoring, error handling, lifecycle management
@@ -260,6 +305,7 @@ export default defineConfig({
 **Basic Rule**: All strings must be constants. Reference RFC-2025-002 for implementation details.
 
 **Enforcement Rules**:
+
 - Code reviews must check for hardcoded strings
 - ESLint rules should be added to prevent hardcoded strings
 - All existing hardcoded strings must be refactored to use constants
@@ -268,6 +314,7 @@ export default defineConfig({
 - Constants must be categorized by functionality and placed in appropriate namespaces
 
 ### 5. Error Handling
+
 ```typescript
 // Service validation pattern - using constants
 private validateParams(params: MyParams): void {
@@ -278,36 +325,46 @@ private validateParams(params: MyParams): void {
 ```
 
 ### 6. Logging
+
 ```typescript
-import logger from '../logger';
+import logger from "../logger";
 // Use constants from RFC-2025-002 specifications
-logger.info(LogMessages.OPERATION_STARTED, { operation: 'copy', files: params.files.length });
+logger.info(LogMessages.OPERATION_STARTED, {
+  operation: "copy",
+  files: params.files.length,
+});
 logger.error(LogMessages.OPERATION_FAILED, { error: error.message });
 ```
 
 ## Common Issues & Solutions
 
 ### 1. TypeScript/ESLint in Tests
+
 **Problem**: Jest globals not recognized
 **Solution**: Use `.eslintrc.js` in test directories:
+
 ```javascript
 module.exports = {
-    env: { jest: true },
-    rules: { '@typescript-eslint/no-explicit-any': 'warn' }
+  env: { jest: true },
+  rules: { "@typescript-eslint/no-explicit-any": "warn" },
 };
 ```
 
 ### 2. Worker Import Issues
+
 **Problem**: Cannot import ES modules in workers
 **Solution**: Use Node.js built-in modules:
+
 ```typescript
-import { parentPort } from 'node:worker_threads';
-import fs from 'node:fs/promises';
+import { parentPort } from "node:worker_threads";
+import fs from "node:fs/promises";
 ```
 
 ### 3. IPC Channel Registration
+
 **Problem**: Service methods not accessible from renderer
 **Solution**: Ensure method starts with `handle` and service is registered:
+
 ```typescript
 // This auto-registers as 'myservice:operation'
 async handleOperation(event: IpcMainInvokeEvent, params: any) {}
@@ -343,23 +400,27 @@ npm run build       # Must succeed
 ## Dependencies & Libraries
 
 ### Core Runtime
+
 - **Electron**: Desktop app framework
 - **React**: UI library
 - **Redux Toolkit**: State management
 - **TypeScript**: Type safety
 
 ### File Operations
+
 - **klaw**: Directory traversal
 - **winston**: Logging
 - **p-queue**: Queue management
 
 ### UI Components
+
 - **Chakra UI**: Component library
 - **Radix UI**: Headless components
 - **Framer Motion**: Animations
 - **@dnd-kit**: Drag & drop
 
 ### Development/Testing
+
 - **electron-vite**: Build tool
 - **Jest**: Testing framework
 - **ESLint**: Code linting
@@ -388,7 +449,6 @@ npm run build       # Must succeed
 **RFC Reference**: RFC-2024-005 (File Management Key Functions v1)
 **Architecture Status**: Service-oriented pattern implemented, worker simplification recommended per RFC-2025-001
 
-
 # 多维思考 + 代理执行协议 + 软件开发规范指南
 
 - 目录
@@ -399,13 +459,13 @@ npm run build       # Must succeed
 - 决策与执行流程
 - 解决方案规范
 - 模式详情
-    - 模式 1: 研究
-    - 模式 2: 创新
-    - 模式 3: 规划
-    - 模式 4: 验证
-    - 模式 5: 执行
-    - 模式 6: 审查
-    - 模式 7: 智能
+  - 模式 1: 研究
+  - 模式 2: 创新
+  - 模式 3: 规划
+  - 模式 4: 验证
+  - 模式 5: 执行
+  - 模式 6: 审查
+  - 模式 7: 智能
 - 编程规范
 - 关键协议指南
 - 代码处理指南
@@ -448,9 +508,9 @@ npm run build       # Must succeed
 
 - 默认从**研究**模式开始。
 - **例外情况**：如果用户的初始请求明确指向特定阶段，你可以直接进入相应的模式。
-    - _示例 1_：用户提供详细的步骤计划并说"执行此计划" → 可以直接进入规划模式（先进行计划验证）或执行模式（如果计划格式标准且明确要求执行）。
-    - _示例 2_：用户问"如何优化函数X的性能？" → 从研究模式开始。
-    - _示例 3_：用户说"重构这段混乱的代码" → 从研究模式开始。
+  - _示例 1_：用户提供详细的步骤计划并说"执行此计划" → 可以直接进入规划模式（先进行计划验证）或执行模式（如果计划格式标准且明确要求执行）。
+  - _示例 2_：用户问"如何优化函数X的性能？" → 从研究模式开始。
+  - _示例 3_：用户说"重构这段混乱的代码" → 从研究模式开始。
 - **AI自检**：开始时，进行快速判断并声明：“初步分析表明用户请求最适合[模式名称]阶段。协议将在[模式名称]模式下启动。”
 
 **代码修复指南**：请修复从第x行到第y行的所有预期表达式问题，确保所有问题都已修复，不留下任何问题。
@@ -505,12 +565,12 @@ npm run build       # Must succeed
 ### [](https://forum.cursor.com/t/share-my-cursor-rules/93898#p-169058-h-11)用户决策机制
 
 - 在需要用户决策的阶段（如多方案抉择时），若用户未直接回复"使用方案X"，则：
-    - 用户输入"1"表示同意AI自动选择最优方案，流程继续。
-    - 用户输入"0"表示不同意当前所有方案，AI需重新规划，且本轮需提供更多可能性方案（不少于3个），并再次进入用户决策流程。
+  - 用户输入"1"表示同意AI自动选择最优方案，流程继续。
+  - 用户输入"0"表示不同意当前所有方案，AI需重新规划，且本轮需提供更多可能性方案（不少于3个），并再次进入用户决策流程。
 
-    **所有需要用户决策的场景，AI均应以数字选项方式输出，用户仅需回复数字即可，AI自动识别并执行，无需额外确认。该规范适用于方案选择、权限确认等所有需要用户决策的场景。**
+  **所有需要用户决策的场景，AI均应以数字选项方式输出，用户仅需回复数字即可，AI自动识别并执行，无需额外确认。该规范适用于方案选择、权限确认等所有需要用户决策的场景。**
 
-    **如有推荐项，AI应在数字选项后自动补充简明推荐理由，格式如：“2. 允许AI自动下载（推荐：理由是什么，简单描述）”。用户仅需回复数字，AI应自动执行对应操作。**
+  **如有推荐项，AI应在数字选项后自动补充简明推荐理由，格式如：“2. 允许AI自动下载（推荐：理由是什么，简单描述）”。用户仅需回复数字，AI应自动执行对应操作。**
 
 ## [](https://forum.cursor.com/t/share-my-cursor-rules/93898#p-169058-h-12)解决方案规范
 
@@ -562,9 +622,9 @@ npm run build       # Must succeed
 **研究协议步骤**：
 
 1. 分析任务相关代码：
-    - 识别核心文件/功能
-    - 追踪代码流程
-    - 记录发现，以便日后使用
+   - 识别核心文件/功能
+   - 追踪代码流程
+   - 记录发现，以便日后使用
 
 **思考过程**：
 
@@ -605,10 +665,10 @@ npm run build       # Must succeed
 **创新协议步骤**：
 
 1. 基于研究分析创建选项：
-    - 研究依赖关系
-    - 考虑多种实现方法
-    - 评估每种方法的优缺点
-    - 添加到任务文件的"建议的解决方案"部分
+   - 研究依赖关系
+   - 考虑多种实现方法
+   - 评估每种方法的优缺点
+   - 添加到任务文件的"建议的解决方案"部分
 2. AI自动选择最优方案并直接进入规划与执行，用户可随时纠错
 
 **思考过程**：
@@ -655,7 +715,7 @@ AI自动选择最优方案进行执行。
 2. 详细说明下一步更改
 3. 提供明确的理由和详细描述：
 
-    `[更改计划] - 文件：[要更改的文件] - 理由：[解释]`
+   `[更改计划] - 文件：[要更改的文件] - 理由：[解释]`
 
 **必需的规划元素**：
 
@@ -713,8 +773,8 @@ AI自动选择最优方案进行执行。
 1. **全面审查计划**：检查计划中提到的所有技术、工具、库和API。
 2. **核实可行性**：利用内部知识库和必要的网络搜索来确认这些技术细节是真实、可用且符合计划描述的。**必须主动利用工具（如网络搜索）去核实关键声明（尤其是外部依赖或文档中的声明）和资源的真实性与可用性。**
 3. **做出明确判断**：
-    - 若所有关键点均确认可行，则验证**通过**，流程进入**执行**模式。
-    - 若发现任何关键点不可行（如伪造、错误、无法找到可靠来源），则验证**未通过**，报告问题并返回**创新**模式重新规划。
+   - 若所有关键点均确认可行，则验证**通过**，流程进入**执行**模式。
+   - 若发现任何关键点不可行（如伪造、错误、无法找到可靠来源），则验证**未通过**，报告问题并返回**创新**模式重新规划。
 
 **思考过程**：
 
@@ -725,15 +785,15 @@ AI自动选择最优方案进行执行。
 
 - **验证通过时**：报告验证过程的摘要，特别是任何外部验证的结果。明确声明所有关键规划组件均已验证，并使用以下格式列出通过项。声明验证通过，并将自动进入执行模式。
 
-    `验证已通过: 1. [已验证项名称1] 2. [已验证项名称2] ...`
+  `验证已通过: 1. [已验证项名称1] 2. [已验证项名称2] ...`
 
 - **验证失败时（发现伪造/错误）**：
-    1. 清晰地报告发现的问题，使用以下格式（未通过项的原因描述请**不超过20字**）。至少列出一个未通过项，可以同时列出已通过项。
+  1. 清晰地报告发现的问题，使用以下格式（未通过项的原因描述请**不超过20字**）。至少列出一个未通过项，可以同时列出已通过项。
 
-        `验证未通过: 1. [未通过项1] ([原因简述]) 2. [未通过项2] ([原因简述]) ...  验证已通过: 1. [已验证项名称1] 2. [已验证项名称2] ...`
+     `验证未通过: 1. [未通过项1] ([原因简述]) 2. [未通过项2] ([原因简述]) ...  验证已通过: 1. [已验证项名称1] 2. [已验证项名称2] ...`
 
-    2. 明确声明：`由于发现上述问题，计划不可行。我将重新进入创新模式，为您重新规划解决方案。`
-    3. 然后自动转换到**创新**模式。
+  2. 明确声明：`由于发现上述问题，计划不可行。我将重新进入创新模式，为您重新规划解决方案。`
+  3. 然后自动转换到**创新**模式。
 
 **注意：** `思考过程` 是AI内部遵循的指导原则，通常不直接展示给用户，或仅展示关键验证结论，以保持输出简洁。
 
@@ -770,13 +830,13 @@ AI自动选择最优方案进行执行。
 1. 严格按照计划（检查清单项）实施变更。
 2. **微小偏差处理**：如果在执行步骤时，发现需要进行微小修正以正确完成该步骤，但计划中未明确说明（例如，修正计划中的变量名称拼写错误，添加明显的空值检查），**必须在执行前报告**：
 
-    `[模式：执行] 执行检查清单项 [X]。 发现小问题：[清晰描述问题，例如，"计划中的变量'user_name'在实际代码中应为'username'"] 建议的修正：[描述修正，例如，"将计划中的'user_name'替换为'username'"] 将继续执行项目 [X] 并应用此修正。`
+   `[模式：执行] 执行检查清单项 [X]。 发现小问题：[清晰描述问题，例如，"计划中的变量'user_name'在实际代码中应为'username'"] 建议的修正：[描述修正，例如，"将计划中的'user_name'替换为'username'"] 将继续执行项目 [X] 并应用此修正。`
 
-    _注意：任何涉及逻辑、算法或架构的更改都不是微小偏差，需要返回规划模式。_
+   _注意：任何涉及逻辑、算法或架构的更改都不是微小偏差，需要返回规划模式。_
 
 3. 完成检查清单项的实施后，**使用文件工具**附加到"任务进度"（作为计划执行的标准步骤）：
 
-    `[日期时间] - 步骤：[检查清单项编号和描述] - 修改：[文件和代码更改列表，包括报告的微小偏差修正] - 更改摘要：[此更改的简要摘要] - 原因：[执行计划步骤 [X]] - 阻碍：[遇到的任何问题，或无] - 状态：[AI自动决策，用户可随时纠错] - 异常与高风险处理：[如遇AI连续失败、不可恢复错误或高风险操作，记录暂停与用户确认情况]`
+   `[日期时间] - 步骤：[检查清单项编号和描述] - 修改：[文件和代码更改列表，包括报告的微小偏差修正] - 更改摘要：[此更改的简要摘要] - 原因：[执行计划步骤 [X]] - 阻碍：[遇到的任何问题，或无] - 状态：[AI自动决策，用户可随时纠错] - 异常与高风险处理：[如遇AI连续失败、不可恢复错误或高风险操作，记录暂停与用户确认情况]`
 
 4. 若AI连续两次（或自定义阈值）执行失败，或遇到不可恢复错误（如外部依赖不可用、权限受限等），自动暂停后续自动化，输出详细诊断信息并提示用户介入。
 5. 若检测到高风险操作（如数据库结构、生产环境配置等），自动暂停流程并请求用户确认，待用户确认后方可继续。

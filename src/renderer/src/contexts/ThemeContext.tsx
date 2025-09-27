@@ -1,33 +1,30 @@
-import { createContext, useEffect, useState, ReactNode } from "react";
+import { useEffect, useState, ReactNode } from "react";
 import { Theme } from "@radix-ui/themes";
-import { THEME_KEY, Appearance, ThemeContextProps } from "../constants/theme";
-
-export const ThemeContext = createContext<ThemeContextProps | undefined>(
-    undefined
-);
+import { THEME_KEY, Appearance } from "../constants/theme";
+import { ThemeContext } from "../theme/context";
 
 export function ThemeProvider({
-    children,
+  children,
 }: {
-    children: ReactNode;
+  children: ReactNode;
 }): JSX.Element {
-    const [theme, setTheme] = useState<Appearance>(() => {
-        return (localStorage.getItem(THEME_KEY) as Appearance) || "light";
-    });
+  const [theme, setTheme] = useState<Appearance>(() => {
+    return (localStorage.getItem(THEME_KEY) as Appearance) || "light";
+  });
 
-    useEffect(() => {
-        document.documentElement.setAttribute("data-theme", theme);
-        if (theme === "dark") {
-            document.documentElement.classList.add("dark");
-        } else {
-            document.documentElement.classList.remove("dark");
-        }
-        localStorage.setItem(THEME_KEY, theme);
-    }, [theme]);
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+    localStorage.setItem(THEME_KEY, theme);
+  }, [theme]);
 
-    return (
-        <ThemeContext.Provider value={{ theme, setTheme }}>
-            <Theme appearance={theme}>{children}</Theme>
-        </ThemeContext.Provider>
-    );
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      <Theme appearance={theme}>{children}</Theme>
+    </ThemeContext.Provider>
+  );
 }

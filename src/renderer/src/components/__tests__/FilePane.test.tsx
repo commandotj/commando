@@ -11,11 +11,11 @@
 // [End of 修复历史]
 import "@testing-library/jest-dom";
 import {
-    render,
-    screen,
-    fireEvent,
-    waitFor,
-    act,
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
 } from "@testing-library/react";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
@@ -29,342 +29,352 @@ const mockStore = configureStore<RootState>([]);
 jest.mock("../../app/hooks");
 
 jest.mock("../../app/fileManagerSlice", () => ({
-    ...jest.requireActual("../../app/fileManagerSlice"),
-    fetchDirectory: jest.fn(() => ({ type: "fileManager/fetchDirectory" })),
+  ...jest.requireActual("../../app/fileManagerSlice"),
+  fetchDirectory: jest.fn(() => ({ type: "fileManager/fetchDirectory" })),
 }));
 
 beforeAll(() => {
-    // Mock window.getComputedStyle
-    Object.defineProperty(window, "getComputedStyle", {
-        value: () => ({
-            getPropertyValue: (prop: string) => {
-                if (
-                    prop === "overflow" ||
-                    prop === "overflow-y" ||
-                    prop === "overflow-x"
-                ) {
-                    return "auto";
-                }
-                return "";
-            },
-            overflow: "auto",
-            overflowY: "auto",
-            overflowX: "auto",
-            scrollbarWidth: "17px",
-            scrollbarHeight: "17px",
-        }),
-    });
+  // Mock window.getComputedStyle
+  Object.defineProperty(window, "getComputedStyle", {
+    value: () => ({
+      getPropertyValue: (prop: string) => {
+        if (
+          prop === "overflow" ||
+          prop === "overflow-y" ||
+          prop === "overflow-x"
+        ) {
+          return "auto";
+        }
+        return "";
+      },
+      overflow: "auto",
+      overflowY: "auto",
+      overflowX: "auto",
+      scrollbarWidth: "17px",
+      scrollbarHeight: "17px",
+    }),
+  });
 
-    // Mock window.matchMedia
-    Object.defineProperty(window, "matchMedia", {
-        writable: true,
-        value: jest.fn().mockImplementation((query) => ({
-            matches: false,
-            media: query,
-            onchange: null,
-            addListener: jest.fn(),
-            removeListener: jest.fn(),
-            addEventListener: jest.fn(),
-            removeEventListener: jest.fn(),
-            dispatchEvent: jest.fn(),
-        })),
-    });
+  // Mock window.matchMedia
+  Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: jest.fn().mockImplementation((query) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+    })),
+  });
 
-    // Mock navigator.userAgent
-    Object.defineProperty(window.navigator, "userAgent", {
-        value: "node.js",
-    });
+  // Mock navigator.userAgent
+  Object.defineProperty(window.navigator, "userAgent", {
+    value: "node.js",
+  });
 
-    // Mock offsetHeight/offsetWidth for Ant Design Table
-    Object.defineProperty(HTMLElement.prototype, "offsetHeight", {
-        configurable: true,
-        value: 100,
-    });
-    Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
-        configurable: true,
-        value: 100,
-    });
+  // Mock offsetHeight/offsetWidth for Ant Design Table
+  Object.defineProperty(HTMLElement.prototype, "offsetHeight", {
+    configurable: true,
+    value: 100,
+  });
+  Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
+    configurable: true,
+    value: 100,
+  });
 
-    // Mock document.documentElement.style
-    Object.defineProperty(document.documentElement, "style", {
-        value: {
-            overflow: "auto",
-            overflowY: "auto",
-            overflowX: "auto",
-        },
-    });
+  // Mock document.documentElement.style
+  Object.defineProperty(document.documentElement, "style", {
+    value: {
+      overflow: "auto",
+      overflowY: "auto",
+      overflowX: "auto",
+    },
+  });
 
-    window.fsApi = {
-        listDir: jest.fn().mockResolvedValue([]),
-        listDrives: jest.fn().mockResolvedValue([
-            {
-                device: "/dev/disk1",
-                description: "Mock Disk",
-                size: 1000000000,
-                mountpoints: [{ path: "/" }],
-                isSystem: true,
-                isRemovable: false,
-            },
-        ]),
-        // ...mock 其他方法
-    } as unknown as typeof window.fsApi;
+  window.fsApi = {
+    listDir: jest.fn().mockResolvedValue([]),
+    listDrives: jest.fn().mockResolvedValue([
+      {
+        device: "/dev/disk1",
+        description: "Mock Disk",
+        size: 1000000000,
+        mountpoints: [{ path: "/" }],
+        isSystem: true,
+        isRemovable: false,
+      },
+    ]),
+    // ...mock 其他方法
+  } as unknown as typeof window.fsApi;
 
-    // Mock window.logApi
-    window.logApi = {
-        log: jest.fn(),
-    } as unknown as typeof window.logApi;
+  // Mock window.logApi
+  window.logApi = {
+    log: jest.fn(),
+  } as unknown as typeof window.logApi;
 });
 
 describe("FilePane", () => {
-    let store: ReturnType<typeof mockStore>;
-    let dispatch: jest.Mock;
+  let store: ReturnType<typeof mockStore>;
+  let dispatch: jest.Mock;
 
-    beforeEach(() => {
-        store = mockStore({
-            fileManager: {
-                panes: [
-                    {
-                        currentPath: "/Users/test",
-                        entries: [
-                            { name: "Documents", isDirectory: true },
-                            {
-                                name: "file.txt",
-                                isDirectory: false,
-                                size: 123456,
-                            },
-                        ],
-                        selectedKeys: [],
-                    },
-                    {
-                        currentPath: "/Users/test",
-                        entries: [],
-                        selectedKeys: [],
-                    },
-                ],
-                activePane: 0,
-            },
-            clipboard: {
-                items: [],
-                operation: null,
-                sourcePane: null,
-                timestamp: 0,
-            },
-            fileOperations: {
-                activeOperations: {},
-                batchOperations: {},
-                operationHistory: [],
-            },
-        });
-        dispatch = jest.fn();
-        (redux.useAppDispatch as jest.Mock).mockReturnValue(dispatch);
-        (redux.useAppSelector as jest.Mock).mockImplementation((fn) =>
-            fn(store.getState())
-        );
-        (fetchDirectory as unknown as jest.Mock).mockClear();
-
-        window.fsApi = {
-            listDir: jest.fn().mockResolvedValue([
-                {
-                    name: "file.txt",
-                    isDirectory: false,
-                    size: 1234,
-                    path: "/file.txt",
-                },
-            ]),
-            listDrives: jest.fn().mockResolvedValue([
-                {
-                    device: "/dev/disk1",
-                    description: "Mock Disk",
-                    size: 1000000000,
-                    mountpoints: [{ path: "/" }],
-                    isSystem: true,
-                    isRemovable: false,
-                },
-            ]),
-        } as unknown as typeof window.fsApi;
+  beforeEach(() => {
+    store = mockStore({
+      fileManager: {
+        panes: [
+          {
+            currentPath: "/Users/test",
+            entries: [
+              {
+                name: "Documents",
+                isDirectory: true,
+                size: 0,
+                mtime: Date.now(),
+              },
+              {
+                name: "file.txt",
+                isDirectory: false,
+                size: 123456,
+                mtime: Date.now(),
+              },
+            ],
+            selectedKeys: [],
+          },
+          {
+            currentPath: "/Users/test",
+            entries: [],
+            selectedKeys: [],
+          },
+        ],
+        activePane: 0,
+      },
+      clipboard: {
+        items: [],
+        operation: null,
+        sourcePane: null,
+        timestamp: 0,
+      },
+      fileOperations: {
+        activeOperations: {},
+        batchOperations: {},
+        operationHistory: [],
+      },
+      drive: {
+        drives: [],
+        loading: false,
+        error: null,
+        lastUpdated: null,
+      },
     });
+    dispatch = jest.fn();
+    (redux.useAppDispatch as jest.Mock).mockReturnValue(dispatch);
+    (redux.useAppSelector as jest.Mock).mockImplementation((fn) =>
+      fn(store.getState()),
+    );
+    (fetchDirectory as unknown as jest.Mock).mockClear();
 
-    it("renders breadcrumb and table", async () => {
-        await act(async () => {
-            render(
-                <Provider store={store}>
-                    <FilePane paneIndex={0} />
-                </Provider>
-            );
-        });
-        await waitFor(() => {
-            expect(screen.getAllByText("Users").length).toBeGreaterThan(0);
-            expect(screen.getAllByText("Documents").length).toBeGreaterThan(0);
-            expect(screen.getAllByText("file.txt").length).toBeGreaterThan(0);
-            expect(screen.getAllByText("120.56 KB").length).toBeGreaterThan(0);
-        });
-    });
+    window.fsApi = {
+      listDir: jest.fn().mockResolvedValue([
+        {
+          name: "file.txt",
+          isDirectory: false,
+          size: 1234,
+          path: "/file.txt",
+        },
+      ]),
+      listDrives: jest.fn().mockResolvedValue([
+        {
+          device: "/dev/disk1",
+          description: "Mock Disk",
+          size: 1000000000,
+          mountpoints: [{ path: "/" }],
+          isSystem: true,
+          isRemovable: false,
+        },
+      ]),
+    } as unknown as typeof window.fsApi;
+  });
 
-    it("dispatches fetchDirectory when folder is clicked", async () => {
-        await act(async () => {
-            render(
-                <Provider store={store}>
-                    <FilePane paneIndex={0} />
-                </Provider>
-            );
-        });
-        await act(async () => {
-            fireEvent.click(screen.getByText("Documents"));
-        });
-        expect(dispatch).toHaveBeenCalled();
-        expect(fetchDirectory).toHaveBeenCalledWith({
-            paneIndex: 0,
-            path: "/Users/test/Documents",
-        });
+  it("renders breadcrumb and table", async () => {
+    await act(async () => {
+      render(
+        <Provider store={store}>
+          <FilePane paneIndex={0} />
+        </Provider>,
+      );
     });
+    await waitFor(() => {
+      expect(screen.getAllByText("Users").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("Documents").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("file.txt").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("120.56 KB").length).toBeGreaterThan(0);
+    });
+  });
 
-    it("does not dispatch fetchDirectory when file is clicked", async () => {
-        await act(async () => {
-            render(
-                <Provider store={store}>
-                    <FilePane paneIndex={0} />
-                </Provider>
-            );
-        });
-        const fileLink = await screen.findByText("file.txt");
-        await act(async () => {
-            fireEvent.click(fileLink);
-        });
-        expect(dispatch).not.toHaveBeenCalled();
-        expect(fetchDirectory).not.toHaveBeenCalled();
+  it("dispatches fetchDirectory when folder is clicked", async () => {
+    await act(async () => {
+      render(
+        <Provider store={store}>
+          <FilePane paneIndex={0} />
+        </Provider>,
+      );
     });
+    await act(async () => {
+      fireEvent.click(screen.getByText("Documents"));
+    });
+    expect(dispatch).toHaveBeenCalled();
+    expect(fetchDirectory).toHaveBeenCalledWith({
+      paneIndex: 0,
+      path: "/Users/test/Documents",
+    });
+  });
 
-    it("dispatches fetchDirectory when breadcrumb is clicked", async () => {
-        await act(async () => {
-            render(
-                <Provider store={store}>
-                    <FilePane paneIndex={0} />
-                </Provider>
-            );
-        });
-        await waitFor(() => {
-            expect(screen.getAllByText("Users").length).toBeGreaterThan(0);
-        });
-        const usersLinks = screen.getAllByText("Users");
-        const clickable = usersLinks.find(
-            (el) =>
-                el instanceof HTMLElement &&
-                (el.className.includes("cursor-pointer") ||
-                    el.getAttribute("title") === "Users")
-        );
-        expect(clickable).toBeDefined();
-        await act(async () => {
-            if (clickable) {
-                fireEvent.click(clickable);
-            }
-        });
-        expect(dispatch).toHaveBeenCalled();
-        expect(fetchDirectory).toHaveBeenCalledWith({
-            paneIndex: 0,
-            path: expect.any(String),
-        });
+  it("does not dispatch fetchDirectory when file is clicked", async () => {
+    await act(async () => {
+      render(
+        <Provider store={store}>
+          <FilePane paneIndex={0} />
+        </Provider>,
+      );
     });
+    const fileLink = await screen.findByText("file.txt");
+    await act(async () => {
+      fireEvent.click(fileLink);
+    });
+    expect(dispatch).not.toHaveBeenCalled();
+    expect(fetchDirectory).not.toHaveBeenCalled();
+  });
 
-    it("handles row selection", async () => {
-        await act(async () => {
-            render(
-                <Provider store={store}>
-                    <FilePane paneIndex={0} />
-                </Provider>
-            );
-        });
-        const checkboxes = screen.getAllByRole("checkbox");
-        const rowCheckbox = checkboxes[1]; // First checkbox is the header checkbox
-        await act(async () => {
-            fireEvent.click(rowCheckbox);
-        });
-        expect(rowCheckbox).toBeChecked();
+  it("dispatches fetchDirectory when breadcrumb is clicked", async () => {
+    await act(async () => {
+      render(
+        <Provider store={store}>
+          <FilePane paneIndex={0} />
+        </Provider>,
+      );
     });
+    await waitFor(() => {
+      expect(screen.getAllByText("Users").length).toBeGreaterThan(0);
+    });
+    const usersLinks = screen.getAllByText("Users");
+    const clickable = usersLinks.find(
+      (el) =>
+        el instanceof HTMLElement &&
+        (el.className.includes("cursor-pointer") ||
+          el.getAttribute("title") === "Users"),
+    );
+    expect(clickable).toBeDefined();
+    await act(async () => {
+      if (clickable) {
+        fireEvent.click(clickable);
+      }
+    });
+    expect(dispatch).toHaveBeenCalled();
+    expect(fetchDirectory).toHaveBeenCalledWith({
+      paneIndex: 0,
+      path: expect.any(String),
+    });
+  });
 
-    it("renders resizable columns", async () => {
-        await act(async () => {
-            render(
-                <Provider store={store}>
-                    <FilePane paneIndex={0} />
-                </Provider>
-            );
-        });
-        await waitFor(() => {
-            expect(screen.getAllByText("Name").length).toBeGreaterThan(0);
-            expect(screen.getAllByText("Date Modified").length).toBeGreaterThan(
-                0
-            );
-            expect(screen.getAllByText("Size").length).toBeGreaterThan(0);
-        });
+  it("handles row selection", async () => {
+    await act(async () => {
+      render(
+        <Provider store={store}>
+          <FilePane paneIndex={0} />
+        </Provider>,
+      );
     });
+    const checkboxes = screen.getAllByRole("checkbox");
+    const rowCheckbox = checkboxes[1]; // First checkbox is the header checkbox
+    await act(async () => {
+      fireEvent.click(rowCheckbox);
+    });
+    expect(rowCheckbox).toBeChecked();
+  });
 
-    it("supports Ctrl/Cmd 增量多选和取消选择", async () => {
-        await act(async () => {
-            render(
-                <Provider store={store}>
-                    <FilePane paneIndex={0} />
-                </Provider>
-            );
-        });
-        const checkboxes = screen.getAllByRole("checkbox");
-        const rowCheckbox1 = checkboxes[1];
-        const rowCheckbox2 = checkboxes[2];
-        await act(async () => {
-            fireEvent.click(rowCheckbox1, { ctrlKey: true });
-        });
-        expect(rowCheckbox1).toBeChecked();
-        await act(async () => {
-            fireEvent.click(rowCheckbox2, { metaKey: true });
-        });
-        expect(rowCheckbox2).toBeChecked();
-        await act(async () => {
-            fireEvent.click(rowCheckbox1, { ctrlKey: true });
-        });
-        expect(rowCheckbox1).not.toBeChecked();
+  it("renders resizable columns", async () => {
+    await act(async () => {
+      render(
+        <Provider store={store}>
+          <FilePane paneIndex={0} />
+        </Provider>,
+      );
     });
+    await waitFor(() => {
+      expect(screen.getAllByText("Name").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("Date Modified").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("Size").length).toBeGreaterThan(0);
+    });
+  });
 
-    it("supports Shift 区间多选", async () => {
-        await act(async () => {
-            render(
-                <Provider store={store}>
-                    <FilePane paneIndex={0} />
-                </Provider>
-            );
-        });
-        const checkboxes = screen.getAllByRole("checkbox");
-        const rowCheckbox1 = checkboxes[1];
-        const rowCheckbox2 = checkboxes[2];
-        await act(async () => {
-            fireEvent.click(rowCheckbox1);
-        });
-        await act(async () => {
-            fireEvent.click(rowCheckbox2, { shiftKey: true });
-        });
-        expect(rowCheckbox1).toBeChecked();
-        expect(rowCheckbox2).toBeChecked();
+  it("supports Ctrl/Cmd 增量多选和取消选择", async () => {
+    await act(async () => {
+      render(
+        <Provider store={store}>
+          <FilePane paneIndex={0} />
+        </Provider>,
+      );
     });
+    const checkboxes = screen.getAllByRole("checkbox");
+    const rowCheckbox1 = checkboxes[1];
+    const rowCheckbox2 = checkboxes[2];
+    await act(async () => {
+      fireEvent.click(rowCheckbox1, { ctrlKey: true });
+    });
+    expect(rowCheckbox1).toBeChecked();
+    await act(async () => {
+      fireEvent.click(rowCheckbox2, { metaKey: true });
+    });
+    expect(rowCheckbox2).toBeChecked();
+    await act(async () => {
+      fireEvent.click(rowCheckbox1, { ctrlKey: true });
+    });
+    expect(rowCheckbox1).not.toBeChecked();
+  });
 
-    it("supports 全选和全不选", async () => {
-        render(
-            <Provider store={store}>
-                <FilePane paneIndex={0} />
-            </Provider>
-        );
-        const checkboxes = screen.getAllByRole("checkbox");
-        const selectAll = checkboxes[0];
-        const rowCheckbox1 = checkboxes[1];
-        const rowCheckbox2 = checkboxes[2];
-        // 全选
-        await act(async () => {
-            fireEvent.click(selectAll);
-        });
-        expect(rowCheckbox1).toBeChecked();
-        expect(rowCheckbox2).toBeChecked();
-        // 全不选
-        await act(async () => {
-            fireEvent.click(selectAll);
-        });
-        expect(rowCheckbox1).not.toBeChecked();
-        expect(rowCheckbox2).not.toBeChecked();
+  it("supports Shift 区间多选", async () => {
+    await act(async () => {
+      render(
+        <Provider store={store}>
+          <FilePane paneIndex={0} />
+        </Provider>,
+      );
     });
+    const checkboxes = screen.getAllByRole("checkbox");
+    const rowCheckbox1 = checkboxes[1];
+    const rowCheckbox2 = checkboxes[2];
+    await act(async () => {
+      fireEvent.click(rowCheckbox1);
+    });
+    await act(async () => {
+      fireEvent.click(rowCheckbox2, { shiftKey: true });
+    });
+    expect(rowCheckbox1).toBeChecked();
+    expect(rowCheckbox2).toBeChecked();
+  });
+
+  it("supports 全选和全不选", async () => {
+    render(
+      <Provider store={store}>
+        <FilePane paneIndex={0} />
+      </Provider>,
+    );
+    const checkboxes = screen.getAllByRole("checkbox");
+    const selectAll = checkboxes[0];
+    const rowCheckbox1 = checkboxes[1];
+    const rowCheckbox2 = checkboxes[2];
+    // 全选
+    await act(async () => {
+      fireEvent.click(selectAll);
+    });
+    expect(rowCheckbox1).toBeChecked();
+    expect(rowCheckbox2).toBeChecked();
+    // 全不选
+    await act(async () => {
+      fireEvent.click(selectAll);
+    });
+    expect(rowCheckbox1).not.toBeChecked();
+    expect(rowCheckbox2).not.toBeChecked();
+  });
 });

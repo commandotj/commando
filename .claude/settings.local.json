@@ -4,7 +4,14 @@
       "WebFetch(domain:electron-vite.org)",
       "WebSearch",
       "WebFetch(domain:newsletter.pragmaticengineer.com)",
-      "WebFetch(domain:fuchsia.dev)"
+      "WebFetch(domain:fuchsia.dev)",
+      "WebFetch(domain:systeminformation.io)",
+      "Bash(npm run typecheck:web:*)",
+      "Bash(npm install:*)",
+      "Bash(npx husky init:*)",
+      "Bash(chmod:*)",
+      "Bash(npm run typecheck:*)",
+      "Bash(npm run lint)"
     ],
     "deny": [],
     "ask": []

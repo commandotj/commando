@@ -1,0 +1,57 @@
+{
+  "menu": {
+    "file": {
+      "label": "File",
+      "newTab": "New Tab",
+      "open": "Open...",
+      "save": "Save",
+      "close": "Close",
+      "quit": "Quit"
+    },
+    "edit": {
+      "label": "Edit",
+      "undo": "Undo",
+      "redo": "Redo",
+      "cut": "Cut",
+      "copy": "Copy",
+      "paste": "Paste",
+      "pasteAndMatchStyle": "Paste and Match Style",
+      "delete": "Delete",
+      "selectAll": "Select All",
+      "speech": "Speech",
+      "startSpeaking": "Start Speaking",
+      "stopSpeaking": "Stop Speaking"
+    },
+    "view": {
+      "label": "View",
+      "reload": "Reload",
+      "toggleFullscreen": "Toggle Full Screen",
+      "resetZoom": "Reset Zoom",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out"
+    }
+  },
+  "ui": {
+    "drives": {
+      "scanning": "Scanning drives...",
+      "refreshing": "Refreshing drives...",
+      "loadingFailed": "Failed to load drives",
+      "homeDirectory": "Home Directory"
+    },
+    "buttons": {
+      "more": "⋯"
+    },
+    "table": {
+      "name": "Name",
+      "dateModified": "Date Modified",
+      "size": "Size",
+      "type": "Type"
+    },
+    "file": {
+      "typeFolder": "Folder",
+      "typeFile": "File",
+      "itemsCount": "items",
+      "selectedCount": "selected"
+    }
+  }
+}
