@@ -124,7 +124,7 @@ export default class DriveService implements BaseService {
      */
     async handleList(_event: IpcMainInvokeEvent, params: ListDrivesParams = {}): Promise<DriveInfo[]> {
         try {
-            logger.info("开始获取磁盘列表", { options: params.options })
+            logger.info(`开始获取磁盘列表，选项: ${JSON.stringify(params.options)}`)
 
             // 使用缓存数据（如果足够新鲜）
             const cacheAge = Date.now() - this.lastUpdateTime
@@ -184,7 +184,7 @@ export default class DriveService implements BaseService {
         try {
             this.validateDevice(params.device)
 
-            logger.info("获取磁盘详情", { device: params.device })
+            logger.info(`获取磁盘详情: ${params.device}`)
 
             // 先获取基础信息
             const basicInfo = this.driveCache.find(drive => drive.device === params.device)
@@ -193,7 +193,7 @@ export default class DriveService implements BaseService {
                 await this.refreshDriveCache()
                 const refreshedInfo = this.driveCache.find(drive => drive.device === params.device)
                 if (!refreshedInfo) {
-                    logger.warn("未找到指定磁盘", { device: params.device })
+                    logger.warn(`未找到指定磁盘: ${params.device}`)
                     return null
                 }
                 return this.enrichDriveDetails(refreshedInfo)
@@ -260,7 +260,7 @@ export default class DriveService implements BaseService {
                 clearInterval(this.watchInterval)
             }
 
-            logger.info("开始监控磁盘变化", { interval })
+            logger.info(`开始监控磁盘变化，间隔: ${interval}ms`)
 
             this.watchInterval = setInterval(async () => {
                 try {
@@ -408,10 +408,7 @@ export default class DriveService implements BaseService {
                 })
 
             this.lastUpdateTime = Date.now()
-            logger.debug("磁盘缓存已刷新", {
-                count: this.driveCache.length,
-                drives: this.driveCache,
-            })
+            logger.debug(`磁盘缓存已刷新，共 ${this.driveCache.length} 个驱动器`)
         } catch (error) {
             logger.error("刷新磁盘缓存失败", {
                 error: error instanceof Error ? error.message : String(error),
