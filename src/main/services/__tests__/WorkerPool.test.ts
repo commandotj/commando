@@ -4,6 +4,15 @@
  */
 
 import { Worker } from "worker_threads";
+
+// Use fake timers to avoid test timeouts
+beforeAll(() => {
+  jest.useFakeTimers();
+});
+
+afterAll(() => {
+  jest.useRealTimers();
+});
 import WorkerPool, {
   WorkerMessage,
   WorkerRequest,
@@ -12,7 +21,7 @@ import WorkerPool, {
 
 // Mock dependencies
 jest.mock("worker_threads");
-jest.mock("../../logger", () => ({
+jest.mock("../../log/logger", () => ({
   info: jest.fn(),
   warn: jest.fn(),
   error: jest.fn(),
@@ -40,7 +49,7 @@ describe("WorkerPool", () => {
       terminate: jest.fn(),
       on: jest.fn(),
       removeAllListeners: jest.fn(),
-    } as unknown as WorkerPool;
+    } as unknown as jest.Mocked<Worker>;
 
     MockWorker.mockImplementation(() => mockWorkerInstance);
   });
@@ -106,7 +115,6 @@ describe("WorkerPool", () => {
       workerPool.registerWorkerType(
         "ExecutionWorker",
         {
-          script: "executionWorker.js",
           maxWorkers: 2,
           maxRetries: 2,
         },
@@ -245,7 +253,7 @@ describe("WorkerPool", () => {
               if (event === "message") {
                 setTimeout(() => {
                   if (callCount <= 2) {
-                    handler({
+                    (handler as (data: unknown) => void)({
                       id: "mock-uuid-123",
                       type: "error",
                       operation: "retry-operation",
@@ -253,7 +261,7 @@ describe("WorkerPool", () => {
                       timestamp: Date.now(),
                     });
                   } else {
-                    handler({
+                    (handler as (data: unknown) => void)({
                       id: "mock-uuid-123",
                       type: "response",
                       operation: "retry-operation",
@@ -265,7 +273,7 @@ describe("WorkerPool", () => {
               }
               return worker;
             }),
-        } as unknown as WorkerPool;
+        } as unknown as jest.Mocked<Worker>;
         return worker;
       });
 
@@ -322,7 +330,6 @@ describe("WorkerPool", () => {
       workerPool.registerWorkerType(
         "PoolWorker",
         {
-          script: "poolWorker.js",
           maxWorkers: 2,
         },
         poolFactory,
@@ -378,7 +385,6 @@ describe("WorkerPool", () => {
       workerPool.registerWorkerType(
         "CleanupWorker",
         {
-          script: "cleanupWorker.js",
           maxWorkers: 1,
         },
         cleanupFactory,
@@ -469,6 +475,13 @@ describe("WorkerPool", () => {
 
     it("should handle unknown message IDs gracefully", () => {
       const logger = jest.requireMock("../../log/logger");
+
+      // Register the worker type first
+      workerPool.registerWorkerType(
+        "ExecutionWorker",
+        { maxWorkers: 1, idleTimeout: 5000 },
+        () => mockWorkerInstance,
+      );
 
       mockWorkerInstance.on.mockImplementation(
         (event: string | symbol, handler: (...args: unknown[]) => void) => {

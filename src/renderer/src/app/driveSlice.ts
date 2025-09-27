@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import type { DriveInfo } from "@common/types/DriveTypes";
+import type { DriveInfo } from "../../../common/types/DriveTypes";
 
 interface DriveState {
   drives: DriveInfo[];

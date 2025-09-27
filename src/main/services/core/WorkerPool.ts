@@ -14,12 +14,12 @@ import {
   WORKER_TYPE_REGISTERED,
   WORKER_CREATED,
   ORPHANED_WORKER_MESSAGE,
-} from "@common/constants/LogMessages";
+} from "../../../common/constants/LogMessages";
 import {
   WORKER_TYPE_NOT_REGISTERED,
   WORKER_SCRIPT_NOT_FOUND,
   WORKER_TIMEOUT,
-} from "@common/constants/ErrorMessages";
+} from "../../../common/constants/ErrorMessages";
 
 // Worker factory registry - Services register their own worker factories
 const workerFactories: Record<string, () => Worker> = {};
@@ -178,7 +178,7 @@ class WorkerInstance extends EventEmitter {
 
     return new Promise<T>((resolve, reject) => {
       this.pendingRequests.set(requestId, {
-        resolve,
+        resolve: resolve as (value: unknown) => void,
         reject,
         onProgress,
       });

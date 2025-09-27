@@ -68,14 +68,15 @@ const createTestStore = (
 
 const renderUseClipboard = (
   initialState = {},
-): ReturnType<typeof renderHook<ReturnType<typeof useClipboard>>> => {
+): ReturnType<typeof renderHook> => {
   const store = createTestStore(initialState);
-  const wrapper = ({ children }: { children: React.ReactNode }): JSX.Element =>
+  const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     React.createElement(Provider, { store }, children);
 
   return renderHook(() => useClipboard(), { wrapper });
 };
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 describe("useClipboard", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -84,15 +85,15 @@ describe("useClipboard", () => {
   it("should return initial empty state", () => {
     const { result } = renderUseClipboard();
 
-    expect(result.current.state).toEqual({
+    expect((result.current as any).state).toEqual({
       items: [],
       operation: null,
       sourcePane: null,
       timestamp: 0,
     });
-    expect(result.current.isEmpty).toBe(true);
-    expect(result.current.isCopy).toBe(false);
-    expect(result.current.isCut).toBe(false);
+    expect((result.current as any).isEmpty).toBe(true);
+    expect((result.current as any).isCopy).toBe(false);
+    expect((result.current as any).isCut).toBe(false);
   });
 
   it("should return clipboard state with items", () => {
@@ -107,13 +108,13 @@ describe("useClipboard", () => {
       clipboard: clipboardState,
     });
 
-    expect(result.current.state).toEqual(clipboardState);
-    expect(result.current.items).toEqual(["/file1.txt", "/file2.txt"]);
-    expect(result.current.operation).toBe("copy");
-    expect(result.current.sourcePane).toBe(0);
-    expect(result.current.isEmpty).toBe(false);
-    expect(result.current.isCopy).toBe(true);
-    expect(result.current.isCut).toBe(false);
+    expect((result.current as any).state).toEqual(clipboardState);
+    expect((result.current as any).items).toEqual(["/file1.txt", "/file2.txt"]);
+    expect((result.current as any).operation).toBe("copy");
+    expect((result.current as any).sourcePane).toBe(0);
+    expect((result.current as any).isEmpty).toBe(false);
+    expect((result.current as any).isCopy).toBe(true);
+    expect((result.current as any).isCut).toBe(false);
   });
 
   it("should return cut operation state", () => {
@@ -128,8 +129,8 @@ describe("useClipboard", () => {
       clipboard: clipboardState,
     });
 
-    expect(result.current.isCopy).toBe(false);
-    expect(result.current.isCut).toBe(true);
+    expect((result.current as any).isCopy).toBe(false);
+    expect((result.current as any).isCut).toBe(true);
   });
 
   it("should call clipboard service methods", () => {
@@ -139,44 +140,44 @@ describe("useClipboard", () => {
 
     // Test copy
     act(() => {
-      result.current.copy(["/file.txt"], 0);
+      (result.current as any).copy(["/file.txt"], 0);
     });
     expect(clipboardService.copy).toHaveBeenCalledWith(["/file.txt"], 0);
 
     // Test cut
     act(() => {
-      result.current.cut(["/file.txt"], 1);
+      (result.current as any).cut(["/file.txt"], 1);
     });
     expect(clipboardService.cut).toHaveBeenCalledWith(["/file.txt"], 1);
 
     // Test clear
     act(() => {
-      result.current.clear();
+      (result.current as any).clear();
     });
     expect(clipboardService.clear).toHaveBeenCalled();
 
     // Test canPaste
-    result.current.canPaste("/target");
+    (result.current as any).canPaste("/target");
     expect(clipboardService.canPaste).toHaveBeenCalledWith("/target");
 
     // Test getItems
-    result.current.getItems();
+    (result.current as any).getItems();
     expect(clipboardService.getItems).toHaveBeenCalled();
 
     // Test hasItems
-    result.current.hasItems();
+    (result.current as any).hasItems();
     expect(clipboardService.hasItems).toHaveBeenCalled();
 
     // Test getOperationType
-    result.current.getOperationType();
+    (result.current as any).getOperationType();
     expect(clipboardService.getOperationType).toHaveBeenCalled();
 
     // Test isFromPane
-    result.current.isFromPane(0);
+    (result.current as any).isFromPane(0);
     expect(clipboardService.isFromPane).toHaveBeenCalledWith(0);
 
     // Test isStale
-    result.current.isStale();
+    (result.current as any).isStale();
     expect(clipboardService.isStale).toHaveBeenCalled();
   });
 
@@ -188,7 +189,7 @@ describe("useClipboard", () => {
     const { result } = renderUseClipboard();
 
     await act(async () => {
-      await result.current.paste("/target", 1);
+      await (result.current as any).paste("/target", 1);
     });
 
     expect(clipboardService.paste).toHaveBeenCalledWith("/target", 1);
@@ -204,7 +205,7 @@ describe("useClipboard", () => {
 
     await expect(
       act(async () => {
-        await result.current.paste("/target", 1);
+        await (result.current as any).paste("/target", 1);
       }),
     ).rejects.toThrow("Paste failed");
   });
@@ -213,19 +214,21 @@ describe("useClipboard", () => {
     const { result, rerender } = renderUseClipboard();
 
     const firstRenderCallbacks = {
-      copy: result.current.copy,
-      cut: result.current.cut,
-      paste: result.current.paste,
-      clear: result.current.clear,
-      canPaste: result.current.canPaste,
+      copy: (result.current as any).copy,
+      cut: (result.current as any).cut,
+      paste: (result.current as any).paste,
+      clear: (result.current as any).clear,
+      canPaste: (result.current as any).canPaste,
     };
 
     rerender();
 
-    expect(result.current.copy).toBe(firstRenderCallbacks.copy);
-    expect(result.current.cut).toBe(firstRenderCallbacks.cut);
-    expect(result.current.paste).toBe(firstRenderCallbacks.paste);
-    expect(result.current.clear).toBe(firstRenderCallbacks.clear);
-    expect(result.current.canPaste).toBe(firstRenderCallbacks.canPaste);
+    expect((result.current as any).copy).toBe(firstRenderCallbacks.copy);
+    expect((result.current as any).cut).toBe(firstRenderCallbacks.cut);
+    expect((result.current as any).paste).toBe(firstRenderCallbacks.paste);
+    expect((result.current as any).clear).toBe(firstRenderCallbacks.clear);
+    expect((result.current as any).canPaste).toBe(
+      firstRenderCallbacks.canPaste,
+    );
   });
 });

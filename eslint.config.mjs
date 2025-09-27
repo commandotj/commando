@@ -31,5 +31,13 @@ export default tseslint.config(
             '@typescript-eslint/semi': 'off'
         }
     },
+    {
+        files: ['jest/**/*.js'],
+        languageOptions: {
+            globals: {
+                jest: 'readonly'
+            }
+        }
+    },
     eslintConfigPrettier
 );

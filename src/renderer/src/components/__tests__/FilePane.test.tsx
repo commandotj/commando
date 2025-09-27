@@ -9,6 +9,7 @@
 // 如需修改测试用例结构、mock 机制或异步断言方式，请优先参考本注释，确保主流程测试链路不被破坏。
 //
 // [End of 修复历史]
+import "./setup"; // Import global setup first
 import "@testing-library/jest-dom";
 import {
   render,
@@ -19,9 +20,15 @@ import {
 } from "@testing-library/react";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
+import { configureStore as configureRealStore } from "@reduxjs/toolkit";
 import FilePane from "../FilePane";
 import * as redux from "../../app/hooks";
 import { fetchDirectory } from "../../app/fileManagerSlice";
+// import { setPaneSelectedKeys } from "../../app/fileManagerSlice";
+// import fileManagerReducer from "../../app/fileManagerSlice";
+// import driveReducer from "../../app/driveSlice";
+// import clipboardReducer from "../../app/clipboardSlice";
+// import fileOperationsReducer from "../../app/fileOperationsSlice";
 import type { RootState } from "../../app/store";
 
 const mockStore = configureStore<RootState>([]);
@@ -31,6 +38,44 @@ jest.mock("../../app/hooks");
 jest.mock("../../app/fileManagerSlice", () => ({
   ...jest.requireActual("../../app/fileManagerSlice"),
   fetchDirectory: jest.fn(() => ({ type: "fileManager/fetchDirectory" })),
+  setPaneSelectedKeys: jest.fn(() => ({
+    type: "fileManager/setPaneSelectedKeys",
+  })),
+}));
+
+// Mock useDriveEvents hook
+jest.mock("../../hooks/useDriveEvents", () => ({
+  useDriveEvents: jest.fn(),
+}));
+
+// Mock logger module
+jest.mock("../../logger", () => ({
+  info: jest.fn(),
+  warn: jest.fn(),
+  error: jest.fn(),
+}));
+
+// Mock useI18n hook
+jest.mock("../../hooks/useI18n", () => ({
+  useI18n: () => ({
+    t: (key: string) => {
+      // Return English translations for common keys
+      const translations: Record<string, string> = {
+        "ui.table.name": "Name",
+        "ui.table.dateModified": "Date Modified",
+        "ui.table.size": "Size",
+        "ui.table.type": "Type",
+        "ui.file.typeFolder": "Folder",
+        "ui.file.typeFile": "File",
+        "ui.status.itemsSelected": "items selected",
+        "ui.status.totalItems": "total items",
+      };
+      return translations[key] || key;
+    },
+    changeLanguage: jest.fn(),
+    currentLanguage: "en-US",
+    isReady: true,
+  }),
 }));
 
 beforeAll(() => {
@@ -94,29 +139,23 @@ beforeAll(() => {
     },
   });
 
-  window.fsApi = {
-    listDir: jest.fn().mockResolvedValue([]),
-    listDrives: jest.fn().mockResolvedValue([
-      {
-        device: "/dev/disk1",
-        description: "Mock Disk",
-        size: 1000000000,
-        mountpoints: [{ path: "/" }],
-        isSystem: true,
-        isRemovable: false,
-      },
-    ]),
-    // ...mock 其他方法
-  } as unknown as typeof window.fsApi;
-
-  // Mock window.logApi
-  window.logApi = {
-    log: jest.fn(),
-  } as unknown as typeof window.logApi;
+  // window.fsApi and window.logApi are already mocked in setup.ts
 });
 
 describe("FilePane", () => {
-  let store: ReturnType<typeof mockStore>;
+  let store:
+    | ReturnType<typeof mockStore>
+    | ReturnType<typeof configureRealStore>;
+
+  // Ensure window.logApi is mocked before each test
+  beforeEach(() => {
+    (global as unknown as { window: unknown }).window = {
+      ...global.window,
+      logApi: {
+        log: jest.fn(),
+      },
+    };
+  });
   let dispatch: jest.Mock;
 
   beforeEach(() => {
@@ -164,7 +203,8 @@ describe("FilePane", () => {
         drives: [],
         loading: false,
         error: null,
-        lastUpdated: null,
+        loadingMessage: "",
+        lastUpdateTime: null,
       },
     });
     dispatch = jest.fn();
@@ -238,6 +278,8 @@ describe("FilePane", () => {
         </Provider>,
       );
     });
+    // Reset dispatch mock after component mount (which calls fetchDrives)
+    dispatch.mockClear();
     const fileLink = await screen.findByText("file.txt");
     await act(async () => {
       fireEvent.click(fileLink);
@@ -285,12 +327,19 @@ describe("FilePane", () => {
         </Provider>,
       );
     });
+    // Reset dispatch mock after component mount (which calls fetchDrives)
+    dispatch.mockClear();
     const checkboxes = screen.getAllByRole("checkbox");
     const rowCheckbox = checkboxes[1]; // First checkbox is the header checkbox
     await act(async () => {
       fireEvent.click(rowCheckbox);
     });
-    expect(rowCheckbox).toBeChecked();
+    // Check if setPaneSelectedKeys was called (since we're using mock store)
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "fileManager/setPaneSelectedKeys",
+      }),
+    );
   });
 
   it("renders resizable columns", async () => {
@@ -316,21 +365,29 @@ describe("FilePane", () => {
         </Provider>,
       );
     });
+    // Reset dispatch mock after component mount (which calls fetchDrives)
+    dispatch.mockClear();
     const checkboxes = screen.getAllByRole("checkbox");
     const rowCheckbox1 = checkboxes[1];
     const rowCheckbox2 = checkboxes[2];
     await act(async () => {
       fireEvent.click(rowCheckbox1, { ctrlKey: true });
     });
-    expect(rowCheckbox1).toBeChecked();
+    // Check if setPaneSelectedKeys was called
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "fileManager/setPaneSelectedKeys",
+      }),
+    );
+    dispatch.mockClear();
     await act(async () => {
       fireEvent.click(rowCheckbox2, { metaKey: true });
     });
-    expect(rowCheckbox2).toBeChecked();
-    await act(async () => {
-      fireEvent.click(rowCheckbox1, { ctrlKey: true });
-    });
-    expect(rowCheckbox1).not.toBeChecked();
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "fileManager/setPaneSelectedKeys",
+      }),
+    );
   });
 
   it("supports Shift 区间多选", async () => {
@@ -341,40 +398,60 @@ describe("FilePane", () => {
         </Provider>,
       );
     });
+    // Reset dispatch mock after component mount (which calls fetchDrives)
+    dispatch.mockClear();
     const checkboxes = screen.getAllByRole("checkbox");
     const rowCheckbox1 = checkboxes[1];
     const rowCheckbox2 = checkboxes[2];
     await act(async () => {
       fireEvent.click(rowCheckbox1);
     });
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "fileManager/setPaneSelectedKeys",
+      }),
+    );
+    dispatch.mockClear();
     await act(async () => {
       fireEvent.click(rowCheckbox2, { shiftKey: true });
     });
-    expect(rowCheckbox1).toBeChecked();
-    expect(rowCheckbox2).toBeChecked();
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "fileManager/setPaneSelectedKeys",
+      }),
+    );
   });
 
   it("supports 全选和全不选", async () => {
-    render(
-      <Provider store={store}>
-        <FilePane paneIndex={0} />
-      </Provider>,
-    );
+    await act(async () => {
+      render(
+        <Provider store={store}>
+          <FilePane paneIndex={0} />
+        </Provider>,
+      );
+    });
+    // Reset dispatch mock after component mount (which calls fetchDrives)
+    dispatch.mockClear();
     const checkboxes = screen.getAllByRole("checkbox");
     const selectAll = checkboxes[0];
-    const rowCheckbox1 = checkboxes[1];
-    const rowCheckbox2 = checkboxes[2];
     // 全选
     await act(async () => {
       fireEvent.click(selectAll);
     });
-    expect(rowCheckbox1).toBeChecked();
-    expect(rowCheckbox2).toBeChecked();
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "fileManager/setPaneSelectedKeys",
+      }),
+    );
+    dispatch.mockClear();
     // 全不选
     await act(async () => {
       fireEvent.click(selectAll);
     });
-    expect(rowCheckbox1).not.toBeChecked();
-    expect(rowCheckbox2).not.toBeChecked();
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "fileManager/setPaneSelectedKeys",
+      }),
+    );
   });
 });

@@ -109,7 +109,8 @@ async function deleteFiles({
 
       await new Promise((resolve) => setTimeout(resolve, 50)); // Simulate delay
       deletedFiles++;
-    } catch (error: unknown) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       failedFiles.push({
         path: filePath,
         error: error.message,

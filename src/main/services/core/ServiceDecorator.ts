@@ -11,7 +11,7 @@ import {
 } from "electron";
 import type { Worker as NodeWorker } from "worker_threads";
 import { WorkerPool } from "./WorkerPool";
-import logger from "@main/log/logger";
+import logger from "../../log/logger";
 
 // IPC channel configuration
 export interface IpcChannelConfig {
@@ -300,12 +300,12 @@ class ServiceRegistry {
 export function Service(
   metadata: Omit<ServiceMetadata, "ipcChannels"> & { ipcChannels?: string[] },
 ) {
-  return function <T extends new (mainWindow?: BrowserWindow) => BaseService>(
-    constructor: T,
-  ): T {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return function <T extends new (...args: any[]) => any>(constructor: T): T {
     // Enhance the constructor to auto-register
     const EnhancedClass = class extends constructor {
-      constructor(...args: unknown[]) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      constructor(...args: any[]) {
         super(...args);
 
         // Auto-detect IPC channels from method names if not provided

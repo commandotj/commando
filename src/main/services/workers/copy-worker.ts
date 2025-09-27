@@ -70,7 +70,8 @@ parentPort?.on("message", async (message: WorkerRequest) => {
               id,
               type: "progress",
               operation,
-              ...progress,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              ...(progress as any),
               timestamp: Date.now(),
             });
           },

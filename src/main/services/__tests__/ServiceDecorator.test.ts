@@ -13,7 +13,13 @@ import {
 } from "../core/ServiceDecorator";
 
 // Mock dependencies
-jest.mock("electron");
+jest.mock("electron", () => ({
+  ipcMain: {
+    handle: jest.fn(),
+    removeHandler: jest.fn(),
+  },
+  IpcMainInvokeEvent: {},
+}));
 jest.mock("../../log/logger", () => ({
   info: jest.fn(),
   warn: jest.fn(),
@@ -27,8 +33,6 @@ jest.mock("../core/WorkerPool", () => ({
     }),
   },
 }));
-
-const mockIpcMain = ipcMain as jest.Mocked<typeof ipcMain>;
 
 describe("ServiceDecorator", () => {
   let registry: ServiceRegistry;
@@ -158,7 +162,7 @@ describe("ServiceDecorator", () => {
         }
       }
 
-      expect(mockIpcMain.handle).toHaveBeenCalledWith(
+      expect(ipcMain.handle).toHaveBeenCalledWith(
         "ipc:test",
         expect.any(Function),
       );
@@ -210,12 +214,12 @@ describe("ServiceDecorator", () => {
 
     it("should initialize all services", async () => {
       await registry.initializeAll();
-      expect(testService.initialized).toBe(true);
+      expect((testService as { initialized: boolean }).initialized).toBe(true);
     });
 
     it("should cleanup all services", async () => {
       await registry.cleanupAll();
-      expect(testService.cleanedUp).toBe(true);
+      expect((testService as { cleanedUp: boolean }).cleanedUp).toBe(true);
     });
 
     it("should handle initialization errors gracefully", async () => {
@@ -308,7 +312,7 @@ describe("ServiceDecorator", () => {
       }
 
       testCases.forEach(({ channel }) => {
-        expect(mockIpcMain.handle).toHaveBeenCalledWith(
+        expect(ipcMain.handle).toHaveBeenCalledWith(
           channel,
           expect.any(Function),
         );
@@ -351,7 +355,7 @@ describe("ServiceDecorator", () => {
       }
 
       // Get the IPC handler function
-      const handlerCall = mockIpcMain.handle.mock.calls.find(
+      const handlerCall = (ipcMain.handle as jest.Mock).mock.calls.find(
         (call) => call[0] === "error:test",
       );
       expect(handlerCall).toBeDefined();

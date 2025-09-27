@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { useAppDispatch } from "@renderer/app/hooks";
-import { setLoading, updateDrives } from "@renderer/app/driveSlice";
-import type { DriveInfo } from "@common/types/DriveTypes";
+import { useAppDispatch } from "../app/hooks";
+import { setLoading, updateDrives } from "../app/driveSlice";
+import type { DriveInfo } from "../../../common/types/DriveTypes";
 
 /**
  * Hook 用于监听驱动器相关的 IPC 事件并更新 Redux store

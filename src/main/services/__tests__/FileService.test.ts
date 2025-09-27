@@ -15,6 +15,8 @@ jest.mock("../../log/logger", () => ({
   error: jest.fn(),
 }));
 
+// Mock ipcMain is handled by jest.mock("electron")
+
 const MockWorkerPool = WorkerPool as jest.Mocked<typeof WorkerPool>;
 
 describe("FileService", () => {

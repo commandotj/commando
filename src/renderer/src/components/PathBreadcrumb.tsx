@@ -175,7 +175,7 @@ const PathBreadcrumb: React.FC<PathBreadcrumbProps> = ({
         ellipsisInserted = true;
       }
     }
-    return items;
+    return <>{items}</>;
   };
 
   return (
