@@ -1,43 +1,43 @@
-import tseslint from '@electron-toolkit/eslint-config-ts';
-import eslintConfigPrettier from 'eslint-config-prettier';
-import eslintPluginReact from 'eslint-plugin-react';
-import eslintPluginReactHooks from 'eslint-plugin-react-hooks';
-import eslintPluginReactRefresh from 'eslint-plugin-react-refresh';
+import tseslint from "@electron-toolkit/eslint-config-ts"
+import eslintConfigPrettier from "eslint-config-prettier"
+import eslintPluginReact from "eslint-plugin-react"
+import eslintPluginReactHooks from "eslint-plugin-react-hooks"
+import eslintPluginReactRefresh from "eslint-plugin-react-refresh"
 
-export default tseslint.config(
+export default [
     {
-        ignores: ['**/node_modules', '**/dist', '**/out']
+        ignores: ["**/node_modules", "**/dist", "**/out"],
     },
-    tseslint.configs.recommended,
-    eslintPluginReact.configs.flat.recommended,
-    eslintPluginReact.configs.flat['jsx-runtime'],
+    ...tseslint.configs.recommended,
+    ...eslintPluginReact.configs.flat.recommended,
+    ...eslintPluginReact.configs.flat["jsx-runtime"],
     {
         settings: {
             react: {
-                version: 'detect'
-            }
-        }
+                version: "detect",
+            },
+        },
     },
     {
-        files: ['**/*.{ts,tsx}'],
+        files: ["**/*.{ts,tsx}"],
         plugins: {
-            'react-hooks': eslintPluginReactHooks,
-            'react-refresh': eslintPluginReactRefresh
+            "react-hooks": eslintPluginReactHooks,
+            "react-refresh": eslintPluginReactRefresh,
         },
         rules: {
             ...eslintPluginReactHooks.configs.recommended.rules,
             ...eslintPluginReactRefresh.configs.vite.rules,
-            semi: 'off',
-            '@typescript-eslint/semi': 'off'
-        }
+            "semi": "error",
+            "@typescript-eslint/semi": "error",
+        },
     },
     {
-        files: ['jest/**/*.js'],
+        files: ["jest/**/*.js"],
         languageOptions: {
             globals: {
-                jest: 'readonly'
-            }
-        }
+                jest: "readonly",
+            },
+        },
     },
-    eslintConfigPrettier
-);
+    eslintConfigPrettier,
+]

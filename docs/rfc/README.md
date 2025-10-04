@@ -1,8 +1,8 @@
 # RFC (Request for Comments) 流程管理
 
 ---
-作者: albert.li/AI  
-创建时间: 2024-12-19  
+作者: albert.li/AI
+创建时间: 2024-12-19
 修改历史:
   - 2024-12-19: 初稿 by AI
   - 2024-12-19: 合并为统一文档 by AI
@@ -90,11 +90,11 @@ RFC (Request for Comments) 是 commando-react 项目中用于记录和跟踪重�
 | 🔵 Proposed | 0 | 0% |
 | 🟡 Under Discussion | 0 | 0% |
 | 🟠 Under Review | 0 | 0% |
-| 🟢 Approved | 2 | 28.6% |
-| 🔵 In Progress | 0 | 0% |
-| ✅ Completed | 5 | 71.4% |
+| 🟢 Approved | 2 | 20% |
+| 🔵 In Progress | 1 | 10% |
+| ✅ Completed | 7 | 70% |
 | ❌ Deprecated | 0 | 0% |
-| **总计** | **7** | **100%** |
+| **总计** | **10** | **100%** |
 
 ## RFC 列表
 
@@ -107,6 +107,8 @@ RFC (Request for Comments) 是 commando-react 项目中用于记录和跟踪重�
 | [RFC-2024-003](./003-filepane-key-consistency.md) | FilePane 多选 key 类型一致性问题 | AI (albert.li) | 2024-06-09 | 2024-06-09 | ✅ Completed |
 | [RFC-2024-004](./004-log-module-api.md) | 日志模块 API 设计 | albert.li/AI | 2024-06-09 | 2024-06-09 | ✅ Completed |
 | [RFC-2024-005](./005-file-management-key-functions.md) | File Management Key Functions v1 | Albert Lee/AI | 2025-01-14 | 2025-01-14 | ✅ Completed |
+| [RFC-2025-008](./008-window-service-api.md) | Window Service API 设计 | AI Assistant | 2025-01-27 | 2025-01-27 | ✅ Completed |
+| [RFC-2025-009](./009-shell-service-api.md) | Shell Service API 设计 | AI Assistant | 2025-01-27 | 2025-01-27 | ✅ Completed |
 
 ### 已批准的 RFC
 
@@ -117,7 +119,9 @@ RFC (Request for Comments) 是 commando-react 项目中用于记录和跟踪重�
 
 ### 进行中的 RFC
 
-*暂无*
+| RFC 编号 | 标题 | 作者 | 创建时间 | 当前阶段 |
+|----------|------|------|----------|----------|
+| [RFC-2025-006](./006-real-file-copy-operations.md) | Complete File Operations with Total Commander Functionality | Claude Code Assistant/albert.li | 2025-09-25 | 🔵 In Progress |
 
 ### 提案中的 RFC
 
@@ -134,7 +138,7 @@ RFC (Request for Comments) 是 commando-react 项目中用于记录和跟踪重�
 | 年份 | 总数 | 已完成 | 已批准 | 进行中 | 提案中 | 已废弃 |
 |------|------|--------|--------|--------|--------|--------|
 | 2024 | 4 | 4 | 0 | 0 | 0 | 0 |
-| 2025 | 3 | 1 | 2 | 0 | 0 | 0 |
+| 2025 | 6 | 3 | 2 | 1 | 0 | 0 |
 
 ### 按作者统计
 
@@ -142,16 +146,20 @@ RFC (Request for Comments) 是 commando-react 项目中用于记录和跟踪重�
 |------|------|--------|--------|--------|--------|--------|
 | albert.li/AI | 4 | 4 | 0 | 0 | 0 | 0 |
 | Albert Lee/AI | 3 | 1 | 2 | 0 | 0 | 0 |
+| AI Assistant | 2 | 2 | 0 | 0 | 0 | 0 |
 
 ## 最近更新
 
 | 时间 | RFC | 更新内容 | 作者 |
 |------|-----|----------|------|
+| 2025-01-27 | RFC-2025-009 | 创建 Shell Service API 设计文档 | AI Assistant |
+| 2025-01-27 | RFC-2025-008 | 创建 Window Service API 设计文档 | AI Assistant |
 | 2024-12-19 | RFC-2024-005 | 清理重复文件，更新索引 | albert.li/AI |
 | 2024-12-19 | RFC-2024-004 | 转换为RFC格式并重命名 | albert.li/AI |
 | 2024-12-19 | RFC-2024-003 | 转换为RFC格式并重命名 | albert.li/AI |
 | 2024-12-19 | RFC-2024-002 | 转换为RFC格式并重命名 | albert.li/AI |
 | 2024-12-19 | RFC-2024-001 | 创建 RFC 索引系统 | albert.li/AI |
+| 2025-09-27 | RFC-2025-006 | LubanEngine 进入实施阶段，记录实现路线 | Codex AI |
 | 2024-06-15 | RFC-2024-002 | 批量复制设计完成 | AI+albert.li |
 | 2024-06-09 | RFC-2024-001 | 日志模块设计完成 | albert.li/AI |
 
@@ -186,8 +194,8 @@ RFC (Request for Comments) 是 commando-react 项目中用于记录和跟踪重�
 # RFC-YYYY-NNN: [RFC 标题]
 
 ---
-作者: [作者姓名]  
-创建时间: [YYYY-MM-DD]  
+作者: [作者姓名]
+创建时间: [YYYY-MM-DD]
 修改历史:
   - [YYYY-MM-DD]: [修改描述] by [修改者]
 ---
@@ -317,8 +325,8 @@ RFC (Request for Comments) 是 commando-react 项目中用于记录和跟踪重�
 
 ---
 
-**状态**: [Proposed/Under Discussion/Under Review/Approved/In Progress/Completed/Deprecated]  
-**最后更新**: [YYYY-MM-DD]  
+**状态**: [Proposed/Under Discussion/Under Review/Approved/In Progress/Completed/Deprecated]
+**最后更新**: [YYYY-MM-DD]
 **下次评审**: [YYYY-MM-DD]
 ```
 
@@ -359,6 +367,6 @@ RFC (Request for Comments) 是 commando-react 项目中用于记录和跟踪重�
 
 ---
 
-**最后更新**: 2024-12-19  
-**维护者**: albert.li  
+**最后更新**: 2024-12-19
+**维护者**: albert.li
 **联系方式**: albert_lee@hotmail.com

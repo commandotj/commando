@@ -83,7 +83,7 @@ parentPort?.on("message", async (message: WorkerRequest) => {
             id,
             type: "error",
             operation,
-            error: error.message,
+            error: error instanceof Error ? error.message : String(error),
             timestamp: Date.now(),
         })
     }
@@ -138,7 +138,7 @@ async function renameFile({ oldPath, newPath }: RenameParams): Promise<unknown> 
             crossDirectory,
         }
     } catch (error: unknown) {
-        throw new Error(`Rename failed: ${error.message}`)
+        throw new Error(`Rename failed: ${error instanceof Error ? error.message : String(error)}`)
     }
 }
 
@@ -165,7 +165,7 @@ async function createFolder({ path: folderPath, recursive }: CreateFolderParams)
             createdParents: recursive ? createdParents : undefined,
         }
     } catch (error: unknown) {
-        throw new Error(`Create folder failed: ${error.message}`)
+        throw new Error(`Create folder failed: ${error instanceof Error ? error.message : String(error)}`)
     }
 }
 
@@ -202,6 +202,6 @@ async function getFileInfo({ path: filePath }: GetInfoParams): Promise<unknown> 
 
         return mockInfo
     } catch (error: unknown) {
-        throw new Error(`Get file info failed: ${error.message}`)
+        throw new Error(`Get file info failed: ${error instanceof Error ? error.message : String(error)}`)
     }
 }

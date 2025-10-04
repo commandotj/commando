@@ -43,7 +43,7 @@ app.whenReady().then(async () => {
         }
 
         // 注册所有 IPC handler
-        registerIpcHandlers({ preload, url, indexHtml, env })
+        registerIpcHandlers()
 
         // Set app user model id for windows
         electronApp.setAppUserModelId("me.systembug.commando")
@@ -56,6 +56,13 @@ app.whenReady().then(async () => {
         // Initialize services after window is created
         const mainWindow = getMainWindow()
         if (mainWindow) {
+            // Configure WindowService with window parameters
+            const { getServiceRegistry } = await import("./services")
+            const windowService = getServiceRegistry().getService("WindowService")
+            if (windowService) {
+                ;(windowService as any).setWindowConfig({ preload, url, indexHtml, env })
+            }
+
             await initializeServices(mainWindow)
             logger.info("Application services initialized successfully")
         } else {

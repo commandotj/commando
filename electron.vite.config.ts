@@ -10,6 +10,9 @@ export default defineConfig({
                 "@common": resolve("src/common"),
                 "@main": resolve("src/main"),
                 "@shared": resolve("src/shared"),
+                // 引擎别名 - 只需要两个！
+                "@engines": resolve("src/main/services/engine"),
+                "@engine-shared": resolve("src/main/services/engine/shared"),
             },
         },
     },

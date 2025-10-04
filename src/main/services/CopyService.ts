@@ -3,24 +3,32 @@
  * Handles single file and batch copy operations with progress tracking
  */
 
-import { IpcMainInvokeEvent, IpcMainEvent, BrowserWindow } from "electron"
-import { Service, ServiceMetadata, BaseService } from "./core/ServiceDecorator"
-import { WorkerPool, WorkerProgress } from "./core/WorkerPool"
-import { ServiceIdentifiers } from "../../common/constants/ServiceIdentifiers"
-import logger from "../log/logger"
-import createWorker from "./workers/copy-worker?nodeWorker"
+import { IpcMainInvokeEvent, IpcMainEvent, BrowserWindow } from "electron";
+import path from "path";
+import { Service, ServiceMetadata, BaseService } from "./core/ServiceDecorator";
+import { WorkerPool, WorkerProgress } from "./core/WorkerPool";
+import { ServiceIdentifiers } from "../../common/constants/ServiceIdentifiers";
+import logger from "../log/logger";
+import createWorker from "./workers/copy-worker?nodeWorker";
 interface CopyParams {
-    source: string
-    destination: string
+    source: string;
+    destination: string;
+}
+
+interface BatchCopyEntry {
+    source: string;
+    destination: string;
+    overwrite?: boolean;
 }
 
 interface BatchCopyParams {
-    sources: string[]
-    destination: string
+    sources?: string[];
+    destination?: string;
+    entries?: BatchCopyEntry[];
 }
 
 interface CancelParams {
-    taskId: string
+    taskId: string;
 }
 
 @Service({
@@ -36,8 +44,8 @@ interface CancelParams {
  * Supports mainWindow injection for direct renderer communication
  */
 export default class CopyService implements BaseService {
-    private workerPool: WorkerPool
-    private mainWindow: BrowserWindow | null = null
+    private workerPool: WorkerPool;
+    private mainWindow: BrowserWindow | null = null;
 
     /**
      * Constructor with optional mainWindow injection
@@ -46,16 +54,16 @@ export default class CopyService implements BaseService {
      * @param mainWindow - Optional BrowserWindow for direct renderer communication
      */
     constructor(mainWindow?: BrowserWindow) {
-        this.mainWindow = mainWindow || null
-        this.workerPool = WorkerPool.getInstance()
+        this.mainWindow = mainWindow || null;
+        this.workerPool = WorkerPool.getInstance();
     }
 
     async initialize(): Promise<void> {
-        logger.info("CopyService initialized with worker pool")
+        logger.info("CopyService initialized with worker pool");
     }
 
     async cleanup(): Promise<void> {
-        logger.info("CopyService cleaning up")
+        logger.info("CopyService cleaning up");
     }
 
     /**
@@ -64,7 +72,7 @@ export default class CopyService implements BaseService {
      * @param mainWindow - The main BrowserWindow instance
      */
     setMainWindow(mainWindow: BrowserWindow): void {
-        this.mainWindow = mainWindow
+        this.mainWindow = mainWindow;
     }
 
     /**
@@ -74,7 +82,11 @@ export default class CopyService implements BaseService {
      * @param message - Optional message to display
      * @param error - Optional error state boolean
      */
-    sendLoadingState(loading: boolean, message?: string, error?: boolean): void {
+    sendLoadingState(
+        loading: boolean,
+        message?: string,
+        error?: boolean
+    ): void {
         if (this.mainWindow && !this.mainWindow.isDestroyed()) {
             this.mainWindow.webContents.send("service:loading", {
                 service: this.getMetadata().name,
@@ -82,7 +94,7 @@ export default class CopyService implements BaseService {
                 message,
                 error,
                 timestamp: Date.now(),
-            })
+            });
         }
     }
 
@@ -97,7 +109,7 @@ export default class CopyService implements BaseService {
                 { channel: "copy:status", type: "on" },
             ],
             description: "Handles file copy operations with progress tracking",
-        }
+        };
     }
 
     /**
@@ -106,8 +118,11 @@ export default class CopyService implements BaseService {
      * @param _event - IPC event (unused in this implementation)
      * @param params - Request parameters containing source and destination paths
      */
-    async handleFile(_event: IpcMainInvokeEvent, params: CopyParams): Promise<unknown> {
-        this.validateCopyParams(params)
+    async handleFile(
+        _event: IpcMainInvokeEvent,
+        params: CopyParams
+    ): Promise<unknown> {
+        this.validateCopyParams(params);
 
         // Setup progress callback for real-time updates
         // Uses mainWindow for direct renderer communication
@@ -118,9 +133,9 @@ export default class CopyService implements BaseService {
                 this.mainWindow.webContents.send("copy:progress", {
                     ...progress,
                     operation: "file", // Override operation type for UI differentiation
-                })
+                });
             }
-        }
+        };
 
         // Ensure Promise is returned for handle pattern
         const result = await this.workerPool.execute(
@@ -128,8 +143,8 @@ export default class CopyService implements BaseService {
             "copy-file",
             params,
             progressCallback
-        )
-        return result
+        );
+        return result;
     }
 
     /**
@@ -138,24 +153,108 @@ export default class CopyService implements BaseService {
      * @param _event - IPC event (unused in this implementation)
      * @param params - Request parameters containing source and destination paths
      */
-    async handleBatch(_event: IpcMainInvokeEvent, params: BatchCopyParams): Promise<unknown> {
-        this.validateBatchParams(params)
+    async handleBatch(
+        _event: IpcMainInvokeEvent,
+        params: BatchCopyParams
+    ): Promise<unknown> {
+        const normalizedTasks = this.normalizeBatchParams(params);
+        this.validateBatchParams(normalizedTasks);
 
-        // Setup progress callback for batch operation tracking
+        const batchId = `copy-batch-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+        logger.info("CopyService batch request received", {
+            batchId,
+            taskCount: normalizedTasks.tasks.length,
+            sample: normalizedTasks.tasks[0],
+        });
+
         const progressCallback = (progress: WorkerProgress): void => {
-            // Send batch progress updates directly to renderer
-            // MainWindow provides reliable communication channel
-            if (this.mainWindow && !this.mainWindow.isDestroyed()) {
-                this.mainWindow.webContents.send("copy:progress", {
-                    ...progress,
-                    operation: "batch", // Mark as batch operation for UI handling
-                })
+            if (!this.mainWindow || this.mainWindow.isDestroyed()) {
+                return;
             }
+
+            const detail = progress.detail ?? {};
+
+            this.mainWindow.webContents.send("copy-batch-progress", {
+                taskId: batchId,
+                type: "progress" as const,
+                current: progress.completedFiles ?? 0,
+                total: progress.totalFiles ?? normalizedTasks.tasks.length,
+                file:
+                    typeof detail.source === "string"
+                        ? (detail.source as string)
+                        : progress.currentItem,
+                fileProgress: {
+                    copied:
+                        typeof detail.bytesCopied === "number"
+                            ? (detail.bytesCopied as number)
+                            : undefined,
+                    total:
+                        typeof detail.totalBytes === "number"
+                            ? (detail.totalBytes as number)
+                            : undefined,
+                    error:
+                        typeof detail.error === "string"
+                            ? (detail.error as string)
+                            : undefined,
+                },
+                status: "running" as const,
+            });
+        };
+
+        const workerResult = (await this.workerPool.execute(
+            ServiceIdentifiers.COPY_SERVICE,
+            "copy-batch",
+            normalizedTasks,
+            progressCallback
+        )) as {
+            success: boolean;
+            copiedFiles?: number;
+            failedFiles?: Array<{
+                source: string;
+                destination: string;
+                error: string;
+            }>;
+            results?: Array<{
+                source: string;
+                destination: string;
+                success: boolean;
+                error?: string;
+            }>;
+        };
+
+        if (this.mainWindow && !this.mainWindow.isDestroyed()) {
+            this.mainWindow.webContents.send("copy-batch-progress", {
+                taskId: batchId,
+                type: "done" as const,
+                current:
+                    workerResult?.copiedFiles ?? normalizedTasks.tasks.length,
+                total: normalizedTasks.tasks.length,
+                status: workerResult?.success
+                    ? workerResult.failedFiles &&
+                      workerResult.failedFiles.length > 0
+                        ? "error"
+                        : "done"
+                    : "error",
+                results: workerResult?.results,
+            });
         }
 
-        // Ensure Promise is returned for handle pattern
-        const result = await this.workerPool.execute("CopyService", "copy-batch", params, progressCallback)
-        return result
+        logger.info("CopyService batch request completed", {
+            batchId,
+            success: workerResult?.success,
+            copiedFiles: workerResult?.copiedFiles,
+            failedFiles: workerResult?.failedFiles?.length ?? 0,
+        });
+
+        return {
+            ...workerResult,
+            batchId,
+            workerBatchId:
+                workerResult && typeof workerResult === "object"
+                    ? (workerResult as { batchId?: string }).batchId
+                    : undefined,
+        };
     }
 
     /**
@@ -164,9 +263,16 @@ export default class CopyService implements BaseService {
      * @param _event - IPC event (unused in this implementation)
      * @param params - Request parameters containing taskId
      */
-    async handleCancel(_event: IpcMainInvokeEvent, params: CancelParams): Promise<unknown> {
-        const result = await this.workerPool.execute("CopyService", "cancel-copy", params)
-        return result
+    async handleCancel(
+        _event: IpcMainInvokeEvent,
+        params: CancelParams
+    ): Promise<unknown> {
+        const result = await this.workerPool.execute(
+            "CopyService",
+            "cancel-copy",
+            params
+        );
+        return result;
     }
 
     /**
@@ -177,18 +283,24 @@ export default class CopyService implements BaseService {
      * @param _event - IPC event (unused in this implementation)
      * @param params - Request parameters containing requestId
      */
-    async handleStatus(_event: IpcMainEvent, params: { requestId: string }): Promise<void> {
+    async handleStatus(
+        _event: IpcMainEvent,
+        params: { requestId: string }
+    ): Promise<void> {
         try {
             // Process status request and prepare response
-            const status = { requestId: params.requestId, active: true }
+            const status = { requestId: params.requestId, active: true };
 
             // Send response directly via mainWindow instead of event.reply
             // This ensures consistent communication channel
             if (this.mainWindow && !this.mainWindow.isDestroyed()) {
-                this.mainWindow.webContents.send("copy:status:response", status)
+                this.mainWindow.webContents.send(
+                    "copy:status:response",
+                    status
+                );
             }
         } catch (error) {
-            logger.error("Status check failed", { error })
+            logger.error("Status check failed", { error });
         }
     }
 
@@ -204,7 +316,7 @@ export default class CopyService implements BaseService {
             typeof params.source !== "string" ||
             typeof params.destination !== "string"
         ) {
-            throw new Error("Invalid copy parameters")
+            throw new Error("Invalid copy parameters");
         }
     }
 
@@ -213,14 +325,43 @@ export default class CopyService implements BaseService {
      *
      * @param params - Request parameters containing source and destination paths
      */
-    private validateBatchParams(params: BatchCopyParams): void {
-        if (
-            !Array.isArray(params.sources) ||
-            params.sources.length === 0 ||
-            !params.destination ||
-            typeof params.destination !== "string"
-        ) {
-            throw new Error("Invalid batch copy parameters")
+    private validateBatchParams(params: { tasks: BatchCopyEntry[] }): void {
+        if (!Array.isArray(params.tasks) || params.tasks.length === 0) {
+            throw new Error("Invalid batch copy parameters");
         }
+    }
+
+    private normalizeBatchParams(params: BatchCopyParams): {
+        tasks: BatchCopyEntry[];
+    } {
+        if (params.entries && params.entries.length > 0) {
+            return {
+                tasks: params.entries.map(entry => ({
+                    source: entry.source,
+                    destination: entry.destination,
+                    overwrite: entry.overwrite ?? false,
+                })),
+            };
+        }
+
+        if (
+            Array.isArray(params.sources) &&
+            params.sources.length > 0 &&
+            params.destination &&
+            typeof params.destination === "string"
+        ) {
+            const tasks = params.sources.map(sourcePath => ({
+                source: sourcePath,
+                destination: path.join(
+                    params.destination as string,
+                    path.basename(sourcePath)
+                ),
+                overwrite: false,
+            }));
+
+            return { tasks };
+        }
+
+        return { tasks: [] };
     }
 }

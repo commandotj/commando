@@ -71,6 +71,7 @@ describe("ServiceDecorator", () => {
             }
 
             expect(registry.getService("TestService")).toBeDefined()
+            expect(TestService).toBeDefined() // Ensure class is used
         })
 
         it("should auto-detect IPC channels from method names", () => {
@@ -108,6 +109,7 @@ describe("ServiceDecorator", () => {
             expect(service).toBeDefined()
             expect(service?.getMetadata().ipcChannels).toContain("autoservice:copy")
             expect(service?.getMetadata().ipcChannels).toContain("autoservice:delete")
+            expect(AutoService).toBeDefined() // Ensure class is used
         })
 
         it("should bind IPC handlers automatically", () => {
@@ -138,6 +140,7 @@ describe("ServiceDecorator", () => {
                     return "ipc-success"
                 }
             }
+            void IPCService // Mark as used
 
             expect(ipcMain.handle).toHaveBeenCalledWith("ipc:test", expect.any(Function))
         })
@@ -175,6 +178,7 @@ describe("ServiceDecorator", () => {
                     }
                 }
             }
+            void LifecycleService // Mark as used
 
             testService = registry.getService("LifecycleService") as unknown as {
                 initialized: boolean
@@ -218,6 +222,7 @@ describe("ServiceDecorator", () => {
                     }
                 }
             }
+            void ErrorService // Mark as used
 
             // Should not throw
             await expect(registry.initializeAll()).resolves.not.toThrow()
@@ -272,6 +277,7 @@ describe("ServiceDecorator", () => {
                     return "batch-rename"
                 }
             }
+            void MappingService // Mark as used
 
             testCases.forEach(({ channel }) => {
                 expect(ipcMain.handle).toHaveBeenCalledWith(channel, expect.any(Function))
@@ -308,6 +314,7 @@ describe("ServiceDecorator", () => {
                     throw new Error("Method failed")
                 }
             }
+            void ErrorService // Mark as used
 
             // Get the IPC handler function
             const handlerCall = (ipcMain.handle as jest.Mock).mock.calls.find(call => call[0] === "error:test")
@@ -346,6 +353,7 @@ describe("ServiceDecorator", () => {
                     }
                 }
             }
+            void MissingMethodService // Mark as used
 
             expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining("Method handleNonexistent not found"))
         })
@@ -382,6 +390,7 @@ describe("ServiceDecorator", () => {
                     }
                 }
             }
+            void WorkerService // Mark as used
 
             expect(mockWorkerPool.registerWorkerType).toHaveBeenCalledWith(
                 "WorkerService",
@@ -445,6 +454,8 @@ describe("ServiceDecorator", () => {
                     }
                 }
             }
+            void Service1 // Mark as used
+            void Service2 // Mark as used
 
             const allServices = registry.getAllServices()
             expect(allServices.size).toBeGreaterThanOrEqual(2)
@@ -457,4 +468,5 @@ describe("ServiceDecorator", () => {
             expect(service).toBeUndefined()
         })
     })
+
 })

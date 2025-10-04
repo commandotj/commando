@@ -14,11 +14,11 @@ export const useClipboard = (): {
   canPaste: (targetPath: string) => boolean;
   getItems: () => unknown[];
   hasItems: () => boolean;
-  getOperationType: () => string;
+  getOperationType: () => "copy" | "cut" | null;
   isFromPane: (paneIndex: 0 | 1) => boolean;
   isStale: () => boolean;
   items: unknown[];
-  operation: string;
+  operation: "copy" | "cut" | null;
   sourcePane: number | null;
   isEmpty: boolean;
   isCopy: boolean;

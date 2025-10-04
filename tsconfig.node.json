@@ -16,7 +16,9 @@
         "paths": {
             "@common/*": ["src/common/*"],
             "@main/*": ["src/main/*"],
-            "@shared/*": ["src/shared/*"]
+            "@shared/*": ["src/shared/*"],
+            "@engines/*": ["src/main/services/engine/*"],
+            "@engine-shared/*": ["src/main/services/engine/shared/*"]
         }
     }
 }

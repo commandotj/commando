@@ -74,11 +74,28 @@ declare global {
       // 文件操作
       copyFile: (src: string, dest: string) => Promise<string>;
       copyBatch: (srcs: string[], dest: string) => Promise<string>;
+      copyEntries: (
+        entries: Array<{
+          source: string;
+          destination: string;
+          overwrite?: boolean;
+        }>,
+      ) => Promise<
+        Array<{
+          success: boolean;
+          source: string;
+          destination: string;
+          bytesProcessed?: number;
+          duration?: number;
+          checksum?: string;
+          error?: string;
+        }>
+      >;
       onCopyProgress: (cb: (msg: CopyWorkerMessage) => void) => void;
       onCopyBatchProgress: (cb: (msg: CopyWorkerMessage) => void) => void;
       getCopyQueueStatus: () => Promise<unknown>;
-      cancelCopyTask: (taskId: string) => Promise<boolean>;
-      cancelCopyBatch: (batchId: string) => Promise<boolean>;
+      cancelCopyTask: (taskId: string) => Promise<unknown>;
+      cancelCopyBatch: (batchId: string) => Promise<{ cancelled: boolean; taskId: string }>;
     };
     electron: {
       ipcRenderer: {

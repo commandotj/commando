@@ -13,6 +13,18 @@ export function joinPath(currentPath: string, name: string): string {
   return cleanPath + "/" + name; // Unix
 }
 
+export function basename(filePath: string): string {
+  if (!filePath) {
+    return "";
+  }
+
+  // Normalize separators to simplify splitting
+  const normalized = filePath.replace(/\\/g, "/");
+  const segments = normalized.split("/").filter(Boolean);
+
+  return segments.length > 0 ? segments[segments.length - 1] : normalized;
+}
+
 // Helper to format file size
 export const formatSize = (size?: number): string => {
   if (size === undefined || size === null) return "";

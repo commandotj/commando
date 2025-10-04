@@ -1,27 +1,43 @@
-import { createLogger, format, transports } from "winston";
+import pino, { TransportSingleOptions } from "pino"
+import type { Logger } from "../services/engine/shared/loggerTypes"
 
-const isDev = process.env.NODE_ENV === "development";
+const isDev = process.env.NODE_ENV !== "production"
 
-const logger = createLogger({
+const transport: TransportSingleOptions | undefined = isDev
+    ? {
+          target: "pino-pretty",
+          options: {
+              colorize: true,
+              translateTime: "SYS:standard",
+              ignore: "pid,hostname",
+          },
+      }
+    : undefined
+
+const baseLogger = pino({
     level: isDev ? "debug" : "info",
-    format: format.combine(
-        format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-        format.errors({ stack: true }),
-        format.splat(),
-        format.printf(({ timestamp, level, message, ...meta }) => {
-            return `${timestamp} [${level}]: ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ""}`;
-        })
-    ),
-    transports: [
-        new transports.Console({
-            format: format.combine(
-                format.colorize(),
-                format.printf(({ timestamp, level, message, ...meta }) => {
-                    return `${timestamp} [${level}]: ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ""}`;
-                })
-            ),
-        }),
-    ],
-});
+    transport,
+    base: undefined,
+})
 
-export default logger;
+const formatMeta = (meta?: Record<string, unknown>): Record<string, unknown> | undefined =>
+    meta && Object.keys(meta).length > 0 ? meta : undefined
+
+const wrap = (method: (obj: unknown, msg?: string) => void) =>
+    (message: string, meta?: Record<string, unknown>): void => {
+        const formattedMeta = formatMeta(meta)
+        if (formattedMeta) {
+            method(formattedMeta, message)
+        } else {
+            method(message)
+        }
+    }
+
+const logger: Logger = {
+    info: wrap(baseLogger.info.bind(baseLogger)),
+    error: wrap(baseLogger.error.bind(baseLogger)),
+    warn: wrap(baseLogger.warn.bind(baseLogger)),
+    debug: wrap(baseLogger.debug.bind(baseLogger)),
+}
+
+export default logger

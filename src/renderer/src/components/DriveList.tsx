@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "@renderer/app/hooks";
 import { fetchDrives, refreshDrives } from "@renderer/app/driveSlice";
 import { useDriveEvents } from "@renderer/hooks/useDriveEvents";
+import type { DriveInfo } from "../../../common/types/DriveTypes";
 import {
   Box,
   VStack,
@@ -21,7 +22,7 @@ import {
   UpdateIcon,
   DesktopIcon,
   DiscIcon,
-  DatabaseIcon,
+  ComponentInstanceIcon,
 } from "@radix-ui/react-icons";
 
 export const DriveList: React.FC = () => {
@@ -58,7 +59,7 @@ export const DriveList: React.FC = () => {
       return <DiscIcon className="w-5 h-5" />;
     }
     if (drive.isSystem) {
-      return <DatabaseIcon className="w-5 h-5" />;
+      return <ComponentInstanceIcon className="w-5 h-5" />;
     }
     return <DesktopIcon className="w-5 h-5" />;
   };

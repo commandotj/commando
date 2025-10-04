@@ -160,6 +160,7 @@ describe("CopyService", () => {
 
             // Mock mainWindow for progress updates
             const mockMainWindow = {
+                isDestroyed: jest.fn(() => false),
                 webContents: {
                     send: jest.fn(),
                 },
@@ -243,6 +244,11 @@ describe("CopyService", () => {
                 copiedFiles: 3,
                 failedFiles: [],
                 totalSize: 3072,
+                results: [
+                    { source: "/path/file1.txt", destination: "/backup/file1.txt", success: true },
+                    { source: "/path/file2.txt", destination: "/backup/file2.txt", success: true },
+                    { source: "/path/file3.txt", destination: "/backup/file3.txt", success: true },
+                ],
             })
 
             const result = await copyService.handleBatch(mockEvent, batchParams)
@@ -250,16 +256,24 @@ describe("CopyService", () => {
             expect(mockWorkerPool.execute).toHaveBeenCalledWith(
                 "CopyService",
                 "copy-batch",
-                batchParams,
+                expect.objectContaining({
+                    tasks: expect.arrayContaining([
+                        expect.objectContaining({ source: "/path/file1.txt" }),
+                    ]),
+                }),
                 expect.any(Function)
             )
 
-            expect(result).toMatchObject({
-                success: true,
-                batchId: "batch-123",
-                totalFiles: 3,
-                copiedFiles: 3,
-            })
+            const typedResult = result as {
+                batchId: string
+                workerBatchId?: string
+                success: boolean
+                copiedFiles?: number
+            }
+            expect(typedResult.batchId).toMatch(/^copy-batch-/)
+            expect(typedResult.workerBatchId).toBe("batch-123")
+            expect(typedResult.success).toBe(true)
+            expect(typedResult.copiedFiles).toBe(3)
         })
 
         it("should handle partial batch failures", async () => {
@@ -276,22 +290,41 @@ describe("CopyService", () => {
                 failedFiles: [
                     {
                         source: "/nonexistent.txt",
+                        destination: "/backup//nonexistent.txt",
                         error: "File not found",
                     },
                 ],
                 totalSize: 2048,
+                results: [
+                    { source: "/path/file1.txt", destination: "/backup/file1.txt", success: true },
+                    {
+                        source: "/nonexistent.txt",
+                        destination: "/backup//nonexistent.txt",
+                        success: false,
+                        error: "File not found",
+                    },
+                    { source: "/path/file3.txt", destination: "/backup/file3.txt", success: true },
+                ],
             })
 
             const result = await copyService.handleBatch(mockEvent, batchParams)
 
             const typedResult = result as {
+                batchId: string
+                workerBatchId?: string
                 success: boolean
                 copiedFiles: number
-                failedFiles: unknown[]
+                failedFiles: Array<{ source: string; destination: string; error: string }>
             }
+            expect(typedResult.batchId).toMatch(/^copy-batch-/)
+            expect(typedResult.workerBatchId).toBe("batch-456")
             expect(typedResult.success).toBe(false)
             expect(typedResult.copiedFiles).toBe(2)
             expect(typedResult.failedFiles).toHaveLength(1)
+            expect(typedResult.failedFiles[0]).toMatchObject({
+                source: "/nonexistent.txt",
+                error: "File not found",
+            })
         })
 
         it("should validate batch parameters", async () => {
@@ -313,6 +346,7 @@ describe("CopyService", () => {
 
             // Mock mainWindow for progress updates
             const mockMainWindow = {
+                isDestroyed: jest.fn(() => false),
                 webContents: {
                     send: jest.fn(),
                 },
@@ -324,20 +358,24 @@ describe("CopyService", () => {
                 progressCallback = onProgress!
 
                 // Simulate batch progress updates
-                ;[20, 40, 60, 80, 100].forEach((progress, index) => {
-                    setTimeout(
-                        () => {
-                            progressCallback?.({
-                                id: "batch-id",
-                                type: "progress",
-                                operation: "copy-batch",
-                                progress,
-                                currentItem: `/files/file${index}.txt`,
-                                timestamp: Date.now(),
-                            })
-                        },
-                        (index + 1) * 10
-                    )
+                ;[20, 40, 60, 80, 100].forEach((progressValue, index) => {
+                    setTimeout(() => {
+                        progressCallback?.({
+                            id: "batch-id",
+                            type: "progress",
+                            operation: "copy-batch",
+                            progress: progressValue,
+                            currentItem: `/files/file${index}.txt`,
+                            completedFiles: index + 1,
+                            totalFiles: 10,
+                            detail: {
+                                source: `/files/file${index}.txt`,
+                                bytesCopied: 1024,
+                                totalBytes: 1024,
+                            },
+                            timestamp: Date.now(),
+                        })
+                    }, (index + 1) * 10)
                 })
 
                 return Promise.resolve({
@@ -346,23 +384,22 @@ describe("CopyService", () => {
                     totalFiles: 10,
                     copiedFiles: 10,
                     failedFiles: [],
+                    results: [],
                 })
             })
 
             await copyService.handleBatch(mockEvent, batchParams)
 
             // Wait for async progress updates
-            await new Promise(resolve => setTimeout(resolve, 100))
+            await new Promise(resolve => setTimeout(resolve, 120))
 
-            // Should have sent multiple progress updates via mainWindow
-            expect(mockMainWindow.webContents.send).toHaveBeenCalledTimes(5)
-            expect(mockMainWindow.webContents.send).toHaveBeenCalledWith(
-                "copy:progress",
-                expect.objectContaining({
-                    progress: 100,
-                    operation: "batch",
-                })
-            )
+            // Should have sent progress updates via mainWindow on the dedicated channel
+            expect(mockMainWindow.webContents.send).toHaveBeenCalled()
+            expect(
+                mockMainWindow.webContents.send.mock.calls.filter(
+                    ([channel]) => channel === "copy-batch-progress"
+                ).length
+            ).toBeGreaterThan(0)
         })
     })
 

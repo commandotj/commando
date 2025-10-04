@@ -90,7 +90,7 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
     });
   }, [pane.selectedKeys, paneIndex]);
 
-  const columns: ColumnDef<FileEntry, FileEntry>[] = [
+  const columns: ColumnDef<FileEntry, unknown>[] = [
     {
       id: "name",
       header: t("ui.table.name") as string,

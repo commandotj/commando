@@ -7,7 +7,7 @@ function clearSelection(): void {
       .createTextRange
   ) {
     const range = (
-      document.body as unknown as { createTextRange: () => unknown }
+      document.body as unknown as { createTextRange: () => { collapse: () => void; select: () => void } }
     ).createTextRange();
     range.collapse();
     range.select();

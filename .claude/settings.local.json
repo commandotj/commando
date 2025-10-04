@@ -11,7 +11,12 @@
       "Bash(npx husky init:*)",
       "Bash(chmod:*)",
       "Bash(npm run typecheck:*)",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "Bash(npx tsc:*)",
+      "Bash(npm test:*)",
+      "Bash(tree:*)",
+      "Bash(npm run build:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []
