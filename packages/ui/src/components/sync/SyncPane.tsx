@@ -9,7 +9,7 @@ import {
 } from "../../app/fileManagerSlice";
 import { fetchDrives } from "../../app/driveSlice";
 import { useI18n } from "../../hooks/useI18n";
-import { ResizableTable } from "../ResizableTable";
+import { VirtualizedTable } from "../VirtualizedTable";
 import { joinPath, formatSize } from "../../common/path";
 import { formatFileTime } from "../../common/time";
 import PathBreadcrumb from "../PathBreadcrumb";
@@ -59,6 +59,9 @@ function filterVolumes(drives: DeviceInfo[]): DeviceInfo[] {
 const SyncPane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
     const dispatch = useAppDispatch();
     const pane = useAppSelector(state => state.fileManager.panes[paneIndex]);
+    const otherSyncRoot = useAppSelector(
+        state => state.fileManager.panes[paneIndex === 0 ? 1 : 0].syncRoot
+    );
     const activePane = useAppSelector(state => state.fileManager.activePane);
     const diffMap = useAppSelector(state => state.sync.diffMap);
     const { drives } = useAppSelector(state => state.drive);
@@ -85,7 +88,7 @@ const SyncPane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
             id: "name",
             header: t("ui.table.name") as string,
             accessorKey: "name",
-            size: 260,
+            meta: { width: "42%" },
             cell: ({ row }) => {
                 const record = row.original;
                 const Icon = record.isDirectory ? ArchiveIcon : FileIcon;
@@ -118,23 +121,24 @@ const SyncPane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
             id: "mtime",
             header: t("ui.table.dateModified") as string,
             accessorKey: "mtime",
-            size: 160,
+            meta: { width: "28%" },
             cell: ({ row }) => formatFileTime(row.original.mtime),
         },
         {
             id: "size",
             header: t("ui.table.size") as string,
             accessorKey: "size",
-            size: 90,
+            meta: { width: "15%", align: "right" as const },
             cell: ({ row }) =>
-                row.original.isDirectory ? "" : formatSize(row.original.size),
-            meta: { align: "right" },
+                row.original.isDirectory
+                    ? "—"
+                    : formatSize(row.original.size) || "—",
         },
         {
             id: "status",
             header: t("sync.table.status") as string,
             accessorKey: "name",
-            size: 88,
+            meta: { width: "15%", align: "center" as const },
             cell: ({ row }) => {
                 const rel = relativeFromRoot(
                     pane.syncRoot,
@@ -191,6 +195,7 @@ const SyncPane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                 paneIndex={paneIndex}
                 syncRoot={pane.syncRoot}
                 currentPath={pane.currentPath}
+                otherSyncRoot={otherSyncRoot}
                 volumes={volumes}
                 onNavigate={handleNavigate}
                 onSetSyncRoot={handleSetSyncRoot}
@@ -211,14 +216,8 @@ const SyncPane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                 tabIndex={0}
                 onFocus={handleFocus}
             >
-                {!pane.syncRoot && (
-                    <div className="sync-pane__empty">
-                        <p>{t("sync.onboarding.setRootHint")}</p>
-                    </div>
-                )}
-
                 {(pane.syncRoot || pane.currentPath) && (
-                    <ResizableTable
+                    <VirtualizedTable
                         key={pane.currentPath}
                         columns={columns}
                         showSelection={false}

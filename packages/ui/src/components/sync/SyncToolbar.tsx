@@ -15,18 +15,21 @@ import { useI18n } from "../../hooks/useI18n";
 import { ThemeSwitchButton } from "../ThemeSwitcher";
 import SyncLegend from "./SyncLegend";
 import SyncPlanModal from "./SyncPlanModal";
+import { useSyncRootsState } from "../../hooks/useSyncRootsState";
+import { getSyncRootsOnboardingKey } from "../../common/syncRoots";
 import SyncSummaryStrip from "./SyncSummaryStrip";
 
 const SyncToolbar: React.FC = () => {
     const dispatch = useAppDispatch();
     const { t } = useI18n();
-    const { panes } = useAppSelector(state => state.fileManager);
     const { strategyId, options, plan, status, error, planModalOpen } =
         useAppSelector(state => state.sync);
-
-    const leftRoot = panes[0].syncRoot;
-    const rightRoot = panes[1].syncRoot;
-    const rootsReady = Boolean(leftRoot && rightRoot);
+    const {
+        leftRoot,
+        rightRoot,
+        state: rootsState,
+        rootsReady,
+    } = useSyncRootsState();
     const busy = status === "comparing" || status === "syncing";
 
     const handleCompare = (): void => {
@@ -63,7 +66,7 @@ const SyncToolbar: React.FC = () => {
                     <SyncSummaryStrip
                         plan={plan}
                         comparing={status === "comparing"}
-                        rootsReady={rootsReady}
+                        rootsState={rootsState}
                     />
                     <ThemeSwitchButton />
                 </div>
@@ -93,6 +96,11 @@ const SyncToolbar: React.FC = () => {
                         className="sync-btn sync-btn--ghost"
                         disabled={!rootsReady || busy}
                         onClick={handleCompare}
+                        title={
+                            !rootsReady
+                                ? t(getSyncRootsOnboardingKey(rootsState))
+                                : undefined
+                        }
                     >
                         <CounterClockwiseClockIcon
                             width={14}

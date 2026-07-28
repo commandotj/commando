@@ -1,15 +1,17 @@
 import React from "react";
 import { useAppSelector } from "../../app/hooks";
 import { useI18n } from "../../hooks/useI18n";
+import { useSyncRootsState } from "../../hooks/useSyncRootsState";
+import { getSyncRootsStatusKey } from "../../common/syncRoots";
 
 const SyncStatusBar: React.FC = () => {
     const { t } = useI18n();
     const { status, plan, error } = useAppSelector(state => state.sync);
-    const { panes } = useAppSelector(state => state.fileManager);
+    const { leftRoot, rightRoot, state: rootsState } = useSyncRootsState();
 
     const busy = status === "comparing" || status === "syncing";
 
-    let message = t("sync.status.ready");
+    let message = t(getSyncRootsStatusKey(rootsState));
     if (status === "comparing") {
         message = t("sync.status.comparing");
     } else if (status === "syncing") {
@@ -23,11 +25,11 @@ const SyncStatusBar: React.FC = () => {
         message = t("sync.status.complete");
     } else if (status === "error" && error) {
         message = error;
+    } else if (rootsState.kind === "ready" && status === "idle") {
+        message = t("sync.status.ready");
     }
 
-    const rootsLabel = [panes[0].syncRoot, panes[1].syncRoot]
-        .filter(Boolean)
-        .join(" ↔ ");
+    const rootsLabel = [leftRoot, rightRoot].filter(Boolean).join(" ↔ ");
 
     return (
         <footer

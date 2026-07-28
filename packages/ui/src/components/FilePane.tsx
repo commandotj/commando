@@ -9,7 +9,7 @@ import {
 import { fetchDrives } from "../app/driveSlice";
 import { useDriveEvents } from "../hooks/useDriveEvents";
 import { useI18n } from "../hooks/useI18n";
-import { ResizableTable } from "./ResizableTable";
+import { VirtualizedTable } from "./VirtualizedTable";
 import { joinPath, formatSize } from "../common/path";
 import { formatFileTime } from "../common/time";
 import PathBreadcrumb from "./PathBreadcrumb";
@@ -99,7 +99,7 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
             id: "name",
             header: t("ui.table.name") as string,
             accessorKey: "name",
-            size: 200,
+            meta: { width: "40%" },
             cell: ({ row }) => {
                 const record = row.original;
                 return (
@@ -130,7 +130,7 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
             id: "mtime",
             header: t("ui.table.dateModified") as string,
             accessorKey: "mtime",
-            size: 180,
+            meta: { width: "28%" },
             cell: ({ row }) => {
                 const mtime = row.original.mtime;
                 if (!mtime) return "";
@@ -141,16 +141,17 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
             id: "size",
             header: t("ui.table.size") as string,
             accessorKey: "size",
-            size: 100,
+            meta: { width: "16%", align: "right" as const },
             cell: ({ row }) =>
-                row.original.isDirectory ? "" : formatSize(row.original.size),
-            meta: { align: "right" },
+                row.original.isDirectory
+                    ? "—"
+                    : formatSize(row.original.size) || "—",
         },
         {
             id: "isDirectory",
             header: t("ui.table.type") as string,
             accessorKey: "isDirectory",
-            size: 100,
+            meta: { width: "16%" },
             cell: ({ getValue }) =>
                 getValue() ? t("ui.file.typeFolder") : t("ui.file.typeFile"),
         },
@@ -231,7 +232,7 @@ const FilePane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                     onRename={handleRename}
                     onNewFolder={handleNewFolder}
                 >
-                    <ResizableTable
+                    <VirtualizedTable
                         key={pane.currentPath}
                         columns={columns}
                         dataSource={pane.entries

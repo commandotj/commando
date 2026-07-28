@@ -92,8 +92,14 @@
         },
         "onboarding": {
             "pickFolders": "Choose different sync folders for left and right panes",
+            "setLeftRoot": "Left: browse to the source folder, then Set sync root",
+            "setRightRoot": "Right: browse to a different target folder, then Set sync root",
+            "sameRoots": "Left and right sync roots must differ — pick another folder on the other pane",
             "clickCompare": "Click Compare to see differences (copy / delete / conflict)",
-            "setRootHint": "Browse to a folder, then click Set sync root"
+            "setRootHint": "Browse to a folder, then click Set sync root",
+            "leftRootSet": "Left sync root is set. Choose a different target folder on the right.",
+            "rightRootSet": "Right sync root is set. Choose a different source folder on the left.",
+            "duplicateRoot": "Cannot match the other pane's sync root"
         },
         "pane": {
             "left": "Left",
@@ -114,7 +120,10 @@
             "syncing": "Syncing…"
         },
         "status": {
-            "ready": "Ready — set sync roots on both panes, then Compare",
+            "ready": "Ready — set different sync roots on both panes, then Compare",
+            "missingLeft": "Set the source sync root on the left pane first",
+            "missingRight": "Set a different target sync root on the right pane",
+            "sameRoots": "Sync roots are identical — choose two different folders",
             "comparing": "Comparing folders…",
             "syncing": "Syncing…",
             "compared": "Compared: {{copy}} copy, {{delete}} delete",

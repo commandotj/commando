@@ -1,5 +1,6 @@
 import { useLayoutEffect, useState, ReactNode } from "react";
 import { Theme } from "@radix-ui/themes";
+import "@radix-ui/themes/styles.css";
 import { THEME_KEY, Appearance } from "../constants/theme";
 import { ThemeContext } from "../theme/context";
 import { applyThemeToDocument } from "../theme/applyTheme";

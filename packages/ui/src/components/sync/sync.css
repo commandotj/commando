@@ -283,6 +283,9 @@ html.dark,
 .sync-root-bar {
   display: grid;
   grid-template-columns: auto 1fr auto;
+  grid-template-areas:
+    "label path actions"
+    "hint hint hint";
   gap: 0.5rem;
   align-items: center;
   padding: 0.625rem 0.75rem;
@@ -291,6 +294,7 @@ html.dark,
 }
 
 .sync-root-bar__label {
+  grid-area: label;
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -305,6 +309,7 @@ html.dark,
 .sync-root-bar--pane-1 .sync-root-bar__label { color: var(--sync-right); }
 
 .sync-root-bar__path {
+  grid-area: path;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.75rem;
   color: var(--sync-text);
@@ -314,8 +319,25 @@ html.dark,
 }
 
 .sync-root-bar__actions {
+  grid-area: actions;
   display: flex;
   gap: 0.375rem;
+}
+
+.sync-root-bar__hint {
+  grid-area: hint;
+  margin: 0;
+  font-size: 0.6875rem;
+  line-height: 1.35;
+  color: var(--sync-text-muted);
+}
+
+.sync-root-bar__hint:empty {
+  display: none;
+}
+
+.sync-summary--warning {
+  color: var(--sync-conflict);
 }
 
 .sync-root-bar__btn {

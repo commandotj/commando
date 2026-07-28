@@ -9,8 +9,8 @@
         "lint": "eslint --cache src"
     },
     "dependencies": {
-        "@commando/shared": "workspace:*",
         "@chakra-ui/react": "^2.5.0",
+        "@commando/shared": "workspace:*",
         "@dnd-kit/core": "^6.1.0",
         "@dnd-kit/modifiers": "7.0.0",
         "@dnd-kit/sortable": "^7.0.2",
@@ -24,6 +24,7 @@
         "@radix-ui/themes": "^3.2.1",
         "@reduxjs/toolkit": "^1.9.3",
         "@tanstack/react-table": "^8.21.3",
+        "@tanstack/react-virtual": "^3.14.8",
         "framer-motion": "^9.0.2",
         "i18next": "^25.2.1",
         "react": "^18.3.1",

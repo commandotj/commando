@@ -1,17 +1,19 @@
 import React from "react";
 import { useI18n } from "../../hooks/useI18n";
 import type { SyncPlan } from "@commando/shared/types/SyncTypes";
+import type { SyncRootsState } from "../../common/syncRoots";
+import { getSyncRootsOnboardingKey } from "../../common/syncRoots";
 
 interface SyncSummaryStripProps {
     plan: SyncPlan | null;
     comparing: boolean;
-    rootsReady: boolean;
+    rootsState: SyncRootsState;
 }
 
 const SyncSummaryStrip: React.FC<SyncSummaryStripProps> = ({
     plan,
     comparing,
-    rootsReady,
+    rootsState,
 }) => {
     const { t } = useI18n();
 
@@ -23,17 +25,24 @@ const SyncSummaryStrip: React.FC<SyncSummaryStripProps> = ({
         );
     }
 
-    if (!rootsReady) {
+    if (rootsState.kind !== "ready") {
         return (
-            <div className="sync-summary sync-summary--hint">
-                {t("sync.onboarding.pickFolders")}
+            <div
+                className={`sync-summary sync-summary--hint${
+                    rootsState.kind === "same-path"
+                        ? " sync-summary--warning"
+                        : ""
+                }`}
+                role="status"
+            >
+                {t(getSyncRootsOnboardingKey(rootsState))}
             </div>
         );
     }
 
     if (!plan) {
         return (
-            <div className="sync-summary sync-summary--hint">
+            <div className="sync-summary sync-summary--hint" role="status">
                 {t("sync.onboarding.clickCompare")}
             </div>
         );

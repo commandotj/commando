@@ -13,6 +13,7 @@ import {
     type SyncStrategyId,
 } from "../constants/sync";
 import { compareFolders, executePlan } from "../services/syncApiService";
+import { areSyncRootsEqual } from "../common/syncRoots";
 import type { RootState } from "./store";
 
 export type DiffMap = Record<string, SyncAction>;
@@ -59,6 +60,11 @@ export const compareSync = createAsyncThunk(
         const rightRoot = state.fileManager.panes[1].syncRoot;
         if (!leftRoot || !rightRoot) {
             return rejectWithValue("Set sync folders on both panes first");
+        }
+        if (areSyncRootsEqual(leftRoot, rightRoot)) {
+            return rejectWithValue(
+                "Left and right sync roots must be different folders"
+            );
         }
         const syncState = state.sync;
         try {
