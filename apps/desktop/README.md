@@ -31,3 +31,12 @@ pnpm test:go
 cd apps/desktop && ../../scripts/wails3.sh dev
 ../../scripts/wails3.sh generate bindings -ts -clean=true
 ```
+
+`pnpm dev` builds and launches `bin/Commando Dev.app`. Production stays separate:
+
+```bash
+pnpm desktop:package
+pnpm desktop:install
+```
+
+These commands create `bin/Commando.app`; install copies only production bundle to `/Applications/Commando.app`.

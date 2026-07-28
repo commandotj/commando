@@ -44,6 +44,8 @@ pnpm test:go          # make test-go
 pnpm cli              # make cli → ./bin/commando
 pnpm cli:install      # make cli-install
 pnpm desktop:build    # make desktop
+pnpm desktop:package  # build apps/desktop/bin/Commando.app
+pnpm desktop:install  # install production app to /Applications/Commando.app
 ```
 
 `go.work` links `./backend` and `./apps/desktop`.

@@ -15,6 +15,8 @@
         "test": "turbo test",
         "test:go": "make test-go",
         "desktop:build": "make desktop",
+        "desktop:package": "make desktop-package",
+        "desktop:install": "make desktop-install",
         "typecheck": "turbo typecheck",
         "lint": "turbo lint",
         "format": "prettier --write .",

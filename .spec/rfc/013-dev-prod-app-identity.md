@@ -64,6 +64,8 @@ macOS Dev 模板尚未应用同样隔离。本 RFC 将同一模式应用到 macO
 - [ ] 生产与开发使用不同 SingleInstance ID。
 - [ ] 生产与开发可同时运行，且各自仍阻止同身份的第二实例。
 - [ ] 开发图标拥有明显 `DEV` 角标，Dock 中可快速区分。
+- [ ] `pnpm dev` 只运行 `Commando Dev.app`。
+- [ ] `pnpm desktop:install` 只部署 production bundle 到 `/Applications/Commando.app`。
 - [ ] CLI 二进制 `commando` 不受影响。
 
 ### 非目标
@@ -261,7 +263,8 @@ CLI `commando` 位于独立 Go 命令，不受桌面 `APP_NAME` 大小写变化�
 10. 用 `plutil`、`codesign`、`file` 与图标文件校验验证两个 bundle。
 11. 启动两个 bundle，验证可同时存在；分别再次启动，验证同身份 SingleInstance 行为。
 12. 运行 `pnpm test:go`、`pnpm --filter @commando/ui test` 与 `go build ./apps/desktop`。
-13. 将 RFC 状态更新为 `Completed`，勾选目标和实施项，并同步 `.spec/ROADMAP.md`。
+13. 新增 `pnpm desktop:package` 与 `pnpm desktop:install`，分别生成 production bundle、部署到 `/Applications/Commando.app`；验证 `pnpm dev` 仍只运行 Dev bundle。
+14. 将 RFC 状态更新为 `Completed`，勾选目标和实施项，并同步 `.spec/ROADMAP.md`。
 
 ### 阶段 1：身份数据
 
