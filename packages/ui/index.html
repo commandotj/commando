@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Commando File Manager</title>
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <meta name="color-scheme" content="dark light" />
+        <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+        <meta
+            http-equiv="Content-Security-Policy"
+            content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
+        />
+        <script>
+            (function () {
+                var KEY = "app-theme";
+                var stored = localStorage.getItem(KEY);
+                var theme =
+                    stored === "light" || stored === "dark"
+                        ? stored
+                        : window.matchMedia("(prefers-color-scheme: dark)").matches
+                          ? "dark"
+                          : window.matchMedia("(prefers-color-scheme: light)").matches
+                            ? "light"
+                            : "dark";
+                document.documentElement.setAttribute("data-theme", theme);
+                document.documentElement.classList.toggle("dark", theme === "dark");
+                document.documentElement.style.colorScheme = theme;
+            })();
+        </script>
+    </head>
+
+    <body>
+        <div id="root"></div>
+        <script type="module" src="/src/main.tsx"></script>
+    </body>
+</html>

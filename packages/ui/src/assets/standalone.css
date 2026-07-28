@@ -1,0 +1,9 @@
+/* @commando/ui standalone dev entry (packages/ui/index.html) — NOT used by Wails desktop. */
+
+@import "./reset.css";
+@import "./shared.css";
+@import "./commando.css";
+
+body {
+  overflow: hidden;
+}

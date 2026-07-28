@@ -1,0 +1,19 @@
+{
+    "extends": "@electron-toolkit/tsconfig/tsconfig.web.json",
+    "include": [
+        "../../../packages/ui/src/**/*",
+        "../preload/**/*",
+        "../types/**/*"
+    ],
+    "compilerOptions": {
+        "composite": true,
+        "jsx": "react-jsx",
+        "resolveJsonModule": true,
+        "baseUrl": "../../../packages/ui",
+        "paths": {
+            "@renderer/*": ["src/*"],
+            "@commando/ui/*": ["src/*"],
+            "@commando/shared/*": ["../../shared/*"]
+        }
+    }
+}

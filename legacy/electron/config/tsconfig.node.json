@@ -1,0 +1,23 @@
+{
+    "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
+    "include": [
+        "electron.vite.config.*",
+        "../main/**/*",
+        "../preload/**/*",
+        "../types/**/*"
+    ],
+    "compilerOptions": {
+        "composite": true,
+        "types": ["jest"],
+        "typeRoots": ["../../../node_modules/@types", "../types"],
+        "baseUrl": "..",
+        "paths": {
+            "@common/*": ["main/common/*"],
+            "@main/*": ["main/*"],
+            "@shared/*": ["shared/*"],
+            "@engines/*": ["main/engine/*"],
+            "@engine/*": ["main/engine/*"],
+            "@engine-shared/*": ["main/engine/shared/*"]
+        }
+    }
+}

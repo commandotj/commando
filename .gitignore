@@ -14,6 +14,9 @@ dist-electron
 release
 *.local
 
+# Local IDE / agent settings
+.claude/settings.local.json
+
 # Editor directories and files
 .vscode/.debug.env
 .idea
@@ -24,6 +27,12 @@ release
 *.sln
 *.sw?
 out
+bin/
+apps/desktop/bin
+apps/desktop/frontend/dist
+apps/desktop/frontend/bindings
+frontend/dist
+frontend/bindings
 
 #lockfile
 /test-results/
@@ -31,3 +40,6 @@ out
 /playwright/.cache/
 *.tsbuildinfo
 .eslintcache
+.turbo/
+desktop
+.superpowers/

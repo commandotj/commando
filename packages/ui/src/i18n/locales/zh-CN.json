@@ -1,0 +1,124 @@
+{
+    "menu": {
+        "file": {
+            "label": "文件",
+            "newTab": "新建标签页",
+            "open": "打开...",
+            "save": "保存",
+            "close": "关闭",
+            "quit": "退出"
+        },
+        "edit": {
+            "label": "编辑",
+            "undo": "撤销",
+            "redo": "重做",
+            "cut": "剪切",
+            "copy": "复制",
+            "paste": "粘贴",
+            "pasteAndMatchStyle": "粘贴并匹配样式",
+            "delete": "删除",
+            "selectAll": "全选",
+            "speech": "语音",
+            "startSpeaking": "开始朗读",
+            "stopSpeaking": "停止朗读"
+        },
+        "view": {
+            "label": "视图",
+            "reload": "重新加载",
+            "toggleFullscreen": "切换全屏",
+            "resetZoom": "重置缩放",
+            "zoomIn": "放大",
+            "zoomOut": "缩小"
+        }
+    },
+    "ui": {
+        "drives": {
+            "scanning": "正在扫描驱动器...",
+            "refreshing": "正在刷新磁盘列表...",
+            "loadingFailed": "加载失败",
+            "homeDirectory": "主目录"
+        },
+        "buttons": {
+            "more": "⋯"
+        },
+        "table": {
+            "name": "名称",
+            "dateModified": "修改日期",
+            "size": "大小",
+            "type": "类型"
+        },
+        "file": {
+            "typeFolder": "文件夹",
+            "typeFile": "文件",
+            "itemsCount": "项",
+            "selectedCount": "已选中"
+        }
+    },
+    "sync": {
+        "toolbar": {
+            "strategy": "同步策略",
+            "compare": "比较",
+            "comparing": "比较中…",
+            "sync": "同步",
+            "syncing": "同步中…",
+            "deleteExtraneous": "删除多余",
+            "dryRun": "试运行",
+            "refresh": "刷新"
+        },
+        "strategy": {
+            "mirrorRight": "镜像 → 右侧",
+            "mirrorRightDesc": "左侧完全覆盖右侧，删除右侧多余文件",
+            "updateRight": "更新 → 右侧",
+            "updateRightDesc": "将左侧新增/较新文件复制到右侧",
+            "mirrorLeft": "镜像 → 左侧",
+            "mirrorLeftDesc": "右侧完全覆盖左侧，删除左侧多余文件",
+            "updateLeft": "更新 → 左侧",
+            "updateLeftDesc": "将右侧新增/较新文件复制到左侧",
+            "twoWay": "双向同步",
+            "twoWayDesc": "两侧较新版本互相同步"
+        },
+        "stats": {
+            "copy": "复制",
+            "delete": "删除",
+            "conflicts": "冲突",
+            "skip": "跳过",
+            "changed": "有差异"
+        },
+        "legend": {
+            "title": "图例",
+            "copy": "将复制",
+            "delete": "将删除",
+            "conflict": "冲突"
+        },
+        "onboarding": {
+            "pickFolders": "为左右两侧选择不同的同步文件夹",
+            "clickCompare": "点击「比较」查看差异（复制 / 删除 / 冲突）",
+            "setRootHint": "浏览到目标文件夹，然后点击「设为同步根」"
+        },
+        "pane": {
+            "left": "左侧",
+            "right": "右侧",
+            "noRoot": "未设置同步根目录",
+            "setRoot": "设为同步根",
+            "browse": "浏览"
+        },
+        "table": {
+            "status": "状态"
+        },
+        "plan": {
+            "title": "同步预览",
+            "summary": "{{copy}} 项复制，{{delete}} 项删除，{{conflicts}} 项冲突",
+            "inSync": "两侧已同步，无需操作",
+            "cancel": "取消",
+            "confirm": "开始同步",
+            "syncing": "同步中…"
+        },
+        "status": {
+            "ready": "就绪 — 设置两侧同步根目录后点击比较",
+            "comparing": "正在比较文件夹…",
+            "syncing": "正在同步…",
+            "compared": "比较完成：{{copy}} 复制，{{delete}} 删除",
+            "complete": "同步完成"
+        }
+    }
+}

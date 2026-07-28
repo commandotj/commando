@@ -1,0 +1,124 @@
+{
+    "menu": {
+        "file": {
+            "label": "File",
+            "newTab": "New Tab",
+            "open": "Open...",
+            "save": "Save",
+            "close": "Close",
+            "quit": "Quit"
+        },
+        "edit": {
+            "label": "Edit",
+            "undo": "Undo",
+            "redo": "Redo",
+            "cut": "Cut",
+            "copy": "Copy",
+            "paste": "Paste",
+            "pasteAndMatchStyle": "Paste and Match Style",
+            "delete": "Delete",
+            "selectAll": "Select All",
+            "speech": "Speech",
+            "startSpeaking": "Start Speaking",
+            "stopSpeaking": "Stop Speaking"
+        },
+        "view": {
+            "label": "View",
+            "reload": "Reload",
+            "toggleFullscreen": "Toggle Full Screen",
+            "resetZoom": "Reset Zoom",
+            "zoomIn": "Zoom In",
+            "zoomOut": "Zoom Out"
+        }
+    },
+    "ui": {
+        "drives": {
+            "scanning": "Scanning drives...",
+            "refreshing": "Refreshing drives...",
+            "loadingFailed": "Failed to load drives",
+            "homeDirectory": "Home Directory"
+        },
+        "buttons": {
+            "more": "⋯"
+        },
+        "table": {
+            "name": "Name",
+            "dateModified": "Date Modified",
+            "size": "Size",
+            "type": "Type"
+        },
+        "file": {
+            "typeFolder": "Folder",
+            "typeFile": "File",
+            "itemsCount": "items",
+            "selectedCount": "selected"
+        }
+    },
+    "sync": {
+        "toolbar": {
+            "strategy": "Sync strategy",
+            "compare": "Compare",
+            "comparing": "Comparing…",
+            "sync": "Sync",
+            "syncing": "Syncing…",
+            "deleteExtraneous": "Delete extraneous",
+            "dryRun": "Dry run",
+            "refresh": "Refresh"
+        },
+        "strategy": {
+            "mirrorRight": "Mirror → Right",
+            "mirrorRightDesc": "Left overwrites right; delete extras on right",
+            "updateRight": "Update → Right",
+            "updateRightDesc": "Copy newer/missing files from left to right",
+            "mirrorLeft": "Mirror → Left",
+            "mirrorLeftDesc": "Right overwrites left; delete extras on left",
+            "updateLeft": "Update → Left",
+            "updateLeftDesc": "Copy newer/missing files from right to left",
+            "twoWay": "Two-way sync",
+            "twoWayDesc": "Sync newer versions in both directions"
+        },
+        "stats": {
+            "copy": "copy",
+            "delete": "delete",
+            "conflicts": "conflicts",
+            "skip": "skip",
+            "changed": "changed"
+        },
+        "legend": {
+            "title": "Legend",
+            "copy": "Will copy",
+            "delete": "Will delete",
+            "conflict": "Conflict"
+        },
+        "onboarding": {
+            "pickFolders": "Choose different sync folders for left and right panes",
+            "clickCompare": "Click Compare to see differences (copy / delete / conflict)",
+            "setRootHint": "Browse to a folder, then click Set sync root"
+        },
+        "pane": {
+            "left": "Left",
+            "right": "Right",
+            "noRoot": "No sync root set",
+            "setRoot": "Set sync root",
+            "browse": "Browse"
+        },
+        "table": {
+            "status": "Status"
+        },
+        "plan": {
+            "title": "Sync preview",
+            "summary": "{{copy}} to copy, {{delete}} to delete, {{conflicts}} conflicts",
+            "inSync": "Folders are already in sync",
+            "cancel": "Cancel",
+            "confirm": "Start sync",
+            "syncing": "Syncing…"
+        },
+        "status": {
+            "ready": "Ready — set sync roots on both panes, then Compare",
+            "comparing": "Comparing folders…",
+            "syncing": "Syncing…",
+            "compared": "Compared: {{copy}} copy, {{delete}} delete",
+            "complete": "Sync complete"
+        }
+    }
+}

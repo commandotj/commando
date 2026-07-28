@@ -1,15 +1,8 @@
 {
     "files": [],
     "references": [
-        { "path": "./tsconfig.node.json" },
-        { "path": "./tsconfig.web.json" },
-        { "path": "./tsconfig.preload.json" }
-    ],
-    "compilerOptions": {
-        "esModuleInterop": true,
-        "allowSyntheticDefaultImports": true,
-        "jsx": "react-jsx"
-    },
-    "typeRoots": ["./node_modules/@types", "./typings"],
-    "include": ["src", "typings/vite-worker-module-path/index.d.ts"]
+        { "path": "./packages/ui" },
+        { "path": "./packages/shared" },
+        { "path": "./apps/desktop/frontend" }
+    ]
 }

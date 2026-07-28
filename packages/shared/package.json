@@ -1,0 +1,10 @@
+{
+    "name": "@commando/shared",
+    "private": true,
+    "version": "1.0.0",
+    "type": "module",
+    "exports": {
+        "./types/*": "./types/*",
+        "./constants/*": "./constants/*"
+    }
+}

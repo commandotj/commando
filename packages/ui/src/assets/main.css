@@ -1,0 +1,5 @@
+/**
+ * @deprecated Desktop uses apps/desktop/frontend/src/desktop.css.
+ * Standalone UI dev uses standalone.css.
+ */
+@import "./shared.css";

@@ -1,0 +1,16 @@
+@import "../../../../packages/ui/src/assets/reset.css";
+@import "../../../../packages/ui/src/assets/shared.css";
+@import "../../../../packages/ui/src/assets/commando.css";
+
+.commando-app-root {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Wails macOS hidden inset titlebar — extra clearance for traffic lights */
+html.platform-macos {
+  --sync-macos-chrome-left: 7rem;
+}

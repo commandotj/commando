@@ -1,0 +1,68 @@
+/**
+ * Wails v3 shell stylesheet (see internal/templates/react/frontend/public/style.css).
+ * App-specific layout lives in @commando/ui — this file only handles desktop chrome.
+ */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+  /* Opt-in drag: only .wails-drag regions move the window (Wails v3). */
+  --wails-draggable: no-drag;
+  background: var(--sync-bg, #f1f5f9);
+  color: var(--sync-text, #0f172a);
+}
+
+html.dark body {
+  background: var(--sync-bg, #0b1220);
+  color: var(--sync-text, #f8fafc);
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+button,
+input,
+select,
+textarea,
+a,
+[role="button"],
+[role="menuitem"],
+[role="separator"],
+.wails-no-drag {
+  --wails-draggable: no-drag;
+}
+
+.wails-drag {
+  /* Only elements with this class (e.g. .sync-titlebar) move the Wails window. */
+  --wails-draggable: drag;
+}
+
+input,
+textarea,
+[contenteditable="true"] {
+  -webkit-user-select: text;
+  user-select: text;
+}

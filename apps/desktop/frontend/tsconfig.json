@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@commando/ui/*": ["../../../packages/ui/src/*"],
+      "@commando/shared/*": ["../../../packages/shared/*"]
+    }
+  },
+  "include": [
+    "src",
+    "bindings",
+    "../../../packages/ui/src",
+    "../../../packages/shared",
+    "../../../typings"
+  ]
+}

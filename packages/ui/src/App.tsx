@@ -1,0 +1,40 @@
+import React, { useEffect } from "react";
+import { useAppDispatch } from "./app/hooks";
+import SplitterLayout from "./components/SplitterLayout/SplitterLayout";
+import "./components/SplitterLayout/index.css";
+import "./components/sync/sync.css";
+import "./assets/commando.css";
+import "./App.css";
+import { fetchDirectory } from "./app/fileManagerSlice";
+import { ThemeProvider } from "./theme";
+import SyncToolbar from "./components/sync/SyncToolbar";
+import SyncPane from "./components/sync/SyncPane";
+import SyncStatusBar from "./components/sync/SyncStatusBar";
+import "./i18n";
+
+const App: React.FC = () => {
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        const homeDir = window.fsApi.getHomeDir();
+        dispatch(fetchDirectory({ paneIndex: 0, path: homeDir }));
+        dispatch(fetchDirectory({ paneIndex: 1, path: homeDir }));
+    }, [dispatch]);
+
+    return (
+        <ThemeProvider>
+            <div className="sync-app">
+                <SyncToolbar />
+                <div className="sync-workspace wails-no-drag">
+                    <SplitterLayout primaryIndex={0} percentage>
+                        <SyncPane paneIndex={0} />
+                        <SyncPane paneIndex={1} />
+                    </SplitterLayout>
+                </div>
+                <SyncStatusBar />
+            </div>
+        </ThemeProvider>
+    );
+};
+
+export default App;

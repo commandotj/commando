@@ -1,0 +1,14 @@
+{
+  "name": "@commando/desktop",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "predev": "../../scripts/ensure-desktop-tools.sh",
+    "prebuild": "../../scripts/ensure-desktop-tools.sh",
+    "pregenerate": "../../scripts/ensure-desktop-tools.sh",
+    "dev": "../../scripts/wails3.sh dev -config ./build/config.yml -port ${WAILS_VITE_PORT:-5189}",
+    "build": "../../scripts/wails3.sh build",
+    "generate": "../../scripts/wails3.sh generate bindings -ts -clean=true",
+    "typecheck": "pnpm --filter @commando/desktop-shell typecheck"
+  }
+}

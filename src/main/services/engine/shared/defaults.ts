@@ -1,6 +1,0 @@
-export const ENGINE_DEFAULTS = {
-    BUFFER_SIZE: 64 * 1024,
-    MAX_RETRIES: 3,
-    RETRY_DELAY: 1000,
-    CONCURRENCY: 3,
-}

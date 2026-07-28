@@ -1,0 +1,18 @@
+{
+    "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
+    "include": ["../preload/**/*", "../types/**/*"],
+    "compilerOptions": {
+        "composite": true,
+        "types": ["jest", "node"],
+        "typeRoots": ["../../../node_modules/@types", "../types"],
+        "baseUrl": "..",
+        "moduleResolution": "node",
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "paths": {
+            "@shared/*": ["shared/*"],
+            "@preload/*": ["preload/*"],
+            "@common/*": ["main/common/*"]
+        }
+    }
+}
