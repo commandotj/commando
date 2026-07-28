@@ -331,17 +331,20 @@ export const executeCopyOperation = createAsyncThunk(
 
             // 监听进度事件
             window.fsApi.onCopyBatchProgress((msg: CopyWorkerMessage) => {
-                if (msg.taskId === taskId) {
-                    dispatch(
-                        updateOperationProgress({
-                            id: operationId,
-                            progress: msg.progress || 0,
-                            currentFile: msg.file,
-                            completedFiles: msg.completedFiles || 0,
-                            estimatedTimeRemaining: msg.estimatedTimeRemaining,
-                        })
-                    );
+                if (msg.type !== "progress" || msg.taskId !== taskId) {
+                    return;
                 }
+                dispatch(
+                    updateOperationProgress({
+                        id: operationId,
+                        progress:
+                            msg.total > 0
+                                ? Math.round((msg.copied / msg.total) * 100)
+                                : 0,
+                        currentFile: msg.file,
+                        completedFiles: msg.copied,
+                    })
+                );
             });
 
             return { operationId, taskId };

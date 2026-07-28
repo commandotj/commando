@@ -1,5 +1,10 @@
 import type { CopyWorkerMessage } from "@commando/shared/types/CopyTypes";
 import type {
+    CompareReport,
+    SyncExportFormat,
+    SyncStrategyId,
+} from "@commando/shared/types/SyncTypes";
+import type {
     DirectoryEntry,
     NavigationResult,
     ListDirectoryOptions,
@@ -110,7 +115,8 @@ declare global {
             plan: (req: {
                 leftRoot: string;
                 rightRoot: string;
-                direction: string;
+                strategyId: SyncStrategyId;
+                direction?: string;
                 options?: {
                     deleteExtraneous?: boolean;
                     dryRun?: boolean;
@@ -120,13 +126,19 @@ declare global {
             compare: (req: {
                 leftRoot: string;
                 rightRoot: string;
-                direction: string;
+                strategyId: SyncStrategyId;
+                direction?: string;
                 options?: {
                     deleteExtraneous?: boolean;
                     dryRun?: boolean;
                     useChecksum?: boolean;
                 };
             }) => Promise<{ jobId: string }>;
+            exportReport: (req: {
+                report: CompareReport;
+                filePath: string;
+                format?: SyncExportFormat;
+            }) => Promise<{ filePath: string }>;
             execute: (
                 plan: unknown,
                 opts: {

@@ -194,16 +194,20 @@ tasks:
       - wails3 generate bindings -f '{{.BUILD_FLAGS}}' -clean=true{{if eq .OBFUSCATED "true"}} -obfuscated{{end}} -ts -i
 
   generate:icons:
-    summary: Generates Windows `.ico` and Mac `.icns` from the canonical app icon.
+    summary: Generates production and development icons from their canonical PNG sources.
     run: once
     dir: build
     sources:
       - "appicon.png"
+      - "appicon-dev.png"
     generates:
       - "darwin/icons.icns"
+      - "darwin/icons-dev.icns"
       - "windows/icon.ico"
+      - "windows/icon-dev.ico"
     cmds:
       - wails3 generate icons -input appicon.png -macfilename darwin/icons.icns -windowsfilename windows/icon.ico
+      - wails3 generate icons -input appicon-dev.png -macfilename darwin/icons-dev.icns -windowsfilename windows/icon-dev.ico
 
   dev:frontend:
     summary: Runs the frontend in development mode

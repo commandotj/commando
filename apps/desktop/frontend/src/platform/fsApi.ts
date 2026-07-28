@@ -16,9 +16,14 @@ type WailsFileService = {
 };
 
 type WailsCopyService = {
-  CopyBatch: (sources: string[], destination: string) => Promise<{ batchId: string }>;
-  CancelCopyBatch: (batchId: string) => Promise<{ cancelled: boolean; taskId: string }>;
-  GetCopyQueueStatus: () => Promise<{ queueSize: number }>;
+  CopyBatch: (
+    sources: string[],
+    destination: string,
+  ) => PromiseLike<{ batchId: string }>;
+  CancelCopyBatch: (
+    batchId: string,
+  ) => PromiseLike<{ cancelled?: boolean; taskId?: string } | null>;
+  GetCopyQueueStatus: () => PromiseLike<{ queueSize?: number } | null>;
 };
 
 type WailsDriveService = {
@@ -153,8 +158,17 @@ export function installFsApi(
         cb(payload as CopyWorkerMessage & BatchProgressPayload);
       });
     },
-    getCopyQueueStatus: () => copyService.GetCopyQueueStatus(),
-    cancelCopyTask: async (taskId) => copyService.CancelCopyBatch(taskId),
-    cancelCopyBatch: (batchId) => copyService.CancelCopyBatch(batchId),
+    getCopyQueueStatus: async () => await copyService.GetCopyQueueStatus(),
+    cancelCopyTask: async (taskId) => {
+      const result = await copyService.CancelCopyBatch(taskId);
+      return result ?? { cancelled: false, taskId };
+    },
+    cancelCopyBatch: async (batchId) => {
+      const result = await copyService.CancelCopyBatch(batchId);
+      return {
+        cancelled: result?.cancelled ?? false,
+        taskId: result?.taskId ?? batchId,
+      };
+    },
   };
 }

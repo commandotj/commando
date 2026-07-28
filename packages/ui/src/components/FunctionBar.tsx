@@ -9,6 +9,7 @@ import {
 } from "@radix-ui/react-icons";
 import IconButton from "./IconButton"; // 独立组件文件
 import { useAppSelector, useAppDispatch } from "../app/hooks";
+import store from "../app/store";
 import BatchCopyProgressModal from "./BatchCopyProgressModal";
 import { fetchDirectory } from "../app/fileManagerSlice";
 import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
@@ -26,10 +27,9 @@ const FunctionBar: React.FC = () => {
     const [operationType, setOperationType] = useState<"copy" | "move">("copy");
 
     // 使用服务层处理文件操作
-    const fileOperations = useAppSelector(state => state.fileOperations);
-    const enhancedService = new EnhancedFileOperationService(dispatch, () => ({
-        fileOperations,
-    }));
+    const enhancedService = new EnhancedFileOperationService(dispatch, () =>
+        store.getState()
+    );
 
     // 刷新当前面板
     const handleRefresh = (): void => {

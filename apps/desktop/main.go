@@ -9,8 +9,6 @@ import (
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
-const appBundleID = "com.systembug.commando"
-
 func focusMainWindow(window *application.WebviewWindow) {
 	if window == nil {
 		return
@@ -28,6 +26,7 @@ func focusMainWindow(window *application.WebviewWindow) {
 var assets embed.FS
 
 func main() {
+	identity := currentAppIdentity()
 	desktopRuntime := services.NewRuntime(nil, runtime.NumCPU())
 
 	var mainWindow *application.WebviewWindow
@@ -38,10 +37,10 @@ func main() {
 	syncService := services.NewSyncService(desktopRuntime)
 
 	app := application.New(application.Options{
-		Name:        "Commando",
+		Name:        identity.Name,
 		Description: "Dual-pane folder sync file manager",
 		SingleInstance: &application.SingleInstanceOptions{
-			UniqueID: appBundleID,
+			UniqueID: identity.InstanceID,
 			OnSecondInstanceLaunch: func(data application.SecondInstanceData) {
 				log.Printf("second instance blocked: args=%v cwd=%s", data.Args, data.WorkingDir)
 				focusMainWindow(mainWindow)
@@ -66,7 +65,7 @@ func main() {
 	}
 
 	mainWindow = app.Window.NewWithOptions(application.WebviewWindowOptions{
-		Title:  "Commando",
+		Title:  identity.Name,
 		Width:  1280,
 		Height: 800,
 		Mac: application.MacWindow{

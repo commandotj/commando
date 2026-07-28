@@ -4,11 +4,13 @@
         <key>CFBundlePackageType</key>
             <string>APPL</string>
         <key>CFBundleName</key>
-            <string>Commando</string>
+            <string>Commando Dev</string>
+        <key>CFBundleDisplayName</key>
+            <string>Commando Dev</string>
         <key>CFBundleExecutable</key>
-            <string>commando</string>
+            <string>Commando</string>
         <key>CFBundleIdentifier</key>
-            <string>com.systembug.commando</string>
+            <string>me.systembug.commando.dev</string>
         <key>CFBundleVersion</key>
             <string>0.1.0</string>
         <key>CFBundleGetInfoString</key>
@@ -30,5 +32,7 @@
             <key>NSAllowsLocalNetworking</key>
             <true/>
         </dict>
+        <key>WailsDevelopmentMode</key>
+            <true/>
     </dict>
 </plist>

@@ -7,7 +7,7 @@ version: '3'
 info:
   companyName: "My Company" # The name of the company
   productName: "Commando" # The name of the application
-  productIdentifier: "com.systembug.commando" # The unique product identifier
+  productIdentifier: "me.systembug.commando" # The unique product identifier
   description: "Dual-pane folder sync" # The application description
   copyright: "(c) 2025, My Company" # Copyright text
   comments: "Some Product Comments" # Comments

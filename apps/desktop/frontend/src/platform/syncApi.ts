@@ -3,6 +3,7 @@ import {
   CancelSync,
   Compare,
   Execute,
+  ExportReport,
   Plan,
 } from "../../bindings/github.com/systembug/commando/apps/desktop/services/syncservice.js";
 import type * as SyncModels from "../../bindings/github.com/systembug/commando/internal/sync/models.js";
@@ -21,6 +22,12 @@ export function installSyncApi(): void {
   window.syncApi = {
     plan: (req) => Plan(req as ServiceModels.SyncRequest),
     compare: (req) => Compare(req as ServiceModels.SyncRequest),
+    exportReport: (req) =>
+      ExportReport({
+        report: req.report as SyncModels.CompareReport,
+        filePath: req.filePath,
+        format: (req.format ?? "json") as SyncModels.ExportFormat,
+      }),
     execute: (plan, opts) =>
       Execute(plan as SyncModels.Plan, opts as SyncModels.Options),
     cancel: (jobId) => CancelSync(jobId),

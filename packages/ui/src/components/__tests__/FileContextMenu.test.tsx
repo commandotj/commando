@@ -70,8 +70,18 @@ const createTestStore = (
             },
             fileManager: {
                 panes: [
-                    { currentPath: "/source", entries: [], selectedKeys: [] },
-                    { currentPath: "/target", entries: [], selectedKeys: [] },
+                    {
+                        currentPath: "/source",
+                        syncRoot: "/source",
+                        entries: [],
+                        selectedKeys: [],
+                    },
+                    {
+                        currentPath: "/target",
+                        syncRoot: "/target",
+                        entries: [],
+                        selectedKeys: [],
+                    },
                 ],
                 activePane: 0,
             },

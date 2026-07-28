@@ -1,4 +1,7 @@
-import type { SyncStrategyId } from "@commando/shared/types/SyncTypes";
+import type {
+    SyncStrategyId,
+    SyncOptions,
+} from "@commando/shared/types/SyncTypes";
 
 /** Strategy ids — must match backend internal/sync.StrategyID */
 export const SYNC_STRATEGY_IDS = {
@@ -57,11 +60,11 @@ export const SYNC_STRATEGY_DELETE_EXTRANEOUS: Record<SyncStrategyId, boolean> =
 
 export const DEFAULT_SYNC_STRATEGY_ID = SYNC_STRATEGY_IDS.UPDATE_RIGHT;
 
-export const DEFAULT_SYNC_OPTIONS = {
+export const DEFAULT_SYNC_OPTIONS: SyncOptions = {
     deleteExtraneous: false,
     dryRun: false,
     useChecksum: false,
-} as const;
+};
 
 export const SYNC_ACTION_COLORS: Record<string, string> = {
     copy: "sync-row-copy",

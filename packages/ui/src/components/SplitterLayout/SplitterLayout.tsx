@@ -161,7 +161,7 @@ class SplitterLayout extends React.Component<
 
     getSecondaryPaneSize(
         containerRect: DOMRect,
-        splitterRect: DOMRect,
+        splitterRect: Pick<DOMRect, "width" | "height">,
         clientPosition: { left: number; top: number },
         offsetMouse: boolean
     ): number {

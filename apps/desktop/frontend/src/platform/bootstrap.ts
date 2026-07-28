@@ -16,6 +16,7 @@ import {
 import { installFsApi } from "./fsApi";
 import { installLogApi } from "./logApi";
 import { installSyncApi } from "./syncApi";
+import { adaptWailsDriveService, adaptWailsFileService } from "./wailsFileAdapters";
 
 /**
  * Wails v3 bootstrap: wire generated bindings before mounting React.
@@ -27,9 +28,9 @@ export async function bootstrapDesktop(): Promise<void> {
   const homeDir = await GetHomeDir();
 
   installFsApi(
-    { ListDir, Navigate, GetHomeDir, GoToParent },
+    adaptWailsFileService(ListDir, Navigate, GoToParent, GetHomeDir),
     { CopyBatch, CancelCopyBatch, GetCopyQueueStatus },
-    { ListDrives, GetDriveDetails },
+    adaptWailsDriveService(ListDrives, GetDriveDetails),
     homeDir,
   );
 

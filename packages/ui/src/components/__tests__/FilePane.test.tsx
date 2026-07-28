@@ -29,7 +29,23 @@ import { fetchDirectory } from "../../app/fileManagerSlice";
 // import driveReducer from "../../app/driveSlice";
 // import clipboardReducer from "../../app/clipboardSlice";
 // import fileOperationsReducer from "../../app/fileOperationsSlice";
+import {
+    DEFAULT_SYNC_OPTIONS,
+    DEFAULT_SYNC_STRATEGY_ID,
+} from "../../constants/sync";
 import type { RootState } from "../../app/store";
+
+const defaultSyncState = {
+    strategyId: DEFAULT_SYNC_STRATEGY_ID,
+    options: DEFAULT_SYNC_OPTIONS,
+    report: null,
+    plan: null,
+    diffMap: {},
+    status: "idle" as const,
+    error: null,
+    lastJobId: null,
+    planModalOpen: false,
+};
 
 const mockStore = configureStore<RootState>([]);
 
@@ -163,6 +179,7 @@ describe("FilePane", () => {
                 panes: [
                     {
                         currentPath: "/Users/test",
+                        syncRoot: "/Users/test",
                         entries: [
                             {
                                 name: "Documents",
@@ -181,6 +198,7 @@ describe("FilePane", () => {
                     },
                     {
                         currentPath: "/Users/test",
+                        syncRoot: "/Users/test",
                         entries: [],
                         selectedKeys: [],
                     },
@@ -205,6 +223,7 @@ describe("FilePane", () => {
                 loadingMessage: "",
                 lastUpdateTime: null,
             },
+            sync: defaultSyncState,
         });
         dispatch = jest.fn();
         (redux.useAppDispatch as jest.Mock).mockReturnValue(dispatch);

@@ -3,6 +3,7 @@ import type {
     CompareReport,
     SyncAction,
     SyncJobStatus,
+    SyncOptions,
     SyncPlan,
 } from "@commando/shared/types/SyncTypes";
 import {
@@ -18,7 +19,7 @@ export type DiffMap = Record<string, SyncAction>;
 
 interface SyncState {
     strategyId: SyncStrategyId;
-    options: typeof DEFAULT_SYNC_OPTIONS;
+    options: SyncOptions;
     report: CompareReport | null;
     plan: SyncPlan | null;
     diffMap: DiffMap;

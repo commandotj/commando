@@ -104,10 +104,10 @@ export class EnhancedFileOperationService {
                     conflicts.push({
                         source,
                         destination: targetPath,
-                        sourceSize: sourceInfo.size,
-                        destinationSize: targetInfo.size,
-                        sourceModified: sourceInfo.mtime,
-                        destinationModified: targetInfo.mtime,
+                        sourceSize: _sourceEntry?.size,
+                        destinationSize: _targetEntry?.size,
+                        sourceModified: _sourceEntry?.mtime,
+                        destinationModified: _targetEntry?.mtime,
                     });
                 }
             } catch (error) {
@@ -146,6 +146,8 @@ export class EnhancedFileOperationService {
 
             return { operationId, success: true };
         } catch (error) {
+            const errorMessage =
+                error instanceof Error ? error.message : String(error);
             // 处理错误
             const state = this.getState();
             const operation =
@@ -154,7 +156,7 @@ export class EnhancedFileOperationService {
             if (operation && operation.retryCount < operation.maxRetries) {
                 // 可以重试
                 this.dispatch(retryOperation({ id: operationId }));
-                return { operationId, needsRetry: true, error: error.message };
+                return { operationId, needsRetry: true, error: errorMessage };
             } else {
                 // 重试次数已满，标记为失败
                 this.dispatch(
@@ -163,7 +165,7 @@ export class EnhancedFileOperationService {
                         file: params.sources[0], // 简化处理，实际应该记录所有失败的文件
                     })
                 );
-                return { operationId, success: false, error: error.message };
+                return { operationId, success: false, error: errorMessage };
             }
         }
     }

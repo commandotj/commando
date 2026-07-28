@@ -14,7 +14,12 @@ describe("syncSlice", () => {
     it("marks error when compare rejected", () => {
         const state = syncReducer(
             undefined,
-            compareSync.rejected(new Error("fail"), "", "roots missing")
+            compareSync.rejected(
+                new Error("fail"),
+                "",
+                undefined,
+                "roots missing"
+            )
         );
         expect(state.status).toBe("error");
         expect(state.error).toBeTruthy();
