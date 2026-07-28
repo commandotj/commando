@@ -100,9 +100,9 @@ RFC (Request for Comments) 是 commando-react 项目中用于记录和跟踪重�
 | 🔵 Proposed         | 1      | 8%       |
 | 🟡 Under Discussion | 0      | 0%       |
 | 🟠 Under Review     | 0      | 0%       |
-| 🟢 Approved         | 3      | 23%      |
+| 🟢 Approved         | 2      | 15%      |
 | 🔵 In Progress      | 1      | 8%       |
-| ✅ Completed        | 8      | 61%      |
+| ✅ Completed        | 9      | 69%      |
 | ❌ Deprecated       | 0      | 0%       |
 | **总计**            | **13** | **100%** |
 
@@ -120,14 +120,14 @@ RFC (Request for Comments) 是 commando-react 项目中用于记录和跟踪重�
 | [RFC-2025-008](./008-window-service-api.md)            | Window Service API 设计          | AI Assistant    | 2025-01-27 | 2025-01-27 | ✅ Completed |
 | [RFC-2025-009](./009-shell-service-api.md)             | Shell Service API 设计           | AI Assistant    | 2025-01-27 | 2025-01-27 | ✅ Completed |
 | [RFC-2026-011](./rfc/011-commando-app-icon.md)         | Commando 卡通应用图标            | Codex/albert.li | 2026-07-27 | 2026-07-27 | ✅ Completed |
+| [RFC-2026-013](./rfc/013-dev-prod-app-identity.md)     | Wails Dev/Prod 应用身份分离      | Codex/albert.li | 2026-07-27 | 2026-07-27 | ✅ Completed |
 
 ### 已批准的 RFC
 
-| RFC 编号                                            | 标题                                  | 作者            | 创建时间   | 状态        |
-| --------------------------------------------------- | ------------------------------------- | --------------- | ---------- | ----------- |
-| [RFC-2025-001](./001-worker-architecture-vite.md)   | Worker Architecture for Electron-Vite | Albert Lee/AI   | 2025-01-14 | 🟢 Approved |
-| [RFC-2025-002](./007-constant-management-system.md) | Constant Management System            | Albert Lee/AI   | 2025-01-14 | 🟢 Approved |
-| [RFC-2026-013](./rfc/013-dev-prod-app-identity.md)  | Wails Dev/Prod 应用身份分离           | Codex/albert.li | 2026-07-27 | 🟢 Approved |
+| RFC 编号                                            | 标题                                  | 作者          | 创建时间   | 状态        |
+| --------------------------------------------------- | ------------------------------------- | ------------- | ---------- | ----------- |
+| [RFC-2025-001](./001-worker-architecture-vite.md)   | Worker Architecture for Electron-Vite | Albert Lee/AI | 2025-01-14 | 🟢 Approved |
+| [RFC-2025-002](./007-constant-management-system.md) | Constant Management System            | Albert Lee/AI | 2025-01-14 | 🟢 Approved |
 
 ### 架构设计 RFC
 
@@ -159,7 +159,7 @@ _暂无_
 | ---- | ---- | ------ | ------ | ------ | ------ | ------ |
 | 2024 | 4    | 4      | 0      | 0      | 0      | 0      |
 | 2025 | 6    | 3      | 2      | 1      | 0      | 0      |
-| 2026 | 3    | 1      | 1      | 0      | 1      | 0      |
+| 2026 | 3    | 2      | 0      | 0      | 1      | 0      |
 
 ### 按作者统计
 
@@ -173,6 +173,7 @@ _暂无_
 
 | 时间       | RFC          | 更新内容                                                 | 作者            |
 | ---------- | ------------ | -------------------------------------------------------- | --------------- |
+| 2026-07-27 | RFC-2026-013 | Dev/Prod 身份、图标、打包入口与运行时验证完成            | Codex/albert.li |
 | 2026-07-27 | RFC-2026-013 | 用户批准 Wails Dev/Prod 身份分离方案                     | Codex/albert.li |
 | 2026-07-27 | RFC-2026-011 | C1 应用于正式应用与平台资产，验证完成                    | Codex/albert.li |
 | 2026-07-27 | RFC-2026-011 | 生成并验证 C1 候选，进入候选审批                         | Codex/albert.li |

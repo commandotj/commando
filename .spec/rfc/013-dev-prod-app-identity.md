@@ -4,11 +4,12 @@
 
 作者: Codex/albert.li
 创建时间: 2026-07-27
-状态: Approved
+状态: Completed
 修改历史:
 
 - 2026-07-27: 用户批准 Wails 对齐方案、`me.systembug` 域名前缀与 Dev/Prod 共存目标 by Codex
 - 2026-07-27: 补充测试先行的原子实施清单 by Codex
+- 2026-07-27: 完成 Dev/Prod 身份、图标、打包入口与运行时验证 by Codex
 
 ---
 
@@ -57,16 +58,16 @@ macOS Dev 模板尚未应用同样隔离。本 RFC 将同一模式应用到 macO
 
 ### 主要目标
 
-- [ ] 生产 bundle 输出为 `bin/Commando.app`。
-- [ ] 开发 bundle 输出为 `bin/Commando Dev.app`。
-- [ ] 生产 bundle ID 为 `me.systembug.commando`。
-- [ ] 开发 bundle ID 为 `me.systembug.commando.dev`。
-- [ ] 生产与开发使用不同 SingleInstance ID。
-- [ ] 生产与开发可同时运行，且各自仍阻止同身份的第二实例。
-- [ ] 开发图标拥有明显 `DEV` 角标，Dock 中可快速区分。
-- [ ] `pnpm dev` 只运行 `Commando Dev.app`。
-- [ ] `pnpm desktop:install` 只部署 production bundle 到 `/Applications/Commando.app`。
-- [ ] CLI 二进制 `commando` 不受影响。
+- [x] 生产 bundle 输出为 `bin/Commando.app`。
+- [x] 开发 bundle 输出为 `bin/Commando Dev.app`。
+- [x] 生产 bundle ID 为 `me.systembug.commando`。
+- [x] 开发 bundle ID 为 `me.systembug.commando.dev`。
+- [x] 生产与开发使用不同 SingleInstance ID。
+- [x] 生产与开发可同时运行，且各自仍阻止同身份的第二实例。
+- [x] 开发图标拥有明显 `DEV` 角标，Dock 中可快速区分。
+- [x] `pnpm dev` 只运行 `Commando Dev.app`。
+- [x] `pnpm desktop:install` 只部署 production bundle 到 `/Applications/Commando.app`。
+- [x] CLI 二进制 `commando` 不受影响。
 
 ### 非目标
 
@@ -268,38 +269,50 @@ CLI `commando` 位于独立 Go 命令，不受桌面 `APP_NAME` 大小写变化�
 
 ### 阶段 1：身份数据
 
-- [ ] 新增纯函数 `identityForMode(production bool)`。
-- [ ] 新增 production/dev build-tag 模式常量。
-- [ ] 更新 `main.go` 使用统一身份。
-- [ ] 更新单元测试覆盖两个模式。
+- [x] 新增纯函数 `identityForMode(production bool)`。
+- [x] 新增 production/dev build-tag 模式常量。
+- [x] 更新 `main.go` 使用统一身份。
+- [x] 更新单元测试覆盖两个模式。
 
 ### 阶段 2：Wails 元数据
 
-- [ ] 更新 `build/config.yml` 的生产 bundle ID。
-- [ ] 更新根 Taskfile 的 `APP_NAME` 与 `DEV_APP_NAME`。
-- [ ] 更新生产与开发 plist。
+- [x] 更新 `build/config.yml` 的生产 bundle ID。
+- [x] 更新根 Taskfile 的 `APP_NAME` 与 `DEV_APP_NAME`。
+- [x] 更新生产与开发 plist。
 
 ### 阶段 3：Dev 图标
 
-- [ ] 创建 `build/appicon-dev.png`。
-- [ ] 生成 `build/darwin/icons-dev.icns`。
-- [ ] 开发 bundle 使用 `icons-dev.icns`。
+- [x] 创建 `build/appicon-dev.png`。
+- [x] 生成 `build/darwin/icons-dev.icns`。
+- [x] 开发 bundle 使用 `icons-dev.icns`。
 
 ### 阶段 4：bundle 组装
 
-- [ ] 生产 bundle 使用 `Commando.app`。
-- [ ] 开发 bundle 使用 `Commando Dev.app`。
-- [ ] 两者复制同名 `Commando` 可执行文件。
-- [ ] 两者分别 ad-hoc 签名。
+- [x] 生产 bundle 使用 `Commando.app`。
+- [x] 开发 bundle 使用 `Commando Dev.app`。
+- [x] 两者复制同名 `Commando` 可执行文件。
+- [x] 两者分别 ad-hoc 签名。
 
 ### 阶段 5：验证
 
-- [ ] 验证两个 plist。
-- [ ] 验证两个图标。
-- [ ] 验证两个 bundle 签名。
-- [ ] 验证 Dev/Prod 同时运行。
-- [ ] 验证同身份第二实例聚焦现有窗口。
-- [ ] 运行项目质量门。
+- [x] 验证两个 plist。
+- [x] 验证两个图标。
+- [x] 验证两个 bundle 签名。
+- [x] 验证 Dev/Prod 同时运行。
+- [x] 验证同身份第二实例聚焦现有窗口。
+- [x] 运行项目质量门。
+
+## 完成证据
+
+- `pnpm dev` 启动路径为 `bin/Commando Dev.app/Contents/MacOS/Commando`。
+- production 与 development 同时运行时各有一个独立进程；重复启动后进程数不增加。
+- production plist 为 `me.systembug.commando`，development plist 为 `me.systembug.commando.dev`。
+- 两个 bundle 均通过 `codesign --verify --deep --strict`。
+- production 与 development `.icns` 的 SHA-256 不同。
+- `pnpm test:go` 通过。
+- `pnpm --filter @commando/ui test` 通过：20 suites、128 tests。
+- `go build ./apps/desktop` 通过。
+- `pnpm desktop:install` 经 `make -n desktop-install` 验证只以 production `Commando.app` 为源；未在 RFC 验证中覆盖用户现有 `/Applications/Commando.app`。
 
 ## 测试策略
 
