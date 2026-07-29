@@ -1,1 +1,3 @@
 npm run typecheck && npm run test
+
+cd backend && go build ./... && go vet ./... && go test ./...
