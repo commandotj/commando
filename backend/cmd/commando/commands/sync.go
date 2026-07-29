@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/systembug/commando/internal/sync"
+	"github.com/systembugtj/commando/internal/sync"
 )
 
 func init() {

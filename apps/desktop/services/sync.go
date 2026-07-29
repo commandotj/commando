@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
-	"github.com/systembug/commando/internal/sync"
+	"github.com/systembugtj/commando/internal/sync"
 )
 
 type SyncRequest struct {

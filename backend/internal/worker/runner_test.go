@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/systembug/commando/internal/worker"
+	"github.com/systembugtj/commando/internal/worker"
 )
 
 func TestRunner_StartAndFinish(t *testing.T) {

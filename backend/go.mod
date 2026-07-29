@@ -1,4 +1,4 @@
-module github.com/systembug/commando
+module github.com/systembugtj/commando
 
 go 1.25.0
 

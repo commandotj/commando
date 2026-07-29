@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/systembug/commando/internal/sync"
+	"github.com/systembugtj/commando/internal/sync"
 )
 
 func TestBuildReport_MirrorRightDeletesExtraneousOnRight(t *testing.T) {

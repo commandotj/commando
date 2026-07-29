@@ -1,10 +1,10 @@
-module github.com/systembug/commando/apps/desktop
+module github.com/systembugtj/commando/apps/desktop
 
 go 1.25.0
 
 require (
 	github.com/google/uuid v1.6.0
-	github.com/systembug/commando v0.0.0
+	github.com/systembugtj/commando v0.0.0
 	github.com/wailsapp/wails/v3 v3.0.0-alpha2.119
 )
 
@@ -146,4 +146,4 @@ require (
 	mvdan.cc/sh/v3 v3.12.0 // indirect
 )
 
-replace github.com/systembug/commando => ../../backend
+replace github.com/systembugtj/commando => ../../backend
