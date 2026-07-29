@@ -21,12 +21,15 @@
 - 2026-07-28: v3.10 — OQ-02 拆出的 RFC 编号回填：创建 **RFC-2026-014**（`014-remote-provider-gdrive-mtp.md`，Google Drive/MTP 完整规格），§9.1、§12 OQ-02、§10 相关 RFC 表全部替换「编号待定」为实际编号
 - 2026-07-28: v3.11 — **文件系统层先行 + 逐包 100% 覆盖率门禁**：新增 §1.2 定义 `internal/fsutil`（独立于 sync，M0 第一交付单元，扶正现有 `fsutil/walk.go`，不迁入 engine）；§2.1.2 依赖表加 `fsutil` 单向依赖行；§6 M0 拆解为 `fsutil→filter→engine→variant→plan` 严格顺序，每包 100% 覆盖率未达标禁止开下一包；§7.3/§7.7/§7.8 同步补 fsutil 测试项与 CI 覆盖率强制脚本
 - 2026-07-28: v3.12 — **RFC 只写功能规格，砍掉审批仪式**：删除原 §0 治理闸门整节（G-01…G-05、生命周期图、0.4 checklist），保留其中有信息量的部分（现有代码处置表、开工前提清单）合并进摘要；删除原 §15 批准清单整节；§11/§12 标题去掉「批准前锁定/关闭」措辞，内容不变；`internal/fsutil` 明确现在就可开工，不受 sync 语义部分限制
+- 2026-07-28: v3.13 — **"1:1 对标"明确为功能对等而非语法照抄**：摘要新增说明段；FLT-01…08 过滤规则语法从 FFS 反斜杠目录传播写法改为标准 doublestar glob（`*`/`?`/`**`），§7.12.3 测试用例同步；§8 第三方库政策新增「通配符匹配算法可用成熟库」一行（`github.com/bmatcuk/doublestar/v4`），区分于必须自研的 include/exclude 优先级判定语义
 
 ---
 
 ## 摘要
 
 Commando 双栏同步模块必须与 **FreeFileSync（FFS）14.x 行为 1:1 对标**。本文是 sync 域的**唯一权威规格**；实施、PR、测试均以 §4 验收表为准。
+
+**对标 = 功能对等，非语法照抄。** "1:1 对标"指 Commando 能做到 FFS 能做的每一件事（同样的比较分类、同样的同步变体、同样的过滤能力），**不代表** Commando 的实现语法/文件格式/命名要复刻 FFS 20 年历史包袱的具体写法。凡是 FFS 某个具体语法选择明显是历史遗留（Windows 路径习惯、过时通配符写法等）而非其功能设计本身，Commando 用现代等价方案实现同样能力，不逐字复刻旧语法。已应用此原则的先例：`GuiConfig`/`BatchConfig` 命名去 FFS 化（§3.7 v3.7）；过滤规则通配符语法用现代 glob 库（doublestar，见 §4.5 FLT-03），不复刻 FFS 反斜杠目录传播写法。
 
 **对标版本：** FreeFileSync **14.x**（含 FFS 13+ changes-based Update）
 
@@ -449,19 +452,19 @@ $ commando sync compare --left L --right R --variant mirror
 
 ##### `engine`
 
-| 符号                                                                                            | 说明                                            |
-| ----------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| `type Entry`                                                                                    | RelPath, AbsPath, IsDir, Size, ModTime, FileID? |
-| `type Index map[string]Entry`                                                                   | 一侧根目录索引                                  |
-| `func IndexRoot(ctx, root, filter.Matcher, IndexOptions) (Index, error)`                        | 遍历建索引                                      |
-| `type CompareMode`                                                                              | `TimeAndSize`, `Content`, `SizeOnly`            |
-| `type CompareSettings`                                                                          | ToleranceSec, SymlinkMode, Parallelism          |
-| `type SymlinkMode`                                                                              | `Exclude`, `AsLink`, `Follow`                   |
-| `func Equal(a, b Entry, mode CompareMode, settings CompareSettings) (bool, error)`              | 文件相等                                        |
-| `type Category`                                                                                 | `LeftOnly` … `Conflict`, `TypeMismatch`         |
-| `func Categorize(left, right *Entry, mode CompareMode, settings) (Category, string /*reason*/)` | 归入 CAT-*                                      |
-| `type DiffOp`                                                                                   | RelPath, Category, Left, Right, Reason          |
-| `func BuildDiff(leftIdx, rightIdx Index) []DiffOp`                                              | 并集 diff                                       |
+| 符号                                                                                            | 说明                                                                          |
+| ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `type Entry`                                                                                    | RelPath, AbsPath, IsDir, Size, ModTime, FileID?                               |
+| `type Index map[string]Entry`                                                                   | 一侧根目录索引                                                                |
+| `func IndexRoot(ctx, root, filter.Matcher, IndexOptions) (Index, error)`                        | 遍历建索引                                                                    |
+| `type CompareMode`                                                                              | `TimeAndSize`, `Content`, `SizeOnly`                                          |
+| `type CompareSettings`                                                                          | ToleranceSec, SymlinkMode, Parallelism                                        |
+| `type SymlinkMode`                                                                              | `Exclude`, `AsLink`, `Follow`                                                 |
+| `func IsEqual(a, b Entry, mode CompareMode, settings CompareSettings) (bool, error)`            | 文件相等（命名为 `IsEqual` 非 `Equal`，避免与 `Category.Equal` 常量同名冲突） |
+| `type Category`                                                                                 | `LeftOnly` … `Conflict`, `TypeMismatch`                                       |
+| `func Categorize(left, right *Entry, mode CompareMode, settings) (Category, string /*reason*/)` | 归入 CAT-*                                                                    |
+| `type DiffOp`                                                                                   | RelPath, Category, Left, Right, Reason                                        |
+| `func BuildDiff(leftIdx, rightIdx Index) []DiffOp`                                              | 并集 diff                                                                     |
 
 ##### `filter`
 
@@ -855,16 +858,18 @@ UI：点击动作图标循环 — 与 FFS F8 一致。
 
 ### 4.5 过滤器
 
-| ID     | 功能                     | 验收                                                   | 状态 |
-| ------ | ------------------------ | ------------------------------------------------------ | ---- |
-| FLT-01 | Include 列表（默认 `*`） | 至少匹配一条                                           | ⬜   |
-| FLT-02 | Exclude 列表             | 不匹配任一条                                           | ⬜   |
-| FLT-03 | 通配符 `*` `?`           | 相对路径                                               | ⬜   |
-| FLT-04 | 默认排除系统项           | `$Recycle.Bin` `System Volume Information` `thumbs.db` | ⬜   |
-| FLT-05 | 目录匹配→子项全匹配      | FFS 规则                                               | ⬜   |
-| FLT-06 | 网格右键快速排除         | 加入 exclude                                           | ⬜   |
-| FLT-07 | 路径分隔符提示 `\`       | 仅目录                                                 | ⬜   |
-| FLT-08 | Exclude 覆盖 Include     | 优先级                                                 | ⬜   |
+**语法：现代 glob（`*`/`?`/`**`），非 FFS 反斜杠语法。** 功能对等 FFS include/exclude + 目录传播能力，语法采用 `github.com/bmatcuk/doublestar/v4`（Go 生态标准 `**` glob 库，`.gitignore`/rsync 同源语义），不复刻 FFS `\folder\` 反斜杠尾缀写法。理由见摘要"对标 = 功能对等，非语法照抄"。
+
+| ID     | 功能                      | 验收                                                                                                              | 状态 |
+| ------ | ------------------------- | ----------------------------------------------------------------------------------------------------------------- | ---- |
+| FLT-01 | Include 列表（默认 `**`） | 至少匹配一条                                                                                                      | ⬜   |
+| FLT-02 | Exclude 列表              | 不匹配任一条                                                                                                      | ⬜   |
+| FLT-03 | 通配符 `*` `?` `**`       | doublestar 语义；`**` 递归匹配任意深度目录，相对路径                                                              | ⬜   |
+| FLT-04 | 默认排除系统项            | `$Recycle.Bin` `System Volume Information` `thumbs.db`（+ fsutil 迁出的 `.git`/`node_modules`/隐藏文件，见 §1.2） | ⬜   |
+| FLT-05 | 目录整树排除              | `temp/**` 排除 `temp` 目录及其全部子内容（doublestar 原生语义，非 FFS 反斜杠写法）                                | ⬜   |
+| FLT-06 | 网格右键快速排除          | 加入 exclude                                                                                                      | ⬜   |
+| FLT-07 | 路径分隔符统一为 `/`      | 跨平台一律用 `/`，不用 Windows `\`（fsutil.Entry.RelativePath 已保证）                                            | ⬜   |
+| FLT-08 | Exclude 覆盖 Include      | 优先级                                                                                                            | ⬜   |
 
 ### 4.6 配置与 CLI
 
@@ -1264,13 +1269,15 @@ pnpm --filter @commando/ui test -- --testPathPattern=sync
 
 #### 7.12.3 `filter` — `matcher_test.go`
 
-| test                                       | Rules               | Path             | Expect                |
-| ------------------------------------------ | ------------------- | ---------------- | --------------------- |
-| `TestFilter_DefaultExcludesRecycleBin`     | default             | `$Recycle.Bin/x` | false                 |
-| `TestFilter_IncludeStar`                   | include `*`         | `any/x.txt`      | true                  |
-| `TestFilter_ExcludeSubfolder`              | exclude `\temp\`    | `temp/x`         | false                 |
-| `TestFilter_ExcludeSubfolderKeepsChildren` | exclude `\temp\`    | `temp/sub/x`     | false（FFS 目录传播） |
-| `TestFilter_IncludeSubfolderOnly`          | include `\data\*\\` | `data/x`         | false；`data/sub/x`   | true |
+**语法：doublestar glob（`*`/`?`/`**`），非 FFS 反斜杠语法。** 见 §4.5。
+
+| test                                       | Rules             | Path             | Expect                       |
+| ------------------------------------------ | ----------------- | ---------------- | ---------------------------- |
+| `TestFilter_DefaultExcludesRecycleBin`     | default           | `$Recycle.Bin/x` | false                        |
+| `TestFilter_IncludeStar`                   | include `**`      | `any/x.txt`      | true                         |
+| `TestFilter_ExcludeSubfolder`              | exclude `temp/**` | `temp/x`         | false                        |
+| `TestFilter_ExcludeSubfolderKeepsChildren` | exclude `temp/**` | `temp/sub/x`     | false（doublestar 递归排除） |
+| `TestFilter_IncludeSubfolderOnly`          | include `data/**` | `data/x`         | true；`other/x` → false      |
 
 #### 7.12.4 Golden — `manifest.json`（M0 首批 24 case）
 
@@ -1720,12 +1727,14 @@ CI：`go test ./internal/sync/... -run TestTraceabilityComplete` 验证 §4 每�
 
 ## 8. 第三方库政策（1:1 模式）
 
-| 领域                | 政策                                   |
-| ------------------- | -------------------------------------- |
-| Compare/Sync 语义   | **自研**，表驱动，FFS 对照测试         |
-| SFTP/FTP/GDrive/MTP | 可用成熟 Go 客户端（实现 REM-*）       |
-| VSS                 | 平台 API / 可选库                      |
-| 禁止                | 用简化语义冒充 FFS（如 mtime two-way） |
+| 领域                       | 政策                                                                                                                                       |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Compare/Sync 语义          | **自研**，表驱动，FFS 对照测试                                                                                                             |
+| Include/Exclude 优先级判定 | **自研**（FLT-08 谁覆盖谁是 sync 语义决策）                                                                                                |
+| 通配符匹配算法本身         | **可用成熟库**（如 doublestar 做 `*`/`?`/`**` 匹配）——这是通用技术，非 FFS 专属语义，不必重新发明；语法从 FFS 反斜杠改为标准 glob，见 §4.5 |
+| SFTP/FTP/GDrive/MTP        | 可用成熟 Go 客户端（实现 REM-*）                                                                                                           |
+| VSS                        | 平台 API / 可选库                                                                                                                          |
+| 禁止                       | 用简化语义冒充 FFS（如 mtime two-way）                                                                                                     |
 
 ---
 

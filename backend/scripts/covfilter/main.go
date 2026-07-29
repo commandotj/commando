@@ -82,7 +82,7 @@ func main() {
 		importFile := filePart[:colonIdx]
 		rangePart := filePart[colonIdx+1:]
 
-		startLine := parseStartLine(rangePart)
+		startLine, _ := parseLineRange(rangePart)
 
 		diskFile := toDiskPath(importFile, modPath)
 		lines, ok := sourceLines[diskFile]
@@ -111,13 +111,19 @@ func main() {
 	fmt.Printf("%.1f\n", pct)
 }
 
-func parseStartLine(rangePart string) int {
+func parseLineRange(rangePart string) (startLine, endLine int) {
 	// rangePart looks like "43.10,47.3"
 	commaIdx := strings.Index(rangePart, ",")
 	startPart := rangePart[:commaIdx]
-	dotIdx := strings.Index(startPart, ".")
-	n, _ := strconv.Atoi(startPart[:dotIdx])
-	return n
+	endPart := rangePart[commaIdx+1:]
+
+	startDot := strings.Index(startPart, ".")
+	startLine, _ = strconv.Atoi(startPart[:startDot])
+
+	endDot := strings.Index(endPart, ".")
+	endLine, _ = strconv.Atoi(endPart[:endDot])
+
+	return startLine, endLine
 }
 
 func readSourceFile(file string) []string {
@@ -128,15 +134,29 @@ func readSourceFile(file string) []string {
 	return strings.Split(string(data), "\n")
 }
 
-// isIgnored reports whether the statement block starting at startLine
-// (1-indexed, as reported by `go test -coverprofile`) opens onto a
-// "// coverage:ignore" comment on the very next source line — i.e. the
-// first line inside the block, right after the "if err != nil {" line
-// itself.
+// isIgnored reports whether the line immediately preceding startLine
+// (1-indexed, as reported by `go test -coverprofile`) is a
+// "// coverage:ignore" comment.
+//
+// Every coverage:ignore annotation in this codebase is written directly
+// above the statement it exempts, e.g.:
+//
+//	// coverage:ignore unreachable — reason
+//	return false, err
+//
+// A single source line like "if err != nil {" produces two profile blocks
+// (the condition, and the block body) that both report the same startLine;
+// checking the line *before* startLine — rather than trying to distinguish
+// which of the two blocks this is — naturally handles both shapes: the
+// condition's preceding line is whatever precedes the "if", almost never a
+// coverage:ignore comment, while the block body's preceding line is the
+// "if ... {" line itself, also not a comment. The one case that matters —
+// a bare statement (no wrapping "if") immediately preceded by the comment —
+// is what this function is built to catch.
 func isIgnored(lines []string, startLine int) bool {
-	if lines == nil || startLine < 1 || startLine >= len(lines) {
+	if lines == nil || startLine < 2 || startLine-2 >= len(lines) {
 		return false
 	}
-	next := strings.TrimSpace(lines[startLine])
-	return strings.HasPrefix(next, "// coverage:ignore")
+	prev := strings.TrimSpace(lines[startLine-2])
+	return strings.HasPrefix(prev, "// coverage:ignore")
 }
