@@ -97,60 +97,75 @@ RFC (Request for Comments) 是 commando-react 项目中用于记录和跟踪重�
 
 | 状态                | 数量   | 百分比   |
 | ------------------- | ------ | -------- |
-| 🔵 Proposed         | 1      | 8%       |
+| 🔵 Proposed         | 10     | 33.3%    |
 | 🟡 Under Discussion | 0      | 0%       |
 | 🟠 Under Review     | 0      | 0%       |
-| 🟢 Approved         | 2      | 15%      |
-| 🔵 In Progress      | 1      | 8%       |
-| ✅ Completed        | 9      | 69%      |
-| ❌ Deprecated       | 0      | 0%       |
-| **总计**            | **13** | **100%** |
+| 🟢 Approved         | 8      | 26.7%    |
+| 🔵 In Progress      | 0      | 0%       |
+| ✅ Completed        | 7      | 23.3%    |
+| ❌ Deprecated       | 5      | 16.7%    |
+| **总计**            | **30** | **100%** |
 
 ## RFC 列表
 
 ### 已完成的 RFC
 
-| RFC 编号                                               | 标题                             | 作者            | 创建时间   | 完成时间   | 状态         |
-| ------------------------------------------------------ | -------------------------------- | --------------- | ---------- | ---------- | ------------ |
-| [RFC-2024-001](./001-worker-architecture-vite.md)      | commando-react 日志模块设计      | albert.li/AI    | 2024-06-09 | 2024-06-09 | ✅ Completed |
-| [RFC-2024-002](./002-batch-copy-unique-key.md)         | 批量复制唯一性与路径准确性设计   | AI+albert.li    | 2024-06-15 | 2024-06-15 | ✅ Completed |
-| [RFC-2024-003](./003-filepane-key-consistency.md)      | FilePane 多选 key 类型一致性问题 | AI (albert.li)  | 2024-06-09 | 2024-06-09 | ✅ Completed |
-| [RFC-2024-004](./004-log-module-api.md)                | 日志模块 API 设计                | albert.li/AI    | 2024-06-09 | 2024-06-09 | ✅ Completed |
-| [RFC-2024-005](./005-file-management-key-functions.md) | File Management Key Functions v1 | Albert Lee/AI   | 2025-01-14 | 2025-01-14 | ✅ Completed |
-| [RFC-2025-008](./008-window-service-api.md)            | Window Service API 设计          | AI Assistant    | 2025-01-27 | 2025-01-27 | ✅ Completed |
-| [RFC-2025-009](./009-shell-service-api.md)             | Shell Service API 设计           | AI Assistant    | 2025-01-27 | 2025-01-27 | ✅ Completed |
-| [RFC-2026-011](./rfc/011-commando-app-icon.md)         | Commando 卡通应用图标            | Codex/albert.li | 2026-07-27 | 2026-07-27 | ✅ Completed |
-| [RFC-2026-013](./rfc/013-dev-prod-app-identity.md)     | Wails Dev/Prod 应用身份分离      | Codex/albert.li | 2026-07-27 | 2026-07-27 | ✅ Completed |
+| RFC 编号                                                             | 标题                                                        | 作者                            | 创建时间   | 完成时间   | 状态         |
+| -------------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------------- | ---------- | ---------- | ------------ |
+| [RFC-2024-002](./rfc/completed/002-batch-copy-unique-key.md)         | 批量复制唯一性与路径准确性设计                              | AI+albert.li                    | 2024-06-15 | 2024-06-15 | ✅ Completed |
+| [RFC-2024-003](./rfc/completed/003-filepane-key-consistency.md)      | FilePane 多选 key 类型一致性问题                            | AI (albert.li)                  | 2024-06-09 | 2024-06-09 | ✅ Completed |
+| [RFC-2024-004](./rfc/completed/004-log-module-api.md)                | 日志模块 API 设计                                           | albert.li/AI                    | 2024-06-09 | 2024-06-09 | ✅ Completed |
+| [RFC-2024-005](./rfc/completed/005-file-management-key-functions.md) | File Management Key Functions v1                            | Albert Lee/AI                   | 2025-01-14 | 2025-01-14 | ✅ Completed |
+| [RFC-2026-011](./rfc/completed/011-commando-app-icon.md)             | Commando 卡通应用图标                                       | Codex/albert.li                 | 2026-07-27 | 2026-07-27 | ✅ Completed |
+| [RFC-2026-013](./rfc/completed/013-dev-prod-app-identity.md)         | Wails Dev/Prod 应用身份分离                                 | Codex/albert.li                 | 2026-07-27 | 2026-07-27 | ✅ Completed |
+| [RFC-2025-006](./rfc/completed/006-real-file-copy-operations.md)     | Complete File Operations with Total Commander Functionality | Claude Code Assistant/albert.li | 2025-09-25 | 2026-07-29 | ✅ Completed |
 
 ### 已批准的 RFC
 
-| RFC 编号                                            | 标题                                  | 作者          | 创建时间   | 状态        |
-| --------------------------------------------------- | ------------------------------------- | ------------- | ---------- | ----------- |
-| [RFC-2025-001](./001-worker-architecture-vite.md)   | Worker Architecture for Electron-Vite | Albert Lee/AI | 2025-01-14 | 🟢 Approved |
-| [RFC-2025-002](./007-constant-management-system.md) | Constant Management System            | Albert Lee/AI | 2025-01-14 | 🟢 Approved |
+| RFC 编号                                                  | 标题                                                         | 作者      | 创建时间   | 批准时间   | 状态        |
+| --------------------------------------------------------- | ------------------------------------------------------------ | --------- | ---------- | ---------- | ----------- |
+| [RFC-2026-016](./rfc/016-compare-engine-extensions.md)    | Compare Engine — Content, Symlinks, Tolerance & Parallel     | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved |
+| [RFC-2026-017](./rfc/017-sync-variants-changes-custom.md) | Sync Variants — Changes Mode, Two-way, Custom & Swap         | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved |
+| [RFC-2026-018](./rfc/018-sync-database.md)                | Sync Database — `sync.commando_db` & Moved File Detection    | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved |
+| [RFC-2026-019](./rfc/019-filter-system.md)                | Filter System — Include/Exclude Glob                         | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved |
+| [RFC-2026-021](./rfc/021-cli-config.md)                   | CLI & Config — Return Codes, Profiles, Schedules             | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved |
+| [RFC-2026-024](./rfc/024-reports.md)                      | Reports — Session Log, LastSyncs & Email                     | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved |
+| [RFC-2026-027](./rfc/027-delete-operations.md)            | Delete Operations — Recycle Bin & Versioning                 | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved |
+| [RFC-2026-028](./rfc/028-execution-options.md)            | Execution Options — Error Handling, Verify, Fail-safe & Lock | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved |
 
 ### 架构设计 RFC
 
-| RFC 编号                                                 | 标题                                                     | 作者                     | 创建时间   | 状态     | 关联功能                   |
-| -------------------------------------------------------- | -------------------------------------------------------- | ------------------------ | ---------- | -------- | -------------------------- |
-| [RFC-2025-010](./010-electron-spacetime-architecture.md) | Electron Spacetime Architecture with Personified Engines | Linus Torvalds/albert.li | 2025-01-05 | 📝 Draft | 为RFC-2025-006提供架构指导 |
+_暂无_
 
 ### 进行中的 RFC
 
-| RFC 编号                                           | 标题                                                        | 作者                            | 创建时间   | 当前阶段       | 架构关联           |
-| -------------------------------------------------- | ----------------------------------------------------------- | ------------------------------- | ---------- | -------------- | ------------------ |
-| [RFC-2025-006](./006-real-file-copy-operations.md) | Complete File Operations with Total Commander Functionality | Claude Code Assistant/albert.li | 2025-09-25 | 🔵 In Progress | 与RFC-2025-010对齐 |
+| RFC 编号 | 标题 | 作者 | 创建时间 | 当前阶段 | 架构关联 |
+| -------- | ---- | ---- | -------- | -------- | -------- |
 
 ### 提案中的 RFC
 
-| RFC 编号                                                | 标题                                                            | 作者         | 创建时间   | 状态        |
-| ------------------------------------------------------- | --------------------------------------------------------------- | ------------ | ---------- | ----------- |
-| [RFC-2026-012](./rfc/012-sync-module-compare-report.md) | Sync — FreeFileSync **1:1 全功能对标**                          | albert.li/AI | 2026-07-27 | 🔵 Proposed |
-| [RFC-2026-014](./rfc/014-remote-provider-gdrive-mtp.md) | 远程存储扩展 — Google Drive / MTP（从 RFC-2026-012 OQ-02 拆出） | albert.li/AI | 2026-07-28 | 🔵 Proposed |
+| RFC 编号                                                        | 标题                                                               | 作者         | 创建时间   | 状态        |
+| --------------------------------------------------------------- | ------------------------------------------------------------------ | ------------ | ---------- | ----------- |
+| [RFC-2026-012](./rfc/012-sync-module-compare-report.md)         | FreeFileSync 14.10 能力目录与 Commando 决策追踪                    | albert.li/AI | 2026-07-27 | 🔵 Proposed |
+| [RFC-2026-014](./rfc/014-remote-provider-gdrive-mtp.md)         | 远程存储扩展 — Google Drive / MTP                                  | albert.li/AI | 2026-07-28 | 🔵 Proposed |
+| [RFC-2026-015](./rfc/015-ui-foundation.md)                      | UI Foundation — Folder Selection & Compare/Sync Settings           | albert.li    | 2026-07-29 | 🔵 Proposed |
+| [RFC-2026-020](./rfc/020-ui-progress.md)                        | UI Progress — Compare/Sync Dialogs & Results                       | albert.li    | 2026-07-29 | 🔵 Proposed |
+| [RFC-2026-022](./rfc/022-ui-panels.md)                          | UI Panels — Tree Overview, Category Filter, Direction & Multi-pair | albert.li    | 2026-07-29 | 🔵 Proposed |
+| [RFC-2026-023](./rfc/023-ui-tools.md)                           | UI Tools — Explorer, External Tools, Context Menu & Rename         | albert.li    | 2026-07-29 | 🔵 Proposed |
+| [RFC-2026-025](./rfc/025-realtimesync.md)                       | RealtimeSync — File Watcher, Idle Debounce & Service               | albert.li    | 2026-07-29 | 🔵 Proposed |
+| [RFC-2026-026](./rfc/026-remote-sftp-ftp.md)                    | Remote — SFTP & FTP Transfers                                      | albert.li    | 2026-07-29 | 🔵 Proposed |
+| [RFC-2026-029](./rfc/029-platform-distribution-and-i18n.md)     | Platform, Distribution, Localization & Scale                       | albert.li/AI | 2026-07-29 | 🔵 Proposed |
+| [RFC-2026-030](./rfc/030-local-smb-filesystem-compatibility.md) | Local & SMB Filesystem Compatibility                               | albert.li/AI | 2026-07-29 | 🔵 Proposed |
 
 ### 已废弃的 RFC
 
-_暂无_
+| RFC 编号                                                               | 标题                                                     | 作者                     | 创建时间   | 废弃时间   | 状态          | 原因                                                                             |
+| ---------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------ | ---------- | ---------- | ------------- | -------------------------------------------------------------------------------- |
+| [RFC-2025-001](./rfc/completed/001-worker-architecture-vite.md)        | Worker Architecture for Electron-Vite                    | Albert Lee/AI            | 2025-01-14 | 2026-07-29 | ❌ Deprecated | 项目已迁移至 Wails 3，Electron-Vite Worker 架构不再适用                          |
+| [RFC-2025-010](./rfc/completed/010-electron-spacetime-architecture.md) | Electron Spacetime Architecture with Personified Engines | Linus Torvalds/albert.li | 2025-01-05 | 2026-07-29 | ❌ Deprecated | Electron-era architecture; Go backend replaces personified engine concepts       |
+| [RFC-2025-008](./rfc/completed/008-window-service-api.md)              | Window Service API 设计                                  | AI Assistant             | 2025-01-27 | 2026-07-29 | ❌ Deprecated | Electron IPC window service; Wails 3 handles windows natively                    |
+| [RFC-2025-009](./rfc/completed/009-shell-service-api.md)               | Shell Service API 设计                                   | AI Assistant             | 2025-01-27 | 2026-07-29 | ❌ Deprecated | Electron-era shell/LubanEngine service; Go backend replaces with direct packages |
+| [RFC-2025-007](./rfc/completed/007-constant-management-system.md)      | Constant Management System                               | Albert Lee/AI            | 2025-01-14 | 2026-07-29 | ❌ Deprecated | Electron-era TS constants; Go backend uses Go constants/iota                     |
 
 ## RFC 统计
 
@@ -159,21 +174,18 @@ _暂无_
 | 年份 | 总数 | 已完成 | 已批准 | 进行中 | 提案中 | 已废弃 |
 | ---- | ---- | ------ | ------ | ------ | ------ | ------ |
 | 2024 | 4    | 4      | 0      | 0      | 0      | 0      |
-| 2025 | 6    | 3      | 2      | 1      | 0      | 0      |
-| 2026 | 4    | 2      | 0      | 0      | 2      | 0      |
+| 2025 | 6    | 1      | 0      | 0      | 0      | 5      |
+| 2026 | 20   | 2      | 8      | 0      | 10     | 0      |
 
 ### 按作者统计
 
-| 作者          | 总数 | 已完成 | 已批准 | 进行中 | 提案中 | 已废弃 |
-| ------------- | ---- | ------ | ------ | ------ | ------ | ------ |
-| albert.li/AI  | 4    | 4      | 0      | 0      | 0      | 0      |
-| Albert Lee/AI | 3    | 1      | 2      | 0      | 0      | 0      |
-| AI Assistant  | 2    | 2      | 0      | 0      | 0      | 0      |
+作者统计不再手工维护；RFC 可能有多名共同作者，机械统计应从 RFC metadata 生成。
 
 ## 最近更新
 
 | 时间       | RFC          | 更新内容                                                               | 作者            |
 | ---------- | ------------ | ---------------------------------------------------------------------- | --------------- |
+| 2026-07-29 | RFC-2026-012 | 173 项能力全部绑定现存 Owner RFC；新增 RFC-029/030                     | Codex/albert.li |
 | 2026-07-27 | RFC-2026-013 | Dev/Prod 身份、图标、打包入口与运行时验证完成                          | Codex/albert.li |
 | 2026-07-27 | RFC-2026-013 | 用户批准 Wails Dev/Prod 身份分离方案                                   | Codex/albert.li |
 | 2026-07-27 | RFC-2026-011 | C1 应用于正式应用与平台资产，验证完成                                  | Codex/albert.li |
@@ -205,7 +217,7 @@ _暂无_
 3. **国际化扩展 RFC** - 多语言支持扩展
 4. **测试策略 RFC** - 测试覆盖率和质量保证
 
-> **治理规则（2026-07-28）：** Sync 域以 [RFC-2026-012](./rfc/012-sync-module-compare-report.md) 为唯一规格。**状态必须为 `Approved` 后**方可实施 M0；`Proposed` 阶段仅允许改 RFC、录 FFS golden，禁止扩写 sync 实现。
+> **治理规则（2026-07-29）：** [RFC-2026-012](./rfc/012-sync-module-compare-report.md) 只管理 FFS 能力库存、Commando 决策和 Owner。具体架构与验收由领域 RFC-014…028 管理；领域 RFC 获批前不得扩写其范围。
 
 ### 需要评审的 RFC
 
@@ -438,3 +450,4 @@ _暂无_
 **最后更新**: 2024-12-19
 **维护者**: albert.li
 **联系方式**: albert_lee@hotmail.com
+| 2026-07-29 | RFC-2026-012 | v4：改为 FFS 14.10 能力目录；设计所有权移交领域 RFC | Codex/albert.li |

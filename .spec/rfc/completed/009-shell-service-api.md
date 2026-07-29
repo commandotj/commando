@@ -1,9 +1,11 @@
 # RFC 009: Shell Service API 设计文档
 
+> **❌ Deprecated** — Electron-era shell/process/LubanEngine service. Go backend replaces with direct internal packages. Deprecated 2026-07-29.
+
 **作者**: AI Assistant
 **创建时间**: 2025-01-27
 **版本**: 1.0.0
-**状态**: 已实现
+**状态**: ❌ Deprecated
 
 ## 概述
 

@@ -1,5 +1,7 @@
 # RFC-2025-001: Worker Architecture for Electron-Vite
 
+> **❌ Deprecated** — 项目已迁移至 Wails 3，Electron-Vite Worker 架构不再适用。见 legacy/electron/。Deprecated 2026-07-29.
+
 ---
 
 作者: Albert Lee/AI
@@ -506,5 +508,5 @@ export default defineConfig({
 
 ---
 
-**状态**: 🟢 Approved
-**最后更新**: 2025-01-14
+**状态**: ❌ Deprecated
+**最后更新**: 2026-07-29

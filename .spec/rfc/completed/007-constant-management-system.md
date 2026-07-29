@@ -1,4 +1,6 @@
-# RFC-2025-002: Constant Management System
+# RFC-2025-007: Constant Management System
+
+> **❌ Deprecated** — Electron-era TypeScript constant management. Go backend uses Go constants/iota. Deprecated 2026-07-29.
 
 ---
 
@@ -488,6 +490,6 @@ module.exports = {
 
 ---
 
-**状态**: 🟢 Approved
+**状态**: ❌ Deprecated
 **最后更新**: 2025-01-14
 **下次评审**: 2025-02-14

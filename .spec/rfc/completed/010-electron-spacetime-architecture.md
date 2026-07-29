@@ -1,5 +1,7 @@
 # RFC-2025-010: Electron Spacetime Architecture with Personified Engines
 
+> **❌ Deprecated** — Electron-era architecture design. Project migrated to Wails 3; Go backend replaces the personified engine concepts. RFC-2025-006 (its companion) completed via Go module. Deprecated 2026-07-29.
+
 ---
 
 作者: Linus Torvalds/albert.li
@@ -1076,8 +1078,8 @@ interface CopyStatus {
 - 提供处理建议
 - 支持用户确认（重试、跳过、取消、覆盖、重命名）
 
-**状态**: In Progress (Phase 4 - 复制状态报告机制完成)
-**最后更新**: 2025-01-05
+**状态**: ❌ Deprecated
+**最后更新**: 2026-07-29
 **下次评审**: 2025-01-12
 **实施阶段**: Phase 4 完成，准备测试
 **注意**: 此RFC为架构设计文档，具体功能实现请参考RFC-2025-006

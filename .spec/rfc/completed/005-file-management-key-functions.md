@@ -581,6 +581,6 @@ class CopyService implements BaseService {
 
 ---
 
-**状态**: 🟠 Under Review
-**最后更新**: 2025-01-14
+**状态**: ✅ Completed (covered by Go module backend/)
+**最后更新**: 2026-07-29
 **下次评审**: 2025-01-21
