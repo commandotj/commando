@@ -1,5 +1,5 @@
 import React from "react";
-import type { SyncPlan } from "@commando/shared/types/SyncTypes";
+import type { SyncPlan } from "@commandojs/shared/types/SyncTypes";
 import { useI18n } from "../../hooks/useI18n";
 
 interface SyncPlanModalProps {

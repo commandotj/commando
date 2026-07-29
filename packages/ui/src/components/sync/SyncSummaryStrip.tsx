@@ -1,6 +1,6 @@
 import React from "react";
 import { useI18n } from "../../hooks/useI18n";
-import type { SyncPlan } from "@commando/shared/types/SyncTypes";
+import type { SyncPlan } from "@commandojs/shared/types/SyncTypes";
 import type { SyncRootsState } from "../../common/syncRoots";
 import { getSyncRootsOnboardingKey } from "../../common/syncRoots";
 

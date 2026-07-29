@@ -8,7 +8,7 @@ import {
     getMessages,
     type Locale,
     type LocaleMessages,
-} from "@commando/shared/constants/Locales";
+} from "@commandojs/shared/constants/Locales";
 
 interface LocaleState {
     locale: Locale;

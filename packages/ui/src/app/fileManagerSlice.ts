@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import type { DirectoryEntry } from "@commando/shared/types/DirectoryTypes";
+import type { DirectoryEntry } from "@commandojs/shared/types/DirectoryTypes";
 
 // 使用与DirectoryService一致的接口
 type FileEntry = DirectoryEntry;

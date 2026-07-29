@@ -5,7 +5,7 @@ import type {
     SyncPlan,
     SyncProgressPayload,
     SyncStrategyId,
-} from "@commando/shared/types/SyncTypes";
+} from "@commandojs/shared/types/SyncTypes";
 
 export interface SyncRequestPayload {
     leftRoot: string;

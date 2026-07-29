@@ -15,7 +15,7 @@ import { formatFileTime } from "../../common/time";
 import PathBreadcrumb from "../PathBreadcrumb";
 import { DeviceInfo } from "../DeviceBar";
 import { SYNC_ACTION_COLORS } from "../../constants/sync";
-import type { SyncAction } from "@commando/shared/types/SyncTypes";
+import type { SyncAction } from "@commandojs/shared/types/SyncTypes";
 import SyncRootBar from "./SyncRootBar";
 
 interface FileEntry {

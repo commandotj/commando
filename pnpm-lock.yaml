@@ -84,7 +84,7 @@ importers:
 
     apps/desktop/frontend:
         dependencies:
-            "@commando/ui":
+            "@commandojs/ui":
                 specifier: workspace:*
                 version: link:../../../packages/ui
             "@wailsio/runtime":
@@ -126,7 +126,7 @@ importers:
             "@chakra-ui/react":
                 specifier: ^2.5.0
                 version: 2.10.10(@emotion/react@11.14.0(@types/react@18.3.31)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.31)(react@18.3.1))(@types/react@18.3.31)(react@18.3.1))(@types/react@18.3.31)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-            "@commando/shared":
+            "@commandojs/shared":
                 specifier: workspace:*
                 version: link:../shared
             "@dnd-kit/core":

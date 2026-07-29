@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import type { CopyWorkerMessage } from "@commando/shared/types/CopyTypes";
+import type { CopyWorkerMessage } from "@commandojs/shared/types/CopyTypes";
 
 export type FileOperationType = "copy" | "move";
 export type OperationStatus =

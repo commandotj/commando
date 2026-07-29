@@ -5,7 +5,7 @@ import type {
     SyncJobStatus,
     SyncOptions,
     SyncPlan,
-} from "@commando/shared/types/SyncTypes";
+} from "@commandojs/shared/types/SyncTypes";
 import {
     DEFAULT_SYNC_OPTIONS,
     DEFAULT_SYNC_STRATEGY_ID,

@@ -23,7 +23,7 @@ import {
 
 /**
  * Wails v3 bootstrap: wire generated bindings before mounting React.
- * @commando/ui stays platform-agnostic via window.fsApi / window.syncApi.
+ * @commandojs/ui stays platform-agnostic via window.fsApi / window.syncApi.
  */
 export async function bootstrapDesktop(): Promise<void> {
     installLogApi();

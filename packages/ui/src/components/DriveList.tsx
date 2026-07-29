@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "../app/hooks";
 import { fetchDrives, refreshDrives } from "../app/driveSlice";
 import { useDriveEvents } from "../hooks/useDriveEvents";
-import type { DriveInfo } from "@commando/shared/types/DriveTypes";
+import type { DriveInfo } from "@commandojs/shared/types/DriveTypes";
 import {
     Box,
     VStack,

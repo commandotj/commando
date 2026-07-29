@@ -1,15 +1,15 @@
-import type { CopyWorkerMessage } from "@commando/shared/types/CopyTypes";
+import type { CopyWorkerMessage } from "@commandojs/shared/types/CopyTypes";
 import type {
     CompareReport,
     SyncExportFormat,
     SyncStrategyId,
-} from "@commando/shared/types/SyncTypes";
+} from "@commandojs/shared/types/SyncTypes";
 import type {
     DirectoryEntry,
     NavigationResult,
     ListDirectoryOptions,
-} from "@commando/shared/types/DirectoryTypes";
-import type { DriveInfo } from "@commando/shared/types/DriveTypes";
+} from "@commandojs/shared/types/DirectoryTypes";
+import type { DriveInfo } from "@commandojs/shared/types/DriveTypes";
 
 export {};
 

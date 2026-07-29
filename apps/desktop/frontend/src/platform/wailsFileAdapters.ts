@@ -2,8 +2,8 @@ import type {
     DirectoryEntry,
     ListDirectoryOptions,
     NavigationResult,
-} from "@commando/shared/types/DirectoryTypes";
-import type { DriveInfo } from "@commando/shared/types/DriveTypes";
+} from "@commandojs/shared/types/DirectoryTypes";
+import type { DriveInfo } from "@commandojs/shared/types/DriveTypes";
 import type { Info } from "../../bindings/github.com/systembugtj/commando/internal/drive/models.js";
 import type {
     Entry,

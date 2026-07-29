@@ -10,7 +10,7 @@
         "cli": "make cli",
         "cli:install": "make cli-install",
         "setup:desktop": "bash scripts/ensure-desktop-tools.sh",
-        "dev": "turbo dev --filter=@commando/desktop",
+        "dev": "turbo dev --filter=@commandojs/desktop",
         "build": "turbo build",
         "test": "turbo test",
         "test:go": "make test-go",
@@ -20,7 +20,7 @@
         "typecheck": "turbo typecheck",
         "lint": "turbo lint",
         "format": "prettier --write .",
-        "generate": "pnpm --filter @commando/desktop generate",
+        "generate": "pnpm --filter @commandojs/desktop generate",
         "prepare": "husky"
     },
     "devDependencies": {

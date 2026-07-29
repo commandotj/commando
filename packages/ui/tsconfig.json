@@ -15,8 +15,8 @@
         "allowSyntheticDefaultImports": true,
         "baseUrl": ".",
         "paths": {
-            "@commando/ui/*": ["src/*"],
-            "@commando/shared/*": ["../shared/*"]
+            "@commandojs/ui/*": ["src/*"],
+            "@commandojs/shared/*": ["../shared/*"]
         }
     },
     "include": ["src", "../shared", "src/types"]

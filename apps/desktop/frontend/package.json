@@ -1,27 +1,27 @@
 {
-  "name": "@commando/desktop-shell",
-  "private": true,
-  "version": "1.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build --mode production",
-    "build:dev": "vite build --mode development",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
-  },
-  "dependencies": {
-    "@commando/ui": "workspace:*",
-    "@wailsio/runtime": "3.0.0-alpha2.117",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  },
-  "devDependencies": {
-    "@types/react": "^18.3.23",
-    "@types/react-dom": "^18.3.7",
-    "@vitejs/plugin-react": "^4.3.4",
-    "autoprefixer": "^10.4.16",
-    "postcss": "^8.5.3",
-    "typescript": "^5.8.3",
-    "vite": "^6.2.6"
-  }
+    "name": "@commandojs/desktop-shell",
+    "private": true,
+    "version": "1.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build --mode production",
+        "build:dev": "vite build --mode development",
+        "typecheck": "tsc -p tsconfig.json --noEmit"
+    },
+    "dependencies": {
+        "@commandojs/ui": "workspace:*",
+        "@wailsio/runtime": "3.0.0-alpha2.117",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1"
+    },
+    "devDependencies": {
+        "@types/react": "^18.3.23",
+        "@types/react-dom": "^18.3.7",
+        "@vitejs/plugin-react": "^4.3.4",
+        "autoprefixer": "^10.4.16",
+        "postcss": "^8.5.3",
+        "typescript": "^5.8.3",
+        "vite": "^6.2.6"
+    }
 }

@@ -1,7 +1,7 @@
 import type {
     SyncStrategyId,
     SyncOptions,
-} from "@commando/shared/types/SyncTypes";
+} from "@commandojs/shared/types/SyncTypes";
 
 /** Strategy ids — must match backend internal/sync.StrategyID */
 export const SYNC_STRATEGY_IDS = {
