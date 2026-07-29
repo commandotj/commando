@@ -11,7 +11,7 @@
 - 2026-07-29: albert.li — Backend 6 items Adopt (100%覆盖), FFSFLT-01~~06 Reject (doublestar取代), FLT-09~~11 Defer, UI items移交UI RFC
   修改历史:
 
-- 2026-07-29: 依据 Feature Map，承接 UI-05、FLT 与 FFSFLT 能力
+- 2026-07-29: 依据 Feature ID 追踪，承接 UI-05、FLT 与 FFSFLT 能力
 - 2026-07-29: 核对代码现状 — FLT-01/02/03/04/05/08 已在 `internal/sync/filter` 完成（100% 覆盖率），本 RFC 收窄为 FLT-06/07（UI 层，未做）。修正设计段以匹配真实类型签名。想法来自 FFS（克隆功能意图），实现和 UI 不抄 FFS，走 Commando 自己的 React/Wails3/Go 风格。
 
 ---
@@ -83,8 +83,8 @@ FFS 是右键上下文菜单加一条"Exclude via filter"。Commando 用什么�
 **状态**: Approved
 **最后更新**: 2026-07-29
 
-## Feature Map 追踪
+## Task Tracking 追踪
 
 本 RFC 明确拥有：`UI-05`, `FLT-01`, `FLT-02`, `FLT-03`, `FLT-04`, `FLT-05`, `FLT-06`, `FLT-07`, `FLT-08`, `FLT-09`, `FLT-10`, `FLT-11`, `FFSFLT-01`, `FFSFLT-02`, `FFSFLT-03`, `FFSFLT-04`, `FFSFLT-05`, `FFSFLT-06`。
 
-Decision、Status 与 Evidence 以 [FFS Feature Map](../FFS-FEATURE-MAP.md) 为唯一事实源；本 RFC 负责 Commando 设计与验收。
+Feature ID 与实施状态以 [TASK TRACKING](../TASK_TRACKING.md) 为准，优先级与 RFC 状态以 [ROADMAP](../ROADMAP.md) 为准；本 RFC 负责产品决策、Commando 设计与验收。

@@ -11,7 +11,7 @@
 - 2026-07-29: albert.li — CLI-01~~03 Adopt(命令已实现), CLI-04~~12/CFG-01~~05 Adapt, MAC-01~~03 Defer
   修改历史:
 
-- 2026-07-29: 依据 Feature Map，承接 UI-12/13、CLI、CFG 与 MAC 能力
+- 2026-07-29: 依据 Feature ID 追踪，承接 UI-12/13、CLI、CFG 与 MAC 能力
 
 ---
 
@@ -91,8 +91,8 @@ commando sync run --profile path/.commando/profile.json \
 **状态**: Approved
 **最后更新**: 2026-07-29
 
-## Feature Map 追踪
+## Task Tracking 追踪
 
 本 RFC 明确拥有：`UI-12`, `UI-13`, `UI-30`, `CLI-01`, `CLI-02`, `CLI-03`, `CLI-04`, `CLI-05`, `CLI-06`, `CLI-07`, `CLI-08`, `CLI-09`, `CLI-10`, `CLI-11`, `CLI-12`, `CFG-01`, `CFG-02`, `CFG-03`, `CFG-04`, `CFG-05`, `MAC-01`, `MAC-02`, `MAC-03`。
 
-Decision、Status 与 Evidence 以 [FFS Feature Map](../FFS-FEATURE-MAP.md) 为唯一事实源；本 RFC 负责 Commando 设计与验收。
+Feature ID 与实施状态以 [TASK TRACKING](../TASK_TRACKING.md) 为准，优先级与 RFC 状态以 [ROADMAP](../ROADMAP.md) 为准；本 RFC 负责产品决策、Commando 设计与验收。

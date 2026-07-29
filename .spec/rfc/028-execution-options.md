@@ -8,10 +8,11 @@
 
 批准记录:
 
-- 2026-07-29: albert.li — SYN-13/14 Adopt(已部分实现), SYN-09~~12/15~~19/META-01~05/EXEC-01 Adapt(待实现)
+- 2026-07-29: albert.li — SYN-13/14 Adopt，SYN-09…12/15…19、META-01…05、EXEC-01/02 Adapt
   修改历史:
 
-- 2026-07-29: 依据 Feature Map，承接 SYN-09…19、META 与 EXEC 能力
+- 2026-07-29: 依据 Feature ID 追踪，承接 SYN-09…19、META 与 EXEC 能力
+- 2026-07-29: 核对代码现状 — `sync/executor.go` 与 `copy/copy.go` 直接以 `O_TRUNC` 打开目标；核心执行入口不接收 context
 
 ---
 
@@ -32,8 +33,28 @@
 - [ ] SYN-17: 磁盘空间峰值优化 — 执行顺序
 - [ ] SYN-18: Lock directories (`*.lock`) — 多实例互斥
 - [ ] SYN-19: Background priority — 降低 IO 优先级
+- [ ] EXEC-02: Context cancellation — 从 CLI/Runner 传播到 walk、compare、copy、delete
 
 ## 提案
+
+### Context cancellation (EXEC-02)
+
+所有 P1 heavy operation 必须接受调用者 context：
+
+```go
+func BuildPlan(ctx context.Context, leftRoot, rightRoot string, direction Direction, opts Options) (*Plan, error)
+func Execute(ctx context.Context, plan *Plan, opts Options) Outcome
+func CopyFile(ctx context.Context, source, destination string, opts CopyOptions) error
+func Delete(ctx context.Context, target string, mode DeleteMode) error
+```
+
+约束：
+
+- Wails/CLI 只能把 `worker.Runner` 提供的 context 向下传递；core 内禁止换成 `context.Background()`。
+- walk、content compare 和 copy 循环必须定期检查 `ctx.Err()`；取消不能只在任务开始前检查。
+- delete 在产生副作用前立即检查取消。
+- fail-safe copy 写 temp 阶段可取消并清理；进入 atomic replace 临界区后必须完成 replace/父目录 flush，再返回 `canceled` outcome，禁止留下半替换目标。
+- 每个 job 只产生一个 terminal outcome；`context.Canceled` 映射 `StatusCanceled`，不得混入普通 item error。
 
 ### 错误处理 (SYN-09/10)
 
@@ -68,6 +89,8 @@ CLI exit code、Wails terminal event 与结果 UI 必须只映射该 Outcome。
 
 同目录创建唯一临时文件，完整写入并 flush，原子替换目标，必要时 flush 父目录。失败后保留可识别恢复状态或显式清理；不得假设临时文件会自动回收。
 
+现有 `sync/executor.go:copyFile` 与 `copy/copy.go` 的目标 `O_TRUNC` 路径必须删除。覆盖已有目标时，任何错误、取消或进程崩溃都不得留下已截断目标。
+
 ### 并行控制 (SYN-16)
 
 共享 Go core `ResourceBudget` 管理 per-device/per-host token。`worker.Runner` 管 job 并发；executor 和 remote provider 只借 token，不各建 goroutine pool。
@@ -89,11 +112,12 @@ func PreserveMeta(src, dst string) error {
 
 ## 文件变更
 
-| 文件                                | 变更                                       |
-| ----------------------------------- | ------------------------------------------ |
-| `backend/internal/sync/executor.go` | 现有执行入口；先评审保留或拆分             |
-| `backend/internal/copy/`            | 复用复制、进度与验证原语                   |
-| `backend/internal/worker/runner.go` | 统一并发与取消；禁止新增第二套 job manager |
+| 文件                                | 变更                                            |
+| ----------------------------------- | ----------------------------------------------- |
+| `backend/internal/sync/executor.go` | 接受 context；统一 Outcome 与取消检查点         |
+| `backend/internal/sync/planner.go`  | 接受 context 并传给 walk/compare                |
+| `backend/internal/copy/`            | context-aware copy、进度、验证与 atomic replace |
+| `backend/internal/worker/runner.go` | 统一并发与取消；禁止新增第二套 job manager      |
 
 ## 风险
 
@@ -101,14 +125,25 @@ func PreserveMeta(src, dst string) error {
 | ------------------------------------ | -------------------------------------------- |
 | VSS 仅 Windows                       | 编译标记 + 运行时友好错误                    |
 | Fail-safe copy 增加写入与 flush 成本 | 允许显式关闭；开启时所有文件遵守同一安全承诺 |
+| replace 临界区收到取消               | 完成原子提交与目录 flush 后返回 canceled     |
+
+## 测试策略
+
+- 排队时取消：heavy operation 不启动，terminal outcome 仅一次。
+- walk/compare 中取消：快速返回 `context.Canceled`，不进入 execute。
+- copy 中取消：原目标保持完整；temp 被清理或留下可识别恢复记录。
+- 写入、flush、verify 任一步失败：原目标 byte-for-byte 不变；不得观察到零长度或部分目标。
+- replace 临界区取消：目标只能是完整旧版本或完整新版本。
+- delete 前取消：目标存在；delete 完成后取消：Outcome 与真实文件状态一致。
+- SYN-11：完整源/目标 byte compare 或 cryptographic hash；禁止采样冒充完成。
 
 ---
 
 **状态**: Approved
 **最后更新**: 2026-07-29
 
-## Feature Map 追踪
+## Task Tracking 追踪
 
-本 RFC 明确拥有：`SYN-09`, `SYN-10`, `SYN-11`, `SYN-12`, `SYN-13`, `SYN-14`, `SYN-15`, `SYN-16`, `SYN-17`, `SYN-18`, `SYN-19`, `META-01`, `META-02`, `META-03`, `META-04`, `META-05`, `EXEC-01`。
+本 RFC 明确拥有：`SYN-09`, `SYN-10`, `SYN-11`, `SYN-12`, `SYN-13`, `SYN-14`, `SYN-15`, `SYN-16`, `SYN-17`, `SYN-18`, `SYN-19`, `META-01`, `META-02`, `META-03`, `META-04`, `META-05`, `EXEC-01`, `EXEC-02`。
 
-Decision、Status 与 Evidence 以 [FFS Feature Map](../FFS-FEATURE-MAP.md) 为唯一事实源；本 RFC 负责 Commando 设计与验收。
+Feature ID 与实施状态以 [TASK TRACKING](../TASK_TRACKING.md) 为准，优先级与 RFC 状态以 [ROADMAP](../ROADMAP.md) 为准；本 RFC 负责产品决策、Commando 设计与验收。

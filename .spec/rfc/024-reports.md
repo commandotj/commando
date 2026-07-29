@@ -11,7 +11,7 @@
 - 2026-07-29: albert.li — RPT-01/02/03 Adopt(已实现), RPT-04 Adapt(计划中)
   修改历史:
 
-- 2026-07-29: 依据 Feature Map，承接 UI-24、RPT 与 SYN-20
+- 2026-07-29: 依据 Feature ID 追踪，承接 UI-24、RPT 与 SYN-20
 
 ---
 
@@ -107,8 +107,8 @@ UI：`SyncStatusBar` 底部显示上次同步时间，点击展开历史。
 **状态**: Approved
 **最后更新**: 2026-07-29
 
-## Feature Map 追踪
+## Task Tracking 追踪
 
 本 RFC 明确拥有：`UI-24`, `SYN-20`, `RPT-01`, `RPT-02`, `RPT-03`, `RPT-04`。
 
-Decision、Status 与 Evidence 以 [FFS Feature Map](../FFS-FEATURE-MAP.md) 为唯一事实源；本 RFC 负责 Commando 设计与验收。
+Feature ID 与实施状态以 [TASK TRACKING](../TASK_TRACKING.md) 为准，优先级与 RFC 状态以 [ROADMAP](../ROADMAP.md) 为准；本 RFC 负责产品决策、Commando 设计与验收。

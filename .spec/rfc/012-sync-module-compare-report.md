@@ -12,6 +12,8 @@
 - 2026-07-28: v3–v3.13，形成 FFS 14.x 对标规格与实现草案
 - 2026-07-29: v4，按评审重构为能力目录与决策追踪章程；删除“行为 1:1”权威定义；设计所有权移交领域 RFC
 - 2026-07-29: v4.1，173 项能力全部绑定现存 Owner RFC；新增 RFC-029/030；子 RFC 增加精确 Feature ID 所有权索引
+- 2026-07-29: v4.2，明确 CLI sync engine first；ROADMAP P1 固定为本地路径 compare/plan/execute/CLI 闭环
+- 2026-07-29: v4.3，删除 FFS-FEATURE-MAP；ROADMAP 管优先级/RFC 状态，TASK_TRACKING 管原子实施任务
 
 ---
 
@@ -23,7 +25,7 @@ RFC-012 只回答三个问题：
 2. Commando 对每项能力选择 `Adopt`、`Adapt`、`Reject` 还是 `Defer`？
 3. 哪个领域 RFC 负责按 Commando 现有架构完成设计与验收？
 
-权威能力库存是 [FFS-FEATURE-MAP.md](../FFS-FEATURE-MAP.md)。RFC-012 不再定义 Go API、包目录、数据库格式、任务框架、CLI 协议或 UI 布局。
+权威追踪由 [ROADMAP.md](../ROADMAP.md) 与 [TASK_TRACKING.md](../TASK_TRACKING.md) 共同组成：ROADMAP 管优先级、RFC 状态和跨 RFC gate；TASK_TRACKING 管稳定 Feature ID 与原子实施任务。RFC-012 不定义 Go API、包目录、数据库格式、任务框架、CLI 协议或 UI 布局。
 
 **核心原则：克隆能力意图，不复制 FFS 设计。**
 
@@ -37,7 +39,7 @@ FFS 是发现成熟功能需求的参考产品，不是 Commando 的架构、行
 - 覆盖官方 Manual、FAQ、版本/edition 功能表公开能力。
 - 每项能力都有稳定 ID、官方来源、平台/edition 限制、Commando 决策、Owner RFC、实现状态和验收证据。
 - 先完成库存，再在领域 RFC 中评审产品价值和 Commando 原生设计。
-- 保持 RFC、Feature Map、ROADMAP 三者状态一致。
+- 保持领域 RFC、ROADMAP、TASK_TRACKING 三者状态一致。
 
 ### 2.2 非目标
 
@@ -47,20 +49,43 @@ FFS 是发现成熟功能需求的参考产品，不是 Commando 的架构、行
 - 不因 FFS 存在某功能而自动决定 Commando 必须实现。
 - 不以“现代皮肤”包装 FFS 原交互。
 
-## 3. 能力库存模型
+### 2.3 交付顺序：CLI sync engine first
 
-Feature Map 每行必须包含：
+RFC-012 第一交付目标不是 Desktop UI，也不是 remote/RealtimeSync，而是可独立验证的本地路径 CLI sync engine：
 
-| 字段                 | 含义                                                   |
-| -------------------- | ------------------------------------------------------ |
-| `ID`                 | 稳定能力编号；删除能力时保留 tombstone                 |
-| `Capability`         | 用户可观察能力，描述意图，不描述 FFS 控件位置          |
-| `Source`             | 官方 URL 或固定来源键                                  |
-| `Platform / Edition` | Windows/macOS/Linux、Standard/Donation/Business 等约束 |
-| `Decision`           | `Unreviewed` / `Adopt` / `Adapt` / `Reject` / `Defer`  |
-| `Owner RFC`          | Commando 设计与验收所有者                              |
-| `Status`             | `Missing` / `Partial` / `Implemented` / `Unsupported`  |
-| `Evidence`           | 测试、代码、运行记录或明确拒绝理由                     |
+```text
+commando CLI
+  → compare
+  → deterministic plan
+  → safe execute
+  → progress / terminal outcome
+```
+
+P1 必须满足：
+
+1. CLI 与 Desktop 共用同一 Go core；P1 验收不依赖 Wails 或 React。
+2. Compare、filter、variant、sync database、delete 与 execution safety 形成单一数据流。
+3. Content/checksum 必须从 CLI `BuildPlan` 接入统一 compare engine；局部 `IsEqual` 原语不能标记端到端完成。
+4. `context.Context` 取消传播到遍历、比较、复制与删除；不得只在任务开始前检查一次。
+5. stdout 输出稳定机器协议，stderr 输出诊断；成功、警告、错误、取消使用稳定退出码。
+6. Mirror、Update、Two-way 的 destructive 行为有 golden/integration tests；Two-way 不得用纯 mtime 冒充 changes/database 语义。
+7. 复制采用完整 fail-safe/verify 语义；锁、部分失败与恢复结果可观察。
+
+P1 Owner RFC：RFC-016、RFC-017、RFC-018、RFC-019、RFC-021、RFC-027、RFC-028、RFC-030。RFC-012 负责跨 RFC gate 与追踪。
+
+UI workspace、progress dialog、file tools、HTML/email report、RealtimeSync、remote provider、distribution/localization 不阻塞 P1；按 ROADMAP P2/P3 推进。
+
+## 3. 能力追踪模型
+
+追踪责任分开，禁止复制同一状态：
+
+| 文档               | 唯一责任                                                     |
+| ------------------ | ------------------------------------------------------------ |
+| `ROADMAP.md`       | P1/P2/P3、RFC lifecycle、跨 RFC gate、交付顺序               |
+| `TASK_TRACKING.md` | 稳定 Feature ID、原子任务、To do/In Progress/Done、验收证据  |
+| Owner RFC          | 官方来源、Adopt/Adapt/Reject/Defer 决策、Commando 设计与风险 |
+
+删除能力时保留 Feature ID tombstone。不得在 ROADMAP、TASK_TRACKING 和 Owner RFC 同时维护相同状态字段。
 
 ### 3.1 决策定义
 
@@ -72,7 +97,7 @@ Feature Map 每行必须包含：
 | `Reject`     | 不符合产品方向；必须记录理由               |
 | `Defer`      | 有价值但非当前阶段；必须记录重审条件       |
 
-`Status` 与 `Decision` 独立。已有代码不代表产品决策正确；决定 `Reject` 也不等于从库存删除。
+任务状态与产品决策独立。已有代码不代表产品决策正确；决定 `Reject` 也不等于删除 Feature ID。
 
 ### 3.2 来源规则
 
@@ -80,7 +105,7 @@ Feature Map 每行必须包含：
 - 精确行为只有领域 RFC 明确需要兼容时才录 golden。
 - `14.x` 不是可验收版本；新增上游版本先建立差异清单，再决定是否更新快照。
 - 论坛只能解释歧义，不能单独证明能力完整性。
-- 每个合并请求只能通过测试或人工验收证据改变 `Status`，不能只改图标。
+- 每个合并请求只能通过测试或人工验收证据把 TASK_TRACKING 任务改为 `Done`，不能只改图标。
 
 ## 4. Commando 设计基线
 
@@ -128,13 +153,13 @@ Feature Map 每行必须包含：
 | Platform / distribution / localization | RFC-029   | 平台支持、安装、edition、语言与非功能指标  |
 | Local / mounted SMB compatibility      | RFC-030   | 本地路径、已挂载网络路径与平台文件系统差异 |
 
-Owner RFC 只拥有 Commando 设计。FFS 能力事实仍由 Feature Map 维护。
+Owner RFC 拥有来源事实、Commando 决策、设计和验收；实施状态只在 TASK_TRACKING 维护。
 
 ## 6. 子 RFC 必备结构
 
 每个领域 RFC 在进入 `Under Review` 前必须包含：
 
-1. 对应 Feature Map ID。
+1. 对应 TASK_TRACKING Feature ID。
 2. 用户问题与生产场景。
 3. 当前 Commando 代码、数据流和缺口。
 4. 至少两个正交方案。
@@ -151,30 +176,29 @@ Owner RFC 只拥有 Commando 设计。FFS 能力事实仍由 Feature Map 维护�
 
 ```text
 官方来源采集
-  → Feature Map 建立稳定 ID
-  → Decision = Unreviewed
-  → 领域 RFC 审查现有 Commando
+  → TASK_TRACKING 建立稳定 Feature ID
+  → Owner RFC 审查现有 Commando
   → Adopt / Adapt / Reject / Defer
-  → RFC Approved
+  → ROADMAP 更新 RFC 状态与优先级
   → 实现与测试
-  → Status + Evidence 更新
+  → TASK_TRACKING 更新任务状态与证据
 ```
 
 ### 7.1 RFC-012 完成定义
 
 RFC-012 达到 `Completed` 只表示：
 
-- FreeFileSync 14.10 官方公开能力全部进入库存；
-- 每行都有来源、平台/edition、Decision 和 Owner；
-- 所有 `Unreviewed` 已清零；
-- ROADMAP 与 Feature Map 统计一致；
+- FreeFileSync 14.10 官方公开能力全部进入 TASK_TRACKING 或保留明确 tombstone；
+- 每个 Feature ID 都有 Owner RFC、产品决策和任务状态；
+- 所有未决策项已清零；
+- ROADMAP、TASK_TRACKING 与 Owner RFC 状态一致；
 - 所有 Owner 均为已存在并登记 ROADMAP 的 `RFC-NNN`；禁止 `TBD`、`core` 等非 RFC Owner。
 
 领域功能是否实现，由对应 RFC 状态决定。RFC-012 不等待全部功能落地。
 
 ## 8. 验收清单
 
-- [ ] Feature Map 覆盖 Manual 导航全部主题。
+- [ ] TASK_TRACKING 覆盖已采用或适配的原子任务；Reject/Defer 在 Owner RFC 保留理由。
 - [ ] FAQ 功能表逐项映射，无合并后丢失的平台语义。
 - [ ] edition / distribution 能力单独追踪。
 - [ ] 每行有官方 Source。
@@ -190,5 +214,5 @@ RFC-012 达到 `Completed` 只表示：
 - [FreeFileSync 14.10](https://freefilesync.org/)
 - [FreeFileSync Manual](https://freefilesync.org/manual.php)
 - [FreeFileSync FAQ / Feature Comparison](https://freefilesync.org/faq.php)
-- [FFS Feature Map](../FFS-FEATURE-MAP.md)
 - [ROADMAP](../ROADMAP.md)
+- [TASK TRACKING](../TASK_TRACKING.md)

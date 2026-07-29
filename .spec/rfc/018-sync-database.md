@@ -11,7 +11,8 @@
 - 2026-07-29: albert.li — DB-01~03 Adapt(核心设计待定), 需Approved RFC-012后实现
   修改历史:
 
-- 2026-07-29: 依据 Feature Map，承接 SYN-01/02 与 DB 子能力
+- 2026-07-29: 依据 Feature ID 追踪，承接 SYN-01/02 与 DB 子能力
+- 2026-07-29: 核对代码现状 — `backend/internal/sync/` 无持久 snapshot/database，现有 Two-way 无法判断相对上次成功同步的 changes
 
 ---
 
@@ -91,13 +92,21 @@ Fallback：file_id 不可用时退化为 copy+delete。
 | 双侧副本部分提交     | 明确 prepare/commit/recovery；故障注入测试 |
 | 状态目录被同步       | core 强制排除 internal metadata path       |
 
+## 测试策略
+
+- 首次同步建立 baseline；只有 terminal success 对应的已提交文件推进 snapshot。
+- 部分失败、取消、进程中断后重启，snapshot 不得声称未完成操作已提交。
+- 双侧各持一份状态时注入单侧 commit 失败，恢复后得到同一逻辑 baseline。
+- 内部数据库、journal 与 lock 路径不进入 compare、plan 或 copy。
+- file ID 稳定时识别 move；不可用时明确降级 copy+delete。
+
 ---
 
 **状态**: Approved
 **最后更新**: 2026-07-29
 
-## Feature Map 追踪
+## Task Tracking 追踪
 
 本 RFC 明确拥有：`DB-01`, `DB-02`, `DB-03`, `SYN-01`, `SYN-02`。
 
-Decision、Status 与 Evidence 以 [FFS Feature Map](../FFS-FEATURE-MAP.md) 为唯一事实源；本 RFC 负责 Commando 设计与验收。
+Feature ID 与实施状态以 [TASK TRACKING](../TASK_TRACKING.md) 为准，优先级与 RFC 状态以 [ROADMAP](../ROADMAP.md) 为准；本 RFC 负责产品决策、Commando 设计与验收。

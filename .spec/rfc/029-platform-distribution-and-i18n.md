@@ -8,7 +8,7 @@
 修改历史:
 
 - 2026-07-29: 创建 Owner RFC，承接 RFC-012 平台、发行、本地化与非功能能力
-- 2026-07-29: 对齐 Feature Map 稳定 ID；删除未经评审的依赖、产品分层和实现预设
+- 2026-07-29: 对齐稳定 Feature ID；删除未经评审的依赖、产品分层和实现预设
 
 ---
 
@@ -24,15 +24,15 @@
 - 安装器、更新器、portable 发行、签名和权限服从 Wails 3 官方生命周期。
 - edition/entitlement 属于独立产品决策，不因 FFS 存在而自动采用。
 - FFS 规模数据只作来源事实，不直接成为 Commando 性能承诺。
-- 本 RFC 不引入 Feature Map 之外的平行 ID 命名空间。
+- 本 RFC 不引入 TASK_TRACKING 之外的平行 ID 命名空间。
 
-## Feature Map 追踪
+## Task Tracking 追踪
 
 本 RFC 明确拥有：
 
 `PLT-01`, `PLT-02`, `PLT-03`, `PLT-04`, `NFR-01`, `NFR-02`, `NFR-03`, `I18N-01`, `DIST-01`, `DIST-02`, `DIST-03`, `DIST-04`, `DIST-05`, `DIST-06`, `DIST-07`
 
-Decision、Status 与 Evidence 以 [FFS Feature Map](../FFS-FEATURE-MAP.md) 为唯一事实源。本 RFC 负责逐项形成 Commando 的 `Adopt / Adapt / Reject / Defer` 决策和验收证据。
+Feature ID 与实施状态以 [TASK TRACKING](../TASK_TRACKING.md) 为准，优先级与 RFC 状态以 [ROADMAP](../ROADMAP.md) 为准。本 RFC 负责逐项形成 Commando 的 `Adopt / Adapt / Reject / Defer` 决策和验收证据。
 
 ## 评审任务
 

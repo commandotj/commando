@@ -11,7 +11,8 @@
 - 2026-07-29: albert.li — VAR-01/02 Adopt(已实现), VAR-03~08 Adapt(需DB支持后实现)
   修改历史:
 
-- 2026-07-29: 依据 Feature Map，承接 VAR-03…08
+- 2026-07-29: 依据 Feature ID 追踪，承接 VAR-03…08
+- 2026-07-29: 核对代码现状 — `planBidirectional` 仅按 `ModTimeUnix` 选择较新侧，尚无上次成功同步快照；该行为不得作为 VAR-04 完成证据
 
 ---
 
@@ -30,6 +31,8 @@
 - **Custom** — 用户对每种类别指定动作
 - **变体切换** — 切换时不丢过滤器配置
 - **Mirror swap** — 一键交换左右方向
+
+`StrategyTwoWay` 名称虽已存在，`planner.go:planBidirectional` 仍只比较两侧 mtime。它无法区分删除、单侧修改、双侧修改与时钟偏差，因此只是无状态 differences heuristic，不是 VAR-04 changes/two-way 语义。
 
 ### 范围
 
@@ -91,6 +94,7 @@ const (
 
 双向传播 create/update/delete。双侧修改同一文件 → conflict。
 M2 实施前须补全 6 种变更组合的逐格动作表并经 golden 验证。
+动作必须由 RFC-018 的上次成功同步快照与当前双侧状态共同导出；禁止继续用“mtime 较新侧覆盖较旧侧”作为 Two-way 决策。
 
 #### VAR-05/06: Custom
 
@@ -142,6 +146,12 @@ VAR-03/04 依赖 RFC-018 数据库，在 DB 就绪前返回错误"changes mode r
 4. VAR-03/04: 依赖 DB 就绪后实现（RFC-018）
 5. VAR-06: Custom (changes) — 最后，依赖 DB
 
+## 测试策略
+
+- 同一基线后左改、右改、左删、右删、双侧同改、双侧冲突分别生成确定动作。
+- 双侧 mtime 被人工调换时，changes 结果仍由 snapshot 差异决定。
+- 无可用数据库时 VAR-04 返回 `changes mode requires database`，禁止静默回退到 mtime。
+
 ## 后续工作
 
 - RFC-018: Sync DB 提供 changes 模式所需数据库
@@ -152,8 +162,8 @@ VAR-03/04 依赖 RFC-018 数据库，在 DB 就绪前返回错误"changes mode r
 **状态**: Approved
 **最后更新**: 2026-07-29
 
-## Feature Map 追踪
+## Task Tracking 追踪
 
 本 RFC 明确拥有：`CMP-15`, `VAR-01`, `VAR-02`, `VAR-03`, `VAR-04`, `VAR-05`, `VAR-06`, `VAR-07`, `VAR-08`。
 
-Decision、Status 与 Evidence 以 [FFS Feature Map](../FFS-FEATURE-MAP.md) 为唯一事实源；本 RFC 负责 Commando 设计与验收。
+Feature ID 与实施状态以 [TASK TRACKING](../TASK_TRACKING.md) 为准，优先级与 RFC 状态以 [ROADMAP](../ROADMAP.md) 为准；本 RFC 负责产品决策、Commando 设计与验收。

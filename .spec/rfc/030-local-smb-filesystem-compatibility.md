@@ -23,11 +23,11 @@
 - CLI 与 Desktop 消费同一 Go core outcome、取消和错误模型。
 - 网络中断、权限变化、case sensitivity、mtime 精度和原子 rename 能力必须按目标文件系统探测或明确降级。
 
-## Feature Map 追踪
+## Task Tracking 追踪
 
 本 RFC 明确拥有 Feature ID：`REM-01`。
 
-Decision 与实现状态仍以 [FFS Feature Map](../FFS-FEATURE-MAP.md) 为唯一事实源。本 RFC 负责形成 Commando 决策和验收证据。
+Feature ID 与实施状态以 [TASK TRACKING](../TASK_TRACKING.md) 为准，优先级与 RFC 状态以 [ROADMAP](../ROADMAP.md) 为准。本 RFC 负责形成 Commando 决策和验收证据。
 
 ## 评审任务
 

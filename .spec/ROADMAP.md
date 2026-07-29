@@ -106,6 +106,26 @@ RFC (Request for Comments) 是 commando-react 项目中用于记录和跟踪重�
 | ❌ Deprecated       | 5      | 16.7%    |
 | **总计**            | **30** | **100%** |
 
+## 交付优先级
+
+### P1 — CLI sync engine first
+
+P1 只包含完成本地路径 CLI `compare → plan → safe execute → terminal outcome` 闭环所需 RFC。
+
+| 顺序 | RFC                                                             | P1 责任                   | Gate                                                           |
+| ---- | --------------------------------------------------------------- | ------------------------- | -------------------------------------------------------------- |
+| 1    | [RFC-2026-012](./rfc/012-sync-module-compare-report.md)         | 能力、Owner 与跨 RFC gate | P1 Feature ID、状态、证据一致                                  |
+| 2    | [RFC-2026-016](./rfc/016-compare-engine-extensions.md)          | Compare engine            | Content mode 接入 planner；无假 checksum 完成                  |
+| 3    | [RFC-2026-019](./rfc/019-filter-system.md)                      | Filter core               | include/exclude 进入 CLI compare                               |
+| 4    | [RFC-2026-030](./rfc/030-local-smb-filesystem-compatibility.md) | Local filesystem baseline | 本地路径错误与文件系统差异可观察                               |
+| 5    | [RFC-2026-017](./rfc/017-sync-variants-changes-custom.md)       | Plan semantics            | Mirror/Update/Two-way 不用名称掩盖错误语义                     |
+| 6    | [RFC-2026-018](./rfc/018-sync-database.md)                      | Changes database          | Two-way/move detection 有持久状态与恢复                        |
+| 7    | [RFC-2026-027](./rfc/027-delete-operations.md)                  | Delete semantics          | Permanent/Trash/Versioning 行为显式                            |
+| 8    | [RFC-2026-028](./rfc/028-execution-options.md)                  | Safe execution            | context 贯穿 walk/compare/copy/delete；atomic replace 后再终止 |
+| 9    | [RFC-2026-021](./rfc/021-cli-config.md)                         | CLI contract              | NDJSON stdout、stderr 诊断、稳定退出码                         |
+
+P1 完成前，UI（RFC-015/020/022/023）、report 增强（RFC-024）、platform/distribution（RFC-029）为 P2；Realtime/remote（RFC-014/025/026）为 P3。P2/P3 不得反向要求 P1 core 引入 Wails、React 或 provider-specific 类型。
+
 ## RFC 列表
 
 ### 已完成的 RFC
@@ -181,11 +201,54 @@ _暂无_
 
 作者统计不再手工维护；RFC 可能有多名共同作者，机械统计应从 RFC metadata 生成。
 
+## FFS 能力决策总览
+
+本节维护产品决策汇总；原子 Feature ID 与实施状态以 [TASK_TRACKING.md](./TASK_TRACKING.md) 为准，设计理由以 Owner RFC 为准。
+
+### 按领域分布
+
+| 领域                               | A (直接采纳) | AD (适配采纳) | R (拒绝) | D (延后) |
+| ---------------------------------- | ------------ | ------------- | -------- | -------- |
+| **UI** (界面工作流)                | 6            | 29            | 0        | 0        |
+| **CMP/LINK** (比较引擎)            | 9            | 10            | 0        | 1        |
+| **VAR/DB** (同步变体)              | 2            | 9             | 0        | 0        |
+| **SYN/VER/META/EXEC** (执行与安全) | 4            | 23            | 0        | 1        |
+| **FLT** (过滤系统)                 | 6            | 2             | 6        | 3        |
+| **CLI/CFG/MAC** (命令行与配置)     | 4            | 12            | 1        | 3        |
+| **EXT** (外部工具宏)               | 0            | 7             | 0        | 0        |
+| **RPT** (报告)                     | 3            | 1             | 0        | 0        |
+| **RTS** (实时同步)                 | 0            | 0             | 0        | 9        |
+| **REM** (远程存储)                 | 1            | 0             | 0        | 6        |
+| **PLT/NFR/I18N/DIST** (平台与分发) | 0            | 0             | 0        | 15       |
+| **总计**                           | **35**       | **93**        | **7**    | **38**   |
+
+### 按 Owner RFC 分布
+
+| Owner RFC | 标题              | A   | AD  | R   | D   | 总计能力 |
+| --------- | ----------------- | --- | --- | --- | --- | -------- |
+| RFC-015   | UI Foundation     | 3   | 5   | 0   | 0   | 8        |
+| RFC-016   | Compare Engine    | 9   | 10  | 0   | 1   | 20       |
+| RFC-017   | Sync Variants     | 2   | 9   | 0   | 0   | 11       |
+| RFC-018   | Sync Database     | 0   | 3   | 0   | 0   | 3        |
+| RFC-019   | Filter System     | 6   | 2   | 6   | 3   | 17       |
+| RFC-020   | UI Progress       | 1   | 3   | 0   | 0   | 4        |
+| RFC-021   | CLI & Config      | 4   | 12  | 1   | 3   | 20       |
+| RFC-022   | UI Panels         | 2   | 12  | 0   | 0   | 14       |
+| RFC-023   | UI Tools          | 0   | 9   | 0   | 0   | 9        |
+| RFC-024   | Reports           | 3   | 2   | 0   | 1   | 6        |
+| RFC-025   | RealtimeSync      | 0   | 0   | 0   | 9   | 9        |
+| RFC-026   | Remote SFTP/FTP   | 0   | 0   | 0   | 4   | 4        |
+| RFC-027   | Delete Operations | 1   | 7   | 0   | 0   | 8        |
+| RFC-028   | Execution Options | 3   | 18  | 0   | 0   | 21       |
+| RFC-029   | Platform/Dist     | 0   | 0   | 0   | 15  | 15       |
+| RFC-030   | Local/SMB         | 1   | 0   | 0   | 0   | 1        |
+| RFC-014   | Remote GDrive/MTP | 0   | 0   | 0   | 3   | 3        |
+
 ## 最近更新
 
 | 时间       | RFC          | 更新内容                                                               | 作者            |
 | ---------- | ------------ | ---------------------------------------------------------------------- | --------------- |
-| 2026-07-29 | RFC-2026-012 | 173 项能力全部绑定现存 Owner RFC；新增 RFC-029/030                     | Codex/albert.li |
+| 2026-07-29 | RFC-2026-012 | Feature ID 全部绑定现存 Owner RFC；新增 RFC-029/030                    | Codex/albert.li |
 | 2026-07-27 | RFC-2026-013 | Dev/Prod 身份、图标、打包入口与运行时验证完成                          | Codex/albert.li |
 | 2026-07-27 | RFC-2026-013 | 用户批准 Wails Dev/Prod 身份分离方案                                   | Codex/albert.li |
 | 2026-07-27 | RFC-2026-011 | C1 应用于正式应用与平台资产，验证完成                                  | Codex/albert.li |
@@ -217,7 +280,7 @@ _暂无_
 3. **国际化扩展 RFC** - 多语言支持扩展
 4. **测试策略 RFC** - 测试覆盖率和质量保证
 
-> **治理规则（2026-07-29）：** [RFC-2026-012](./rfc/012-sync-module-compare-report.md) 只管理 FFS 能力库存、Commando 决策和 Owner。具体架构与验收由领域 RFC-014…028 管理；领域 RFC 获批前不得扩写其范围。
+> **治理规则（2026-07-29）：** [RFC-2026-012](./rfc/012-sync-module-compare-report.md) 管理 FFS 能力库存、Commando 决策、Owner 与跨 RFC 交付 gate。具体架构与验收由领域 RFC-014…030 管理；领域 RFC 获批前不得扩写其范围。
 
 ### 需要评审的 RFC
 

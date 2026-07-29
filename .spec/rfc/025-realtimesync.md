@@ -7,7 +7,7 @@
 状态: Proposed
 修改历史:
 
-- 2026-07-29: 依据 Feature Map，承接 RTS 能力
+- 2026-07-29: 依据 Feature ID 追踪，承接 RTS 能力
 
 ---
 
@@ -111,8 +111,8 @@ type Debouncer struct {
 **状态**: Proposed
 **最后更新**: 2026-07-29
 
-## Feature Map 追踪
+## Task Tracking 追踪
 
 本 RFC 明确拥有：`RTS-01`, `RTS-02`, `RTS-03`, `RTS-04`, `RTS-05`, `RTS-06`, `RTS-07`, `RTS-08`, `RTS-09`。
 
-Decision、Status 与 Evidence 以 [FFS Feature Map](../FFS-FEATURE-MAP.md) 为唯一事实源；本 RFC 负责 Commando 设计与验收。
+Feature ID 与实施状态以 [TASK TRACKING](../TASK_TRACKING.md) 为准，优先级与 RFC 状态以 [ROADMAP](../ROADMAP.md) 为准；本 RFC 负责产品决策、Commando 设计与验收。
