@@ -179,3 +179,19 @@ func TestIsEqual_Content_RightFileMissing_ReturnsError(t *testing.T) {
 		t.Fatal("expected error when right file does not exist")
 	}
 }
+
+func TestIsEqual_UnknownMode_ReturnsFalse(t *testing.T) {
+	// CompareMode is a plain int, not a closed enum — Go has no exhaustiveness
+	// checking, so callers really can pass an out-of-range value. Verified
+	// this compiles and runs (CompareMode(99) is not a hypothetical).
+	a := Entry{Size: 1}
+	b := Entry{Size: 1}
+
+	eq, err := IsEqual(a, b, CompareMode(99), CompareSettings{})
+	if err != nil {
+		t.Fatalf("expected no error for unknown mode, got %v", err)
+	}
+	if eq {
+		t.Error("expected false for unrecognized CompareMode")
+	}
+}

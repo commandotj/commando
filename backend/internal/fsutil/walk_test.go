@@ -210,6 +210,13 @@ func TestWalkRoot_UnreadableSubdirectory_ReturnsError(t *testing.T) {
 	}
 }
 
+func TestIsSymlink_NonExistentPath_ReturnsError(t *testing.T) {
+	_, err := isSymlink(filepath.Join(t.TempDir(), "does-not-exist"))
+	if err == nil {
+		t.Fatal("expected error for non-existent path, got nil")
+	}
+}
+
 func keys(m map[string]Entry) []string {
 	ks := make([]string, 0, len(m))
 	for k := range m {

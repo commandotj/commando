@@ -30,6 +30,7 @@ release
 out
 bin/
 apps/desktop/bin
+backend/covfilter
 apps/desktop/frontend/dist
 apps/desktop/frontend/bindings
 frontend/dist

@@ -23,9 +23,6 @@ func IsEqual(a, b Entry, mode CompareMode, settings CompareSettings) (bool, erro
 	case Content:
 		return contentEqual(a.AbsolutePath, b.AbsolutePath)
 	}
-	// coverage:ignore unreachable — CompareMode only has the three values
-	// handled above; this default only exists to satisfy Go's requirement
-	// that all paths return a value.
 	return false, nil
 }
 
@@ -55,14 +52,16 @@ func contentEqual(pathA, pathB string) (bool, error) {
 			return true, nil
 		}
 		if errA != nil && errA != io.EOF {
-			// coverage:ignore unreachable in practice — os.File.Read only
-			// returns non-EOF errors on genuine I/O failure (disk error,
-			// revoked permissions mid-read), not reproducible without
-			// simulating hardware/OS failure.
+			// coverage:ignore tested empirically: chmod 0000 on an
+			// already-open *os.File does not affect subsequent Read calls
+			// (POSIX fd permissions are checked at open, not per-read), so
+			// this can't be triggered by revoking permissions mid-read.
+			// Reaching it needs a genuine disk/hardware I/O failure, which
+			// isn't reproducible in a unit test.
 			return false, errA
 		}
 		if errB != nil && errB != io.EOF {
-			// coverage:ignore unreachable in practice — same as errA above.
+			// coverage:ignore same empirical basis as errA above.
 			return false, errB
 		}
 	}

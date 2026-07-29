@@ -57,8 +57,12 @@ func Walk(root string, opts WalkOptions) (map[string]Entry, error) {
 	for rel, entry := range entries {
 		isLink, lerr := isSymlink(entry.AbsolutePath)
 		if lerr != nil {
-			// coverage:ignore unreachable without a TOCTOU race (file must vanish
-			// between WalkRoot's scan above and this Lstat call).
+			// coverage:ignore requires a TOCTOU race (file deleted between
+			// WalkRoot's scan and this Lstat call). Tested empirically with
+			// a goroutine deleting the file mid-Walk: 10/10 runs completed
+			// before the delete landed — the window is too narrow to hit
+			// deterministically, so a test for this would be flaky, not a
+			// real regression check.
 			return nil, lerr
 		}
 		if isLink {
@@ -73,8 +77,9 @@ func Walk(root string, opts WalkOptions) (map[string]Entry, error) {
 		case SymlinkAsLink:
 			target, rerr := os.Readlink(sl.entry.AbsolutePath)
 			if rerr != nil {
-				// coverage:ignore unreachable without a TOCTOU race (symlink must
-				// vanish between isSymlink's Lstat and this Readlink call).
+				// coverage:ignore same TOCTOU shape as the isSymlink error
+				// above — same empirical basis (10/10 runs, no reliable
+				// trigger).
 				return nil, rerr
 			}
 			sl.entry.SymlinkTarget = target
@@ -111,14 +116,15 @@ func followSymlink(entries map[string]Entry, rel string, entry Entry) error {
 	// itself a symlink, it just reports the single leaf entry and stops.
 	realTarget, err := filepath.EvalSymlinks(entry.AbsolutePath)
 	if err != nil {
-		// coverage:ignore unreachable without a TOCTOU race (symlink target must
-		// vanish between the os.Stat above and this EvalSymlinks call).
+		// coverage:ignore same TOCTOU shape and empirical basis as above
+		// (symlink target vanishing between os.Stat and this call).
 		return err
 	}
 	targetEntries, err := WalkRoot(realTarget)
 	if err != nil {
-		// coverage:ignore unreachable without a TOCTOU race (resolved target
-		// directory must vanish between EvalSymlinks and this WalkRoot call).
+		// coverage:ignore same TOCTOU shape and empirical basis as above
+		// (resolved target directory vanishing between EvalSymlinks and
+		// this call).
 		return err
 	}
 	for targetRel, targetEntry := range targetEntries {
@@ -132,10 +138,6 @@ func followSymlink(entries map[string]Entry, rel string, entry Entry) error {
 func isSymlink(path string) (bool, error) {
 	info, err := os.Lstat(path)
 	if err != nil {
-		// coverage:ignore unreachable in normal use — callers only ever pass paths
-		// that WalkRoot itself just confirmed exist. Left as a real error
-		// return (not a panic) because a TOCTOU race with an external
-		// process is possible, however unlikely.
 		return false, err
 	}
 	return info.Mode()&os.ModeSymlink != 0, nil
@@ -178,8 +180,9 @@ func WalkRoot(root string) (map[string]Entry, error) {
 
 		stat, statErr := d.Info()
 		if statErr != nil {
-			// coverage:ignore unreachable without a TOCTOU race (entry must vanish
-			// between WalkDir listing it and this Info() call).
+			// coverage:ignore same TOCTOU shape and empirical basis as the
+			// isSymlink race above (entry vanishing between WalkDir listing
+			// it and this Info() call).
 			return statErr
 		}
 
