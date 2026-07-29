@@ -9,79 +9,55 @@ const (
 	t3 int64 = 1700000300
 )
 
+func assertCategorize(t *testing.T, left, right *Entry, mode CompareMode, settings CompareSettings, expected Category) {
+	t.Helper()
+	cat, _, err := Categorize(left, right, mode, settings)
+	if err != nil {
+		t.Fatalf("Categorize returned error: %v", err)
+	}
+	if cat != expected {
+		t.Errorf("expected %v, got %v", expected, cat)
+	}
+}
+
 func TestCategorize_LeftOnly(t *testing.T) {
 	left := &Entry{RelativePath: "x.txt", Size: 10, ModTimeUnix: t1}
-
-	cat, _ := Categorize(left, nil, TimeAndSize, CompareSettings{})
-
-	if cat != LeftOnly {
-		t.Errorf("expected LeftOnly, got %v", cat)
-	}
+	assertCategorize(t, left, nil, TimeAndSize, CompareSettings{}, LeftOnly)
 }
 
 func TestCategorize_RightOnly(t *testing.T) {
 	right := &Entry{RelativePath: "x.txt", Size: 10, ModTimeUnix: t1}
-
-	cat, _ := Categorize(nil, right, TimeAndSize, CompareSettings{})
-
-	if cat != RightOnly {
-		t.Errorf("expected RightOnly, got %v", cat)
-	}
+	assertCategorize(t, nil, right, TimeAndSize, CompareSettings{}, RightOnly)
 }
 
 func TestCategorize_Equal(t *testing.T) {
 	left := &Entry{RelativePath: "x.txt", Size: 10, ModTimeUnix: t1}
 	right := &Entry{RelativePath: "x.txt", Size: 10, ModTimeUnix: t1}
-
-	cat, _ := Categorize(left, right, TimeAndSize, CompareSettings{})
-
-	if cat != Equal {
-		t.Errorf("expected Equal, got %v", cat)
-	}
+	assertCategorize(t, left, right, TimeAndSize, CompareSettings{}, Equal)
 }
 
 func TestCategorize_LeftNewer(t *testing.T) {
 	left := &Entry{RelativePath: "x.txt", Size: 10, ModTimeUnix: t2}
 	right := &Entry{RelativePath: "x.txt", Size: 10, ModTimeUnix: t1}
-
-	cat, _ := Categorize(left, right, TimeAndSize, CompareSettings{})
-
-	if cat != LeftNewer {
-		t.Errorf("expected LeftNewer, got %v", cat)
-	}
+	assertCategorize(t, left, right, TimeAndSize, CompareSettings{}, LeftNewer)
 }
 
 func TestCategorize_RightNewer(t *testing.T) {
 	left := &Entry{RelativePath: "x.txt", Size: 10, ModTimeUnix: t1}
 	right := &Entry{RelativePath: "x.txt", Size: 10, ModTimeUnix: t2}
-
-	cat, _ := Categorize(left, right, TimeAndSize, CompareSettings{})
-
-	if cat != RightNewer {
-		t.Errorf("expected RightNewer, got %v", cat)
-	}
+	assertCategorize(t, left, right, TimeAndSize, CompareSettings{}, RightNewer)
 }
 
 func TestCategorize_Conflict(t *testing.T) {
 	left := &Entry{RelativePath: "x.txt", Size: 10, ModTimeUnix: t1}
 	right := &Entry{RelativePath: "x.txt", Size: 20, ModTimeUnix: t1}
-
-	cat, _ := Categorize(left, right, TimeAndSize, CompareSettings{})
-
-	if cat != Conflict {
-		t.Errorf("expected Conflict, got %v", cat)
-	}
+	assertCategorize(t, left, right, TimeAndSize, CompareSettings{}, Conflict)
 }
 
 func TestCategorize_TypeMismatch(t *testing.T) {
 	left := &Entry{RelativePath: "d", IsDir: true, ModTimeUnix: t1}
 	right := &Entry{RelativePath: "d", IsDir: false, Size: 5, ModTimeUnix: t1}
-
-	cat, _ := Categorize(left, right, TimeAndSize, CompareSettings{})
-
-	if cat != TypeMismatch {
-		t.Errorf("expected TypeMismatch, got %v", cat)
-	}
+	assertCategorize(t, left, right, TimeAndSize, CompareSettings{}, TypeMismatch)
 }
 
 func TestCategorize_ContentEqual(t *testing.T) {
@@ -90,12 +66,7 @@ func TestCategorize_ContentEqual(t *testing.T) {
 	rightPath := writeTempFile(t, dir, "right.txt", "same-bytes")
 	left := &Entry{RelativePath: "x.txt", AbsolutePath: leftPath, Size: 10, ModTimeUnix: t1}
 	right := &Entry{RelativePath: "x.txt", AbsolutePath: rightPath, Size: 10, ModTimeUnix: t2}
-
-	cat, _ := Categorize(left, right, Content, CompareSettings{})
-
-	if cat != Equal {
-		t.Errorf("expected Equal, got %v", cat)
-	}
+	assertCategorize(t, left, right, Content, CompareSettings{}, Equal)
 }
 
 func TestCategorize_ContentDifferent(t *testing.T) {
@@ -104,53 +75,34 @@ func TestCategorize_ContentDifferent(t *testing.T) {
 	rightPath := writeTempFile(t, dir, "right.txt", "b")
 	left := &Entry{RelativePath: "x.txt", AbsolutePath: leftPath, Size: 1, ModTimeUnix: t1}
 	right := &Entry{RelativePath: "x.txt", AbsolutePath: rightPath, Size: 1, ModTimeUnix: t1}
-
-	cat, _ := Categorize(left, right, Content, CompareSettings{})
-
-	if cat != DifferentContent {
-		t.Errorf("expected DifferentContent, got %v", cat)
-	}
+	assertCategorize(t, left, right, Content, CompareSettings{}, DifferentContent)
 }
 
 func TestCategorize_SizeOnlyEqual(t *testing.T) {
 	left := &Entry{RelativePath: "x.txt", Size: 10, ModTimeUnix: t1}
 	right := &Entry{RelativePath: "x.txt", Size: 10, ModTimeUnix: t3}
-
-	cat, _ := Categorize(left, right, SizeOnly, CompareSettings{})
-
-	if cat != Equal {
-		t.Errorf("expected Equal, got %v", cat)
-	}
+	assertCategorize(t, left, right, SizeOnly, CompareSettings{}, Equal)
 }
 
 func TestCategorize_SizeOnlyDifferent(t *testing.T) {
 	left := &Entry{RelativePath: "x.txt", Size: 10, ModTimeUnix: t1}
 	right := &Entry{RelativePath: "x.txt", Size: 11, ModTimeUnix: t1}
-
-	cat, _ := Categorize(left, right, SizeOnly, CompareSettings{})
-
-	if cat != DifferentSize {
-		t.Errorf("expected DifferentSize, got %v", cat)
-	}
+	assertCategorize(t, left, right, SizeOnly, CompareSettings{}, DifferentSize)
 }
 
 func TestCategorize_Tolerance2s(t *testing.T) {
 	left := &Entry{RelativePath: "x.txt", Size: 10, ModTimeUnix: t1}
 	right := &Entry{RelativePath: "x.txt", Size: 10, ModTimeUnix: t1 + 1}
-
-	cat, _ := Categorize(left, right, TimeAndSize, CompareSettings{ToleranceSec: 2})
-
-	if cat != Equal {
-		t.Errorf("expected Equal within 2s tolerance, got %v", cat)
-	}
+	assertCategorize(t, left, right, TimeAndSize, CompareSettings{ToleranceSec: 2}, Equal)
 }
 
 func TestCategorize_ToleranceExceed(t *testing.T) {
 	left := &Entry{RelativePath: "x.txt", Size: 10, ModTimeUnix: t1}
 	right := &Entry{RelativePath: "x.txt", Size: 10, ModTimeUnix: t1 + 3}
-
-	cat, _ := Categorize(left, right, TimeAndSize, CompareSettings{ToleranceSec: 2})
-
+	cat, _, err := Categorize(left, right, TimeAndSize, CompareSettings{ToleranceSec: 2})
+	if err != nil {
+		t.Fatalf("Categorize returned error: %v", err)
+	}
 	if cat != LeftNewer && cat != RightNewer {
 		t.Errorf("expected LeftNewer or RightNewer beyond tolerance, got %v", cat)
 	}
@@ -193,5 +145,31 @@ func TestIsEqual_UnknownMode_ReturnsFalse(t *testing.T) {
 	}
 	if eq {
 		t.Error("expected false for unrecognized CompareMode")
+	}
+}
+
+func TestCategorize_Error(t *testing.T) {
+	left := &Entry{RelativePath: "x.txt", AbsolutePath: "non-existent-left"}
+	right := &Entry{RelativePath: "x.txt", AbsolutePath: "non-existent-right"}
+	_, _, err := Categorize(left, right, Content, CompareSettings{})
+	if err == nil {
+		t.Fatal("expected error from Categorize when IsEqual fails")
+	}
+}
+
+func TestIsEqual_Content_ReadDirectoryError_ReturnsError(t *testing.T) {
+	dir := t.TempDir()
+	a := Entry{AbsolutePath: dir}
+	dummy := writeTempFile(t, dir, "dummy.txt", "hello")
+	b := Entry{AbsolutePath: dummy}
+
+	_, err := IsEqual(a, b, Content, CompareSettings{})
+	if err == nil {
+		t.Fatal("expected error reading from directory")
+	}
+
+	_, err = IsEqual(b, a, Content, CompareSettings{})
+	if err == nil {
+		t.Fatal("expected error reading from directory")
 	}
 }

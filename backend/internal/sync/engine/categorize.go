@@ -17,36 +17,40 @@ const (
 
 // Categorize classifies a relative path given its (possibly nil) entry on
 // each side. left and right are nil when the path does not exist on that
-// side.
-func Categorize(left, right *Entry, mode CompareMode, settings CompareSettings) (Category, string) {
+// side. Returns an error when the comparison itself fails (e.g. I/O error
+// during Content mode) — callers MUST check the error before using Category.
+func Categorize(left, right *Entry, mode CompareMode, settings CompareSettings) (Category, string, error) {
 	if right == nil {
-		return LeftOnly, "left-only"
+		return LeftOnly, "left-only", nil
 	}
 	if left == nil {
-		return RightOnly, "right-only"
+		return RightOnly, "right-only", nil
 	}
 	if left.IsDir != right.IsDir {
-		return TypeMismatch, "type-mismatch"
+		return TypeMismatch, "type-mismatch", nil
 	}
 
-	eq, _ := IsEqual(*left, *right, mode, settings)
+	eq, err := IsEqual(*left, *right, mode, settings)
+	if err != nil {
+		return Equal, "", err // fail-closed: comparison error means no valid Category
+	}
 	if eq {
-		return Equal, "equal"
+		return Equal, "equal", nil
 	}
 
 	switch mode {
 	case Content:
-		return DifferentContent, "different-content"
+		return DifferentContent, "different-content", nil
 	case SizeOnly:
-		return DifferentSize, "different-size"
+		return DifferentSize, "different-size", nil
 	}
 
 	if left.Size != right.Size {
-		return Conflict, "conflict"
+		return Conflict, "conflict", nil
 	}
 
 	if left.ModTimeUnix > right.ModTimeUnix {
-		return LeftNewer, "left-newer"
+		return LeftNewer, "left-newer", nil
 	}
-	return RightNewer, "right-newer"
+	return RightNewer, "right-newer", nil
 }

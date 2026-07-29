@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -13,7 +14,7 @@ func TestIndexRoot_SkipsGit(t *testing.T) {
 	writeIndexFile(t, filepath.Join(root, ".git", "config"), "gitconfig")
 	writeIndexFile(t, filepath.Join(root, "a.txt"), "hello")
 
-	idx, err := IndexRoot(root, filter.NewMatcher(filter.DefaultRules()), IndexOptions{})
+	idx, err := IndexRoot(context.Background(), root, filter.NewMatcher(filter.DefaultRules()), IndexOptions{})
 	if err != nil {
 		t.Fatalf("IndexRoot returned error: %v", err)
 	}
@@ -31,7 +32,7 @@ func TestIndexRoot_SkipsNodeModules(t *testing.T) {
 	writeIndexFile(t, filepath.Join(root, "node_modules", "x"), "module")
 	writeIndexFile(t, filepath.Join(root, "a.txt"), "hello")
 
-	idx, err := IndexRoot(root, filter.NewMatcher(filter.DefaultRules()), IndexOptions{})
+	idx, err := IndexRoot(context.Background(), root, filter.NewMatcher(filter.DefaultRules()), IndexOptions{})
 	if err != nil {
 		t.Fatalf("IndexRoot returned error: %v", err)
 	}
@@ -51,7 +52,7 @@ func TestIndexRoot_SymlinkExclude(t *testing.T) {
 		t.Fatalf("Symlink failed: %v", err)
 	}
 
-	idx, err := IndexRoot(root, filter.NewMatcher(filter.DefaultRules()), IndexOptions{SymlinkMode: SymlinkExclude})
+	idx, err := IndexRoot(context.Background(), root, filter.NewMatcher(filter.DefaultRules()), IndexOptions{SymlinkMode: SymlinkExclude})
 	if err != nil {
 		t.Fatalf("IndexRoot returned error: %v", err)
 	}
@@ -69,7 +70,7 @@ func TestIndexRoot_SymlinkAsLink(t *testing.T) {
 		t.Fatalf("Symlink failed: %v", err)
 	}
 
-	idx, err := IndexRoot(root, filter.NewMatcher(filter.DefaultRules()), IndexOptions{SymlinkMode: SymlinkAsLink})
+	idx, err := IndexRoot(context.Background(), root, filter.NewMatcher(filter.DefaultRules()), IndexOptions{SymlinkMode: SymlinkAsLink})
 	if err != nil {
 		t.Fatalf("IndexRoot returned error: %v", err)
 	}
@@ -90,7 +91,7 @@ func TestIndexRoot_SymlinkFollow(t *testing.T) {
 		t.Fatalf("Symlink failed: %v", err)
 	}
 
-	idx, err := IndexRoot(root, filter.NewMatcher(filter.DefaultRules()), IndexOptions{SymlinkMode: SymlinkFollow})
+	idx, err := IndexRoot(context.Background(), root, filter.NewMatcher(filter.DefaultRules()), IndexOptions{SymlinkMode: SymlinkFollow})
 	if err != nil {
 		t.Fatalf("IndexRoot returned error: %v", err)
 	}
@@ -106,7 +107,7 @@ func TestIndexRoot_AppliesMatcherExclusion(t *testing.T) {
 	writeIndexFile(t, filepath.Join(root, "drop.txt"), "world")
 
 	m := filter.NewMatcher(filter.FilterRules{Include: []string{"**"}, Exclude: []string{"drop.txt"}})
-	idx, err := IndexRoot(root, m, IndexOptions{})
+	idx, err := IndexRoot(context.Background(), root, m, IndexOptions{})
 	if err != nil {
 		t.Fatalf("IndexRoot returned error: %v", err)
 	}
@@ -120,7 +121,7 @@ func TestIndexRoot_AppliesMatcherExclusion(t *testing.T) {
 }
 
 func TestIndexRoot_NonExistentPath_ReturnsError(t *testing.T) {
-	_, err := IndexRoot(filepath.Join(t.TempDir(), "does-not-exist"), filter.NewMatcher(filter.DefaultRules()), IndexOptions{})
+	_, err := IndexRoot(context.Background(), filepath.Join(t.TempDir(), "does-not-exist"), filter.NewMatcher(filter.DefaultRules()), IndexOptions{})
 	if err == nil {
 		t.Fatal("expected error for non-existent root, got nil")
 	}

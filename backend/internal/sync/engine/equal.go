@@ -45,24 +45,17 @@ func contentEqual(pathA, pathB string) (bool, error) {
 	for {
 		na, errA := fa.Read(bufA)
 		nb, errB := fb.Read(bufB)
+		if errA != nil && errA != io.EOF {
+			return false, errA
+		}
+		if errB != nil && errB != io.EOF {
+			return false, errB
+		}
 		if na != nb || !bytes.Equal(bufA[:na], bufB[:nb]) {
 			return false, nil
 		}
 		if errA == io.EOF && errB == io.EOF {
 			return true, nil
-		}
-		if errA != nil && errA != io.EOF {
-			// coverage:ignore tested empirically: chmod 0000 on an
-			// already-open *os.File does not affect subsequent Read calls
-			// (POSIX fd permissions are checked at open, not per-read), so
-			// this can't be triggered by revoking permissions mid-read.
-			// Reaching it needs a genuine disk/hardware I/O failure, which
-			// isn't reproducible in a unit test.
-			return false, errA
-		}
-		if errB != nil && errB != io.EOF {
-			// coverage:ignore same empirical basis as errA above.
-			return false, errB
 		}
 	}
 }

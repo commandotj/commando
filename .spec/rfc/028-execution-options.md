@@ -8,11 +8,12 @@
 
 批准记录:
 
-- 2026-07-29: albert.li — SYN-13/14 Adopt，SYN-09…12/15…19、META-01…05、EXEC-01/02 Adapt
+- 2026-07-29: albert.li — SYN-13 Adopt，SYN-09…12/14…19、META-01…05、EXEC-01/02 Adapt
   修改历史:
 
 - 2026-07-29: 依据 Feature ID 追踪，承接 SYN-09…19、META 与 EXEC 能力
 - 2026-07-29: 核对代码现状 — `sync/executor.go` 与 `copy/copy.go` 直接以 `O_TRUNC` 打开目标；核心执行入口不接收 context
+- 2026-07-29: 执行审计 — item error 最终返回 `nil` error；Wails 接受 renderer 提交的完整绝对路径 plan；`sync`/`copy` 存在重复复制实现
 
 ---
 
@@ -33,6 +34,7 @@
 - [ ] SYN-17: 磁盘空间峰值优化 — 执行顺序
 - [ ] SYN-18: Lock directories (`*.lock`) — 多实例互斥
 - [ ] SYN-19: Background priority — 降低 IO 优先级
+- [ ] EXEC-01: Truthful typed Outcome 与 core-owned plan integrity
 - [ ] EXEC-02: Context cancellation — 从 CLI/Runner 传播到 walk、compare、copy、delete
 
 ## 提案
@@ -81,6 +83,36 @@ type Outcome struct {
 
 CLI exit code、Wails terminal event 与结果 UI 必须只映射该 Outcome。
 
+`Outcome` 必须满足：
+
+- `len(ItemErrors) > 0` 时 Status 只能是 warning/error，禁止 success。
+- FatalError 非空时 Status 必须为 error；`context.Canceled` 必须为 canceled。
+- executor 不得收集错误后固定返回 `nil`，调用者无需重新推断结果。
+- CLI、Wails 与 UI 不得各自实现第二套状态归类。
+
+### Core-owned plan integrity (EXEC-01)
+
+renderer 只能提交 opaque `planId` 与允许覆盖的非破坏性 execution options，不得提交可修改的绝对 Source/Destination 或 delete target。
+
+```text
+CLI/Desktop request
+  → core Prepare
+  → PreparedPlan + public PlanView + opaque planId
+  → caller confirms planId
+  → core ExecutePrepared(planId)
+  → revalidate
+  → side effects
+```
+
+约束：
+
+- core 保存 PreparedPlan；Wails `Execute` 接收 `planId`，不接收 `sync.Plan` body。
+- CLI 同进程持有 PreparedPlan；不得序列化后重新信任 stdout JSON。
+- 副作用前校验 canonical source/destination 仍位于批准 roots、动作仍符合 strategy、source fingerprint 未变化。
+- plan 一次性消费并有过期时间；root/profile/strategy 变化后失效。
+- 校验失败返回 typed stale/invalid-plan Outcome，不执行任何 copy/delete。
+- 防止 TOCTOU 的 fingerprint 至少包含 file identity、type、size、mtime；启用 Content mode 时包含 content identity。
+
 ### 拷贝验证 (SYN-11)
 
 启用验证时必须覆盖完整源文件与目标文件。实现可选流式 byte compare 或全量 cryptographic hash；头尾采样只能命名为 sampling check，不能满足 SYN-11。
@@ -91,9 +123,13 @@ CLI exit code、Wails terminal event 与结果 UI 必须只映射该 Outcome。
 
 现有 `sync/executor.go:copyFile` 与 `copy/copy.go` 的目标 `O_TRUNC` 路径必须删除。覆盖已有目标时，任何错误、取消或进程崩溃都不得留下已截断目标。
 
+`backend/internal/copy` 是唯一复制实现。`sync` executor 只调用该能力；删除私有 `sync.copyFile`。P1 调用链必须显式传入 context，禁止内部回退 `context.Background()`。
+
 ### 并行控制 (SYN-16)
 
 共享 Go core `ResourceBudget` 管理 per-device/per-host token。`worker.Runner` 管 job 并发；executor 和 remote provider 只借 token，不各建 goroutine pool。
+
+Runner 等待并发 token 时必须 `select` 监听 `ctx.Done()`；排队任务取消后不得再调用 job function。Runner 不得丢弃未被 adapter 消费的 job error。
 
 ### VSS (SYN-12)
 
@@ -112,20 +148,23 @@ func PreserveMeta(src, dst string) error {
 
 ## 文件变更
 
-| 文件                                | 变更                                            |
-| ----------------------------------- | ----------------------------------------------- |
-| `backend/internal/sync/executor.go` | 接受 context；统一 Outcome 与取消检查点         |
-| `backend/internal/sync/planner.go`  | 接受 context 并传给 walk/compare                |
-| `backend/internal/copy/`            | context-aware copy、进度、验证与 atomic replace |
-| `backend/internal/worker/runner.go` | 统一并发与取消；禁止新增第二套 job manager      |
+| 文件                                | 变更                                                       |
+| ----------------------------------- | ---------------------------------------------------------- |
+| `backend/internal/sync/executor.go` | 接受 context；只执行 core-owned PreparedPlan；统一 Outcome |
+| `backend/internal/sync/planner.go`  | 接受 context 并传给 walk/compare                           |
+| `backend/internal/copy/`            | context-aware copy、进度、验证与 atomic replace            |
+| `backend/internal/worker/runner.go` | 统一并发与取消；禁止新增第二套 job manager                 |
+| `apps/desktop/services/sync.go`     | 只传 opaque planId；renderer plan 仅用于展示               |
 
 ## 风险
 
-| 风险                                 | 缓解                                         |
-| ------------------------------------ | -------------------------------------------- |
-| VSS 仅 Windows                       | 编译标记 + 运行时友好错误                    |
-| Fail-safe copy 增加写入与 flush 成本 | 允许显式关闭；开启时所有文件遵守同一安全承诺 |
-| replace 临界区收到取消               | 完成原子提交与目录 flush 后返回 canceled     |
+| 风险                                  | 缓解                                                       |
+| ------------------------------------- | ---------------------------------------------------------- |
+| VSS 仅 Windows                        | 编译标记 + 运行时友好错误                                  |
+| Fail-safe copy 增加写入与 flush 成本  | 允许显式关闭；开启时所有文件遵守同一安全承诺               |
+| replace 临界区收到取消                | 完成原子提交与目录 flush 后返回 canceled                   |
+| renderer 篡改绝对路径或 delete target | core-owned PreparedPlan；执行前 canonical containment 校验 |
+| plan 与文件状态之间发生 TOCTOU        | source fingerprint 重验；不一致返回 stale plan             |
 
 ## 测试策略
 
@@ -136,6 +175,10 @@ func PreserveMeta(src, dst string) error {
 - replace 临界区取消：目标只能是完整旧版本或完整新版本。
 - delete 前取消：目标存在；delete 完成后取消：Outcome 与真实文件状态一致。
 - SYN-11：完整源/目标 byte compare 或 cryptographic hash；禁止采样冒充完成。
+- 任一 item copy/delete 失败：Outcome 不能是 success，CLI 不能 exit 0。
+- 篡改 PlanView 的 Source/Destination 后提交：core 忽略 body 或拒绝；批准 roots 外文件保持不变。
+- source 在 prepare 后被替换：返回 stale plan，不执行目标覆盖。
+- 静态检查确认 P1 只有一个文件复制 implementation，`sync.copyFile` 不存在。
 
 ---
 

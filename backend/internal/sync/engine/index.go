@@ -1,6 +1,8 @@
 package engine
 
 import (
+	"context"
+
 	"github.com/systembugtj/commando/internal/fsutil"
 	"github.com/systembugtj/commando/internal/sync/filter"
 )
@@ -24,7 +26,10 @@ func toFsutilSymlinkMode(mode SymlinkMode) fsutil.SymlinkMode {
 // producing a sync-engine Index. Filtering decisions (what belongs in a
 // sync) live in filter.Matcher; fsutil only knows how to read the
 // filesystem (RFC-012 §1.2).
-func IndexRoot(root string, matcher filter.Matcher, opts IndexOptions) (Index, error) {
+//
+// The ctx parameter is reserved for cancellation and parallelism (CMP-10);
+// it is not yet wired through fsutil.Walk.
+func IndexRoot(ctx context.Context, root string, matcher filter.Matcher, opts IndexOptions) (Index, error) {
 	entries, err := fsutil.Walk(root, fsutil.WalkOptions{SymlinkMode: toFsutilSymlinkMode(opts.SymlinkMode)})
 	if err != nil {
 		return nil, err
@@ -36,11 +41,12 @@ func IndexRoot(root string, matcher filter.Matcher, opts IndexOptions) (Index, e
 			continue
 		}
 		idx[rel] = Entry{
-			RelativePath: e.RelativePath,
-			AbsolutePath: e.AbsolutePath,
-			IsDir:        e.IsDir,
-			Size:         e.Size,
-			ModTimeUnix:  e.ModTimeUnix,
+			RelativePath:  e.RelativePath,
+			AbsolutePath:  e.AbsolutePath,
+			IsDir:         e.IsDir,
+			Size:          e.Size,
+			ModTimeUnix:   e.ModTimeUnix,
+			SymlinkTarget: e.SymlinkTarget,
 		}
 	}
 	return idx, nil
