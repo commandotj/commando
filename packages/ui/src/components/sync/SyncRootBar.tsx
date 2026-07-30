@@ -92,16 +92,6 @@ const SyncRootBar: React.FC<SyncRootBarProps> = ({
             />
 
             <div className="sync-root-bar__actions">
-                <button
-                    type="button"
-                    className="sync-btn sync-btn--ghost sync-root-bar__btn"
-                    onClick={() => onSetSyncRoot(currentPath)}
-                    disabled={!currentPath}
-                    title={t("sync.pane.setRoot")}
-                >
-                    {t("sync.pane.setRoot")}
-                </button>
-
                 <div className="sync-root-bar__dropdown">
                     <button
                         type="button"

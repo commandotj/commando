@@ -18,6 +18,8 @@ export interface SyncOptions {
     deleteExtraneous: boolean;
     dryRun: boolean;
     useChecksum: boolean;
+    errorMode?: "stop" | "ignore";
+    deleteMethod?: "permanent" | "trash" | "versioning";
     filter?: SyncFilterRules;
 }
 

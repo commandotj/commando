@@ -64,6 +64,8 @@ export const DEFAULT_SYNC_OPTIONS: SyncOptions = {
     deleteExtraneous: false,
     dryRun: false,
     useChecksum: false,
+    errorMode: "ignore",
+    deleteMethod: "permanent",
 };
 
 export const SYNC_ACTION_COLORS: Record<string, string> = {

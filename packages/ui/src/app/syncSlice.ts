@@ -119,6 +119,18 @@ const syncSlice = createSlice({
         setDryRun(state, action: PayloadAction<boolean>) {
             state.options.dryRun = action.payload;
         },
+        setUseChecksum(state, action: PayloadAction<boolean>) {
+            state.options.useChecksum = action.payload;
+        },
+        setErrorMode(state, action: PayloadAction<"stop" | "ignore">) {
+            state.options.errorMode = action.payload;
+        },
+        setDeleteMethod(
+            state,
+            action: PayloadAction<"permanent" | "trash" | "versioning">
+        ) {
+            state.options.deleteMethod = action.payload;
+        },
         setPlanModalOpen(state, action: PayloadAction<boolean>) {
             state.planModalOpen = action.payload;
         },
@@ -169,6 +181,9 @@ export const {
     setStrategyId,
     setDeleteExtraneous,
     setDryRun,
+    setUseChecksum,
+    setErrorMode,
+    setDeleteMethod,
     setPlanModalOpen,
     clearSyncPlan,
 } = syncSlice.actions;
