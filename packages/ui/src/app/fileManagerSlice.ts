@@ -109,14 +109,20 @@ const fileManagerSlice = createSlice({
             if (action.payload.path) {
                 state.panes[action.payload.paneIndex].currentPath =
                     action.payload.path;
+                localStorage.setItem(
+                    `commando-pane-${action.payload.paneIndex}-path`,
+                    action.payload.path
+                );
             }
         },
         setPaneSyncRoot(
             state,
             action: PayloadAction<{ paneIndex: 0 | 1; syncRoot: string }>
         ) {
-            state.panes[action.payload.paneIndex].syncRoot =
-                action.payload.syncRoot;
+            const { paneIndex, syncRoot } = action.payload;
+            state.panes[paneIndex].syncRoot = syncRoot;
+            state.panes[paneIndex].currentPath = syncRoot;
+            localStorage.setItem(`commando-pane-${paneIndex}-path`, syncRoot);
         },
         setPaneEntries(
             state,

@@ -17,8 +17,10 @@ const App: React.FC = () => {
 
     useEffect(() => {
         const homeDir = window.fsApi.getHomeDir();
-        dispatch(fetchDirectory({ paneIndex: 0, path: homeDir }));
-        dispatch(fetchDirectory({ paneIndex: 1, path: homeDir }));
+        const saved0 = localStorage.getItem("commando-pane-0-path") || homeDir;
+        const saved1 = localStorage.getItem("commando-pane-1-path") || homeDir;
+        dispatch(fetchDirectory({ paneIndex: 0, path: saved0 }));
+        dispatch(fetchDirectory({ paneIndex: 1, path: saved1 }));
     }, [dispatch]);
 
     return (
