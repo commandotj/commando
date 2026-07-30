@@ -54,6 +54,7 @@ const SyncRootBar: React.FC<SyncRootBarProps> = ({
 }) => {
     const { t } = useI18n();
     const [open, setOpen] = useState(false);
+    const [editPath, setEditPath] = useState("");
     const label = paneIndex === 0 ? t("sync.pane.left") : t("sync.pane.right");
     const displayPath = syncRoot || currentPath || t("sync.pane.noRoot");
     const hintKey = paneHintKey(paneIndex, syncRoot, otherSyncRoot);
@@ -64,6 +65,18 @@ const SyncRootBar: React.FC<SyncRootBarProps> = ({
 
     const volumePaths = volumes.flatMap(d => d.mountpoints.map(mp => mp.path));
 
+    const handlePathSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter" && editPath.trim()) {
+            const path = editPath.trim();
+            if (otherSyncRoot && areSyncRootsEqual(path, otherSyncRoot)) {
+                return;
+            }
+            onNavigate(path);
+            onSetSyncRoot(path);
+            setEditPath("");
+        }
+    };
+
     return (
         <div className={`sync-root-bar sync-root-bar--pane-${paneIndex}`}>
             <div className="sync-root-bar__label">
@@ -71,9 +84,17 @@ const SyncRootBar: React.FC<SyncRootBarProps> = ({
                 {label}
             </div>
 
-            <div className="sync-root-bar__path" title={displayPath}>
-                {displayPath}
-            </div>
+            <input
+                className="sync-root-bar__input"
+                type="text"
+                value={editPath || displayPath}
+                placeholder={t("sync.pane.pathPlaceholder")}
+                onFocus={() => setEditPath(displayPath)}
+                onChange={e => setEditPath(e.target.value)}
+                onKeyDown={handlePathSubmit}
+                onBlur={() => setEditPath("")}
+                spellCheck={false}
+            />
 
             <div className="sync-root-bar__actions">
                 <button
