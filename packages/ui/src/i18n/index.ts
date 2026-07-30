@@ -9,21 +9,31 @@ import { initReactI18next } from "react-i18next";
 // 导入翻译文件
 import zhCN from "./locales/zh-CN.json";
 import enUS from "./locales/en-US.json";
+import es from "./locales/es.json";
+import fr from "./locales/fr.json";
+import de from "./locales/de.json";
+import ja from "./locales/ja.json";
+import ko from "./locales/ko.json";
 
 const resources = {
-    "zh-CN": {
-        translation: zhCN,
-    },
-    "en-US": {
-        translation: enUS,
-    },
+    "zh-CN": { translation: zhCN },
+    "en-US": { translation: enUS },
+    "es": { translation: es },
+    "fr": { translation: fr },
+    "de": { translation: de },
+    "ja": { translation: ja },
+    "ko": { translation: ko },
 };
 
-// 初始化 i18next
+const saved =
+    typeof localStorage !== "undefined"
+        ? localStorage.getItem("commando-locale")
+        : null;
+
 i18next.use(initReactI18next).init({
     resources,
-    lng: "zh-CN", // 默认语言
-    fallbackLng: "zh-CN",
+    lng: saved || "en-US",
+    fallbackLng: "en-US",
     interpolation: {
         escapeValue: false, // React 已经处理了 XSS
     },

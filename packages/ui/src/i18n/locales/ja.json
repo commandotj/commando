@@ -1,0 +1,61 @@
+{
+    "sync": {
+        "toolbar": {
+            "strategy": "同期方法",
+            "compare": "比較",
+            "comparing": "比較中…",
+            "sync": "同期",
+            "syncing": "同期中…"
+        },
+        "strategy": {
+            "mirrorRight": "ミラー → 右",
+            "updateRight": "更新 → 右",
+            "mirrorLeft": "ミラー → 左",
+            "updateLeft": "更新 → 左",
+            "twoWay": "双方向"
+        },
+        "stats": {
+            "copy": "コピー",
+            "delete": "削除",
+            "conflicts": "競合",
+            "skip": "スキップ"
+        },
+        "legend": {
+            "copy": "コピーされます",
+            "delete": "削除されます",
+            "conflict": "競合"
+        },
+        "onboarding": { "clickCompare": "比較をクリック" },
+        "pane": {
+            "left": "左",
+            "right": "右",
+            "noRoot": "ルート未設定",
+            "setRoot": "ルート設定",
+            "browse": "参照"
+        },
+        "plan": {
+            "title": "プレビュー",
+            "cancel": "キャンセル",
+            "confirm": "開始"
+        },
+        "status": {
+            "ready": "準備完了",
+            "comparing": "比較中…",
+            "complete": "同期完了"
+        },
+        "table": { "status": "状態" }
+    },
+    "ui": {
+        "table": {
+            "name": "名前",
+            "dateModified": "更新日",
+            "size": "サイズ",
+            "type": "種類"
+        },
+        "file": {
+            "typeFolder": "フォルダ",
+            "typeFile": "ファイル",
+            "itemsCount": "項目"
+        }
+    }
+}

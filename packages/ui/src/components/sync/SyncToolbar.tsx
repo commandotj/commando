@@ -11,6 +11,7 @@ import {
 import { SYNC_STRATEGY_OPTIONS } from "../../constants/sync";
 import { useI18n } from "../../hooks/useI18n";
 import { ThemeSwitchButton } from "../ThemeSwitcher";
+import SyncLocaleSelector from "./SyncLocaleSelector";
 import SyncLegend from "./SyncLegend";
 import SyncMoreOptions from "./SyncMoreOptions";
 import SyncProgressBar from "./SyncProgressBar";
@@ -53,6 +54,7 @@ const SyncToolbar: React.FC = () => {
             <header className="sync-toolbar">
                 <div className="sync-toolbar__top wails-drag">
                     <span className="sync-toolbar__brand">Commando Sync</span>
+                    <SyncLocaleSelector />
                     <ThemeSwitchButton />
                 </div>
                 <div className="sync-toolbar__bottom wails-no-drag">

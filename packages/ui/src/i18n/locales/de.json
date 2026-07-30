@@ -1,0 +1,61 @@
+{
+    "sync": {
+        "toolbar": {
+            "strategy": "Strategie",
+            "compare": "Vergleichen",
+            "comparing": "Vergleiche…",
+            "sync": "Sync",
+            "syncing": "Synchronisiere…"
+        },
+        "strategy": {
+            "mirrorRight": "Spiegeln → Rechts",
+            "updateRight": "Update → Rechts",
+            "mirrorLeft": "Spiegeln → Links",
+            "updateLeft": "Update → Links",
+            "twoWay": "Bidirektional"
+        },
+        "stats": {
+            "copy": "kopieren",
+            "delete": "löschen",
+            "conflicts": "Konflikte",
+            "skip": "überspringen"
+        },
+        "legend": {
+            "copy": "Wird kopiert",
+            "delete": "Wird gelöscht",
+            "conflict": "Konflikt"
+        },
+        "onboarding": { "clickCompare": "Klicke Vergleichen" },
+        "pane": {
+            "left": "Links",
+            "right": "Rechts",
+            "noRoot": "Keine Wurzel",
+            "setRoot": "Wurzel setzen",
+            "browse": "Durchsuchen"
+        },
+        "plan": {
+            "title": "Vorschau",
+            "cancel": "Abbrechen",
+            "confirm": "Starten"
+        },
+        "status": {
+            "ready": "Bereit",
+            "comparing": "Vergleiche…",
+            "complete": "Sync abgeschlossen"
+        },
+        "table": { "status": "Status" }
+    },
+    "ui": {
+        "table": {
+            "name": "Name",
+            "dateModified": "Geändert",
+            "size": "Größe",
+            "type": "Typ"
+        },
+        "file": {
+            "typeFolder": "Ordner",
+            "typeFile": "Datei",
+            "itemsCount": "Elemente"
+        }
+    }
+}

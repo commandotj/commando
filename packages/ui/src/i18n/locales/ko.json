@@ -1,0 +1,57 @@
+{
+    "sync": {
+        "toolbar": {
+            "strategy": "동기화 방법",
+            "compare": "비교",
+            "comparing": "비교 중…",
+            "sync": "동기화",
+            "syncing": "동기화 중…"
+        },
+        "strategy": {
+            "mirrorRight": "미러 → 오른쪽",
+            "updateRight": "업데이트 → 오른쪽",
+            "mirrorLeft": "미러 → 왼쪽",
+            "updateLeft": "업데이트 → 왼쪽",
+            "twoWay": "양방향"
+        },
+        "stats": {
+            "copy": "복사",
+            "delete": "삭제",
+            "conflicts": "충돌",
+            "skip": "건너뛰기"
+        },
+        "legend": {
+            "copy": "복사 예정",
+            "delete": "삭제 예정",
+            "conflict": "충돌"
+        },
+        "onboarding": { "clickCompare": "비교 클릭" },
+        "pane": {
+            "left": "왼쪽",
+            "right": "오른쪽",
+            "noRoot": "루트 없음",
+            "setRoot": "루트 설정",
+            "browse": "찾아보기"
+        },
+        "plan": { "title": "미리보기", "cancel": "취소", "confirm": "시작" },
+        "status": {
+            "ready": "준비",
+            "comparing": "비교 중…",
+            "complete": "동기화 완료"
+        },
+        "table": { "status": "상태" }
+    },
+    "ui": {
+        "table": {
+            "name": "이름",
+            "dateModified": "수정일",
+            "size": "크기",
+            "type": "유형"
+        },
+        "file": {
+            "typeFolder": "폴더",
+            "typeFile": "파일",
+            "itemsCount": "항목"
+        }
+    }
+}

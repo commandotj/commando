@@ -223,12 +223,13 @@ export const compareSync = createAsyncThunk(
 
 ## 9. 风险
 
-| 风险                                                                 | 缓解                                                                                                                      |
-| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Wails 环境下找不到 CLI 二进制路径                                    | 打包时把 CLI 一并嵌入 app bundle，启动时解析绝对路径，非 PATH 依赖                                                        |
-| 子进程 NDJSON 解析中断（非法行/截断）                                | 逐行 try-parse，单行失败跳过不中止整个流，记录 warning                                                                    |
-| `viewMode` 与已有 `diffMap`（SyncPane 现有行染色机制）职责重叠       | `diffMap` 废弃，diff 展示逻辑统一收拢进 `SyncDiffView`                                                                    |
-| `exec.CommandContext` 取消后子进程留下的部分写入的 stdout 缓冲未读完 | `streamNDJSONAsEvents` 读循环遇 EOF 自然退出，不需要额外 flush 逻辑；Compare 阶段本身只读不写用户数据，取消无副作用需清理 |
+| 风险                                                                                                      | 缓解                                                                                                                                  |
+| --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Wails 环境下找不到 CLI 二进制路径                                                                         | 打包时把 CLI 一并嵌入 app bundle，启动时解析绝对路径，非 PATH 依赖                                                                    |
+| 子进程 NDJSON 解析中断（非法行/截断）                                                                     | 逐行 try-parse，单行失败跳过不中止整个流，记录 warning                                                                                |
+| `fileManagerSlice.viewMode` 与已有 `diffMap`（SyncPane 现有行染色机制）职责重叠                           | `diffMap` 废弃，diff 展示逻辑统一收拢进 `SyncDiffView`                                                                                |
+| `viewMode`（fileManagerSlice）与 `compareReport`（syncSlice）分属两个 slice，切换视图与数据到达顺序需一致 | `compareSync.fulfilled` 内先 dispatch syncSlice 存数据，同步再 dispatch fileManagerSlice 切视图，同一事件循环内完成，不产生中间态闪烁 |
+| `exec.CommandContext` 取消后子进程留下的部分写入的 stdout 缓冲未读完                                      | `streamNDJSONAsEvents` 读循环遇 EOF 自然退出，不需要额外 flush 逻辑；Compare 阶段本身只读不写用户数据，取消无副作用需清理             |
 
 ## 9a. 测试计划（TDD 前置，非事后补测）
 
@@ -243,12 +244,12 @@ export const compareSync = createAsyncThunk(
 | Wails | `TestCancelSync_UnknownJobID_ReturnsFalseNoError`                                 | 取消一个不存在的 jobID 不 panic，返回 `cancelled:false`                                                                                                                               |
 | Wails | `TestStreamNDJSONAsEvents_PartialLineOnKill_NoCorruptEvent`                       | **需先手工验证真实行为再定断言**：SIGKILL 子进程时 stdout 可能截断半行 JSON，确认 `streamNDJSONAsEvents` 对半行的处理是丢弃还是报错，再写断言——不要在不知道真实行为前先编好"应该怎样" |
 | Redux | `progressUpdated reducer 合并 payload 到 progressFile/progressDone/progressTotal` | 修复 task #6 的核心断言：确认这三个字段真的被更新，不再停留在初始值                                                                                                                   |
-| Redux | `compareSync.fulfilled 设置 viewMode 为 diff`                                     | 验证视图切换真的发生                                                                                                                                                                  |
-| Redux | `clearSyncPlan 或返回浏览态 action 把 viewMode 设回 browse`                       | 验证切回逻辑，防止卡死在 diff 态                                                                                                                                                      |
+| Redux | `compareSync.fulfilled 触发 fileManagerSlice setViewMode("diff")`                 | 验证视图切换真的发生，且跨 slice 触发路径正确                                                                                                                                         |
+| Redux | `setViewMode("browse") 把 fileManagerSlice.viewMode 设回 browse`                  | 验证切回逻辑，防止卡死在 diff 态                                                                                                                                                      |
 | UI    | `SyncDiffView 渲染 conflict 组永远展开且置顶`                                     | S-04 铁律的 UI 层验证，防止未来重构悄悄破坏这条安全规则                                                                                                                               |
 | UI    | `SyncDiffView skip 组默认折叠`                                                    | §7 分组行为回归保护                                                                                                                                                                   |
 
-**门禁：** 本 RFC 涉及的 4 个新文件（`SyncDiffView.tsx` + 修改的 `sync.go`×2 + `syncSlice.ts`）比照 RFC-012 §6 的逐包覆盖率纪律，Go 侧新增代码需要 100%（`.coverage-required` 标记同已完成的 `fsutil`/`filter`/`engine`），前端侧至少覆盖上表列出的每一条。
+**门禁：** 本 RFC 涉及的新增/修改文件（`SyncDiffView.tsx` + 修改的 `sync.go`×2 + `syncSlice.ts` + `fileManagerSlice.ts`）比照 RFC-012 §6 的逐包覆盖率纪律，Go 侧新增代码需要 100%（`.coverage-required` 标记同已完成的 `fsutil`/`filter`/`engine`），前端侧至少覆盖上表列出的每一条。
 
 ## 10. 待定
 

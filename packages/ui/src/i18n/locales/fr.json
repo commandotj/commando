@@ -1,0 +1,61 @@
+{
+    "sync": {
+        "toolbar": {
+            "strategy": "Stratégie",
+            "compare": "Comparer",
+            "comparing": "Comparaison…",
+            "sync": "Sync",
+            "syncing": "Synchro…"
+        },
+        "strategy": {
+            "mirrorRight": "Miroir → Droite",
+            "updateRight": "MàJ → Droite",
+            "mirrorLeft": "Miroir → Gauche",
+            "updateLeft": "MàJ → Gauche",
+            "twoWay": "Bidirectionnel"
+        },
+        "stats": {
+            "copy": "copier",
+            "delete": "supprimer",
+            "conflicts": "conflits",
+            "skip": "ignorer"
+        },
+        "legend": {
+            "copy": "Sera copié",
+            "delete": "Sera supprimé",
+            "conflict": "Conflit"
+        },
+        "onboarding": { "clickCompare": "Cliquez Comparer" },
+        "pane": {
+            "left": "Gauche",
+            "right": "Droite",
+            "noRoot": "Aucune racine",
+            "setRoot": "Définir racine",
+            "browse": "Parcourir"
+        },
+        "plan": {
+            "title": "Aperçu",
+            "cancel": "Annuler",
+            "confirm": "Démarrer"
+        },
+        "status": {
+            "ready": "Prêt",
+            "comparing": "Comparaison…",
+            "complete": "Sync terminé"
+        },
+        "table": { "status": "Statut" }
+    },
+    "ui": {
+        "table": {
+            "name": "Nom",
+            "dateModified": "Modifié",
+            "size": "Taille",
+            "type": "Type"
+        },
+        "file": {
+            "typeFolder": "Dossier",
+            "typeFile": "Fichier",
+            "itemsCount": "éléments"
+        }
+    }
+}
