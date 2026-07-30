@@ -149,16 +149,16 @@ P1 完成前，UI（RFC-015/020/022/023）、report 增强（RFC-024）、platfo
 
 ### 已批准的 RFC
 
-| RFC 编号                                                         | 标题                                                         | 作者      | 创建时间   | 批准时间   | 状态         |
-| ---------------------------------------------------------------- | ------------------------------------------------------------ | --------- | ---------- | ---------- | ------------ |
-| [RFC-2026-016](./rfc/completed/016-compare-engine-extensions.md) | Compare Engine — Content, Symlinks, Tolerance & Parallel     | albert.li | 2026-07-29 | 2026-07-30 | ✅ Completed |
-| [RFC-2026-017](./rfc/017-sync-variants-changes-custom.md)        | Sync Variants — Changes Mode, Two-way, Custom & Swap         | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
-| [RFC-2026-018](./rfc/018-sync-database.md)                       | Sync Database — `sync.commando_db` & Moved File Detection    | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
-| [RFC-2026-019](./rfc/completed/019-filter-system.md)             | Filter System — Include/Exclude Glob                         | albert.li | 2026-07-29 | 2026-07-30 | ✅ Completed |
-| [RFC-2026-021](./rfc/021-cli-config.md)                          | CLI & Config — Return Codes, Profiles, Schedules             | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
-| [RFC-2026-024](./rfc/024-reports.md)                             | Reports — Session Log, LastSyncs & Email                     | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
-| [RFC-2026-027](./rfc/027-delete-operations.md)                   | Delete Operations — Recycle Bin & Versioning                 | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
-| [RFC-2026-028](./rfc/028-execution-options.md)                   | Execution Options — Error Handling, Verify, Fail-safe & Lock | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
+| RFC 编号                                                            | 标题                                                         | 作者      | 创建时间   | 批准时间   | 状态         |
+| ------------------------------------------------------------------- | ------------------------------------------------------------ | --------- | ---------- | ---------- | ------------ |
+| [RFC-2026-016](./rfc/completed/016-compare-engine-extensions.md)    | Compare Engine — Content, Symlinks, Tolerance & Parallel     | albert.li | 2026-07-29 | 2026-07-30 | ✅ Completed |
+| [RFC-2026-017](./rfc/completed/017-sync-variants-changes-custom.md) | Sync Variants — Changes Mode, Two-way, Custom & Swap         | albert.li | 2026-07-29 | 2026-07-30 | ✅ Completed |
+| [RFC-2026-018](./rfc/018-sync-database.md)                          | Sync Database — `sync.commando_db` & Moved File Detection    | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
+| [RFC-2026-019](./rfc/completed/019-filter-system.md)                | Filter System — Include/Exclude Glob                         | albert.li | 2026-07-29 | 2026-07-30 | ✅ Completed |
+| [RFC-2026-021](./rfc/021-cli-config.md)                             | CLI & Config — Return Codes, Profiles, Schedules             | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
+| [RFC-2026-024](./rfc/024-reports.md)                                | Reports — Session Log, LastSyncs & Email                     | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
+| [RFC-2026-027](./rfc/027-delete-operations.md)                      | Delete Operations — Recycle Bin & Versioning                 | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
+| [RFC-2026-028](./rfc/028-execution-options.md)                      | Execution Options — Error Handling, Verify, Fail-safe & Lock | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
 
 ### 架构设计 RFC
 

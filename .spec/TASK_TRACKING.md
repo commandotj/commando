@@ -75,16 +75,16 @@ P1 RFC 内的 UI-only、email/HTML、remote、RealtimeSync、distribution 任务
 
 ### RFC-017 — Sync Variants (11 actionable)
 
-| Task                                          | IDs                   | Status       |
-| --------------------------------------------- | --------------------- | ------------ |
-| Mirror / Update 变体（已有）                  | VAR-01, 02            | 🟢           |
-| 冲突识别（已有）                              | CMP-15                | 🟢           |
-| 安全交换左右路径（Swap）                      | VAR-08                | 🟢           |
-| Custom 自定义规则（differences 模式）         | VAR-05                | 🟢           |
-| 跨变体保留过滤器                              | VAR-07                | 🟢           |
-| Changes Mode（按变更检测同步）                | VAR-03, DB-01, 02, 03 | 🔵 → RFC-018 |
-| Two-way 使用 DB changes；删除 mtime-only 决策 | VAR-04                | 🔵 → RFC-018 |
-| Custom (changes)                              | VAR-06                | 🔵 → RFC-018 |
+| Task                                  | IDs        | Status         |
+| ------------------------------------- | ---------- | -------------- |
+| Mirror / Update 变体（已有）          | VAR-01, 02 | 🟢             |
+| 冲突识别（已有）                      | CMP-15     | 🟢             |
+| 安全交换左右路径（Swap）              | VAR-08     | 🟢             |
+| Custom 自定义规则（differences 模式） | VAR-05     | 🟢             |
+| 跨变体保留过滤器                      | VAR-07     | 🟢             |
+| Update (changes) 基于 DB 变更检测     | VAR-03     | 🟢             |
+| Two-way (changes) — 双向 DB           | VAR-04     | 🔵 RFC-017-ext |
+| Custom (changes) — 变更类型动作映射   | VAR-06     | 🔵 RFC-017-ext |
 
 ### RFC-018 — Sync Database (3 actionable)
 
