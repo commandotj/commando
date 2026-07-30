@@ -25,12 +25,7 @@ const SyncToolbar: React.FC = () => {
     const { strategyId, plan, status, error, planModalOpen } = useAppSelector(
         state => state.sync
     );
-    const {
-        leftRoot,
-        rightRoot,
-        state: rootsState,
-        rootsReady,
-    } = useSyncRootsState();
+    const { leftRoot, rightRoot, state: rootsState } = useSyncRootsState();
     const busy = status === "comparing" || status === "syncing";
 
     const handleCompare = (): void => {
@@ -38,11 +33,8 @@ const SyncToolbar: React.FC = () => {
     };
 
     const handleSync = (): void => {
-        if (plan) {
-            dispatch(setPlanModalOpen(true));
-            return;
-        }
-        void dispatch(compareSync());
+        if (!plan) return;
+        dispatch(setPlanModalOpen(true));
     };
 
     const handleConfirmSync = (): void => {
@@ -84,7 +76,7 @@ const SyncToolbar: React.FC = () => {
                     <button
                         type="button"
                         className="sync-btn sync-btn--ghost"
-                        disabled={!rootsReady || busy}
+                        disabled={busy}
                         onClick={handleCompare}
                     >
                         <CounterClockwiseClockIcon width={14} height={14} />
@@ -96,7 +88,7 @@ const SyncToolbar: React.FC = () => {
                     <button
                         type="button"
                         className="sync-btn sync-btn--primary"
-                        disabled={!rootsReady || busy}
+                        disabled={busy || !plan}
                         onClick={handleSync}
                     >
                         <PlayIcon width={14} height={14} />
