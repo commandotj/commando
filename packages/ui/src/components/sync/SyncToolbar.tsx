@@ -57,22 +57,11 @@ const SyncToolbar: React.FC = () => {
     return (
         <>
             <header className="sync-toolbar">
-                <div
-                    className="sync-titlebar wails-drag"
-                    aria-label="Window title bar"
-                >
-                    <div className="sync-toolbar__brand">Commando Sync</div>
-                </div>
-                <div className="sync-toolbar__top wails-no-drag">
-                    <SyncSummaryStrip
-                        plan={plan}
-                        comparing={status === "comparing"}
-                        rootsState={rootsState}
-                    />
-                    <ThemeSwitchButton />
-                </div>
-
                 <div className="sync-toolbar__bottom wails-no-drag">
+                    <div className="sync-toolbar__brand wails-drag">
+                        Commando Sync
+                    </div>
+
                     <select
                         className="sync-select"
                         value={strategyId}
@@ -118,8 +107,15 @@ const SyncToolbar: React.FC = () => {
 
                     <SyncLegend />
                     <SyncMoreOptions />
+                    <ThemeSwitchButton />
                 </div>
             </header>
+
+            <SyncSummaryStrip
+                plan={plan}
+                comparing={status === "comparing"}
+                rootsState={rootsState}
+            />
 
             <SyncPlanModal
                 open={planModalOpen}
