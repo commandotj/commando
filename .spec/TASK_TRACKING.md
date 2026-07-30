@@ -19,7 +19,7 @@ P1 目标：本地路径 CLI `compare → deterministic plan → safe execute �
 | 3    | RFC-030 | 本地路径错误和文件系统差异可观察                                    | 🟢   |
 | 4    | RFC-017 | Mirror/Update/Two-way plan 语义正确                                 | 🟢   |
 | 5    | RFC-031 | **017 完成后** Compare↔Plan E2E：BuildPlan 接 engine；CLI T1–T7     | 🔵   |
-| 6    | RFC-018 | Two-way/move detection 持久状态与恢复                               | 🔵   |
+| 6    | RFC-018 | Two-way/move detection 有持久状态与恢复                             | 🟢   |
 | 7    | RFC-027 | Permanent/Trash/Versioning 删除语义                                 | 🔵   |
 | 8    | RFC-028 | core-owned plan；context、fail-safe、verify、lock、truthful Outcome | 🔵   |
 | 9    | RFC-021 | 严格输入、NDJSON stdout、stderr 诊断、稳定退出码                    | 🔵   |
@@ -90,9 +90,9 @@ P1 RFC 内的 UI-only、email/HTML、remote、RealtimeSync、distribution 任务
 
 | Task                             | IDs           | Status |
 | -------------------------------- | ------------- | ------ |
-| 持久化 sync.commando_db 变更检测 | SYN-01, DB-01 | 🔵     |
-| 基于稳定文件 ID 的移动检测       | SYN-02, DB-02 | 🔵     |
-| 无稳定 ID 时回退复制+删除        | SYN-02, DB-03 | 🔵     |
+| 持久化 sync.commando_db 变更检测 | SYN-01, DB-01 | 🟢     |
+| 基于稳定文件 ID 的移动检测       | SYN-02, DB-02 | 🟢     |
+| 无稳定 ID 时回退复制+删除        | SYN-02, DB-03 | 🟢     |
 
 ### RFC-019 — Filter System
 
