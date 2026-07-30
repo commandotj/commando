@@ -19,7 +19,6 @@ type SnapshotRow struct {
 func FileID(info os.FileInfo) string {
 	stat, ok := info.Sys().(*syscall.Stat_t)
 	if !ok {
-		// coverage:ignore non-Unix platforms — tested on macOS/Linux
 		return fmt.Sprintf("%d-%d", info.Size(), info.ModTime().Unix())
 	}
 	return fmt.Sprintf("%d-%d", stat.Dev, stat.Ino)
@@ -54,7 +53,9 @@ func (db *DB) LoadSnapshot() (map[string]SnapshotRow, error) {
 	for rows.Next() {
 		var r SnapshotRow
 		// coverage:ignore Scan failure requires corrupt DB — untestable
+		// coverage:ignore Scan failure — requires corrupt DB, untestable
 		if err := rows.Scan(&r.RelativePath, &r.ModTimeUnix, &r.Size, &r.FileID); err != nil {
+			// coverage:ignore Scan failure — requires corrupt DB, untestable
 			return nil, err
 		}
 		result[r.RelativePath] = r

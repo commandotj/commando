@@ -51,7 +51,6 @@ func (db *DB) ClearSnapshot() error {
 // WriteSnapshot replaces the entire snapshot table with the given rows in a
 // single transaction.
 func (db *DB) WriteSnapshot(rows []SnapshotRow) error {
-	// coverage:ignore Begin failure — tested with valid WAL-mode SQLite
 	tx, err := db.conn.Begin()
 	if err != nil {
 		return err
@@ -62,7 +61,6 @@ func (db *DB) WriteSnapshot(rows []SnapshotRow) error {
 		return err
 	}
 	for _, r := range rows {
-		// coverage:ignore Exec failure — tested with valid schema+sane inputs
 		if _, err := tx.Exec(
 			`INSERT INTO snapshot (relative_path, mod_time_unix, size, file_id, updated_at)
 			 VALUES (?, ?, ?, ?, datetime('now'))`,
