@@ -100,9 +100,9 @@ RFC (Request for Comments) 是 commando-react 项目中用于记录和跟踪重�
 | 🔵 Proposed         | 10     | 32.3%    |
 | 🟡 Under Discussion | 0      | 0%       |
 | 🟠 Under Review     | 0      | 0%       |
-| 🟢 Approved         | 8      | 25.8%    |
+| 🟢 Approved         | 7      | 22.6%    |
 | 🔵 In Progress      | 0      | 0%       |
-| ✅ Completed        | 8      | 25.8%    |
+| ✅ Completed        | 9      | 29.0%    |
 | ❌ Deprecated       | 5      | 16.1%    |
 | **总计**            | **31** | **100%** |
 
@@ -115,7 +115,7 @@ P1 只包含完成本地路径 CLI `compare → plan → safe execute → termin
 | 顺序 | RFC                                                             | P1 责任                   | Gate                                                       |
 | ---- | --------------------------------------------------------------- | ------------------------- | ---------------------------------------------------------- |
 | 1    | [RFC-2026-016](./rfc/016-compare-engine-extensions.md)          | Compare engine            | engine 原语+单测；**不含** planner 接线                    |
-| 2    | [RFC-2026-019](./rfc/019-filter-system.md)                      | Filter core               | matcher 经统一 engine 进入 CLI compare；非法 glob 报错     |
+| 2    | [RFC-2026-019](./rfc/019-filter-system.md)                      | Filter CLI-first ✅       | matcher 经统一 engine 进入 CLI compare；非法 glob 报错     |
 | 3    | [RFC-2026-030](./rfc/030-local-smb-filesystem-compatibility.md) | Local filesystem baseline | 本地路径错误与文件系统差异可观察                           |
 | 4    | [RFC-2026-017](./rfc/017-sync-variants-changes-custom.md)       | Plan semantics            | Mirror/Update/Two-way 不用名称掩盖错误语义                 |
 | 5    | [RFC-2026-031](./rfc/031-compare-plan-e2e-verify.md)            | Compare↔Plan E2E verify   | **017 完成后**；BuildPlan 接 engine；CLI T1–T7 全绿        |
@@ -149,16 +149,16 @@ P1 完成前，UI（RFC-015/020/022/023）、report 增强（RFC-024）、platfo
 
 ### 已批准的 RFC
 
-| RFC 编号                                                  | 标题                                                         | 作者      | 创建时间   | 批准时间   | 状态        |
-| --------------------------------------------------------- | ------------------------------------------------------------ | --------- | ---------- | ---------- | ----------- |
-| [RFC-2026-016](./rfc/016-compare-engine-extensions.md)    | Compare Engine — Content, Symlinks, Tolerance & Parallel     | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved |
-| [RFC-2026-017](./rfc/017-sync-variants-changes-custom.md) | Sync Variants — Changes Mode, Two-way, Custom & Swap         | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved |
-| [RFC-2026-018](./rfc/018-sync-database.md)                | Sync Database — `sync.commando_db` & Moved File Detection    | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved |
-| [RFC-2026-019](./rfc/019-filter-system.md)                | Filter System — Include/Exclude Glob                         | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved |
-| [RFC-2026-021](./rfc/021-cli-config.md)                   | CLI & Config — Return Codes, Profiles, Schedules             | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved |
-| [RFC-2026-024](./rfc/024-reports.md)                      | Reports — Session Log, LastSyncs & Email                     | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved |
-| [RFC-2026-027](./rfc/027-delete-operations.md)            | Delete Operations — Recycle Bin & Versioning                 | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved |
-| [RFC-2026-028](./rfc/028-execution-options.md)            | Execution Options — Error Handling, Verify, Fail-safe & Lock | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved |
+| RFC 编号                                                  | 标题                                                         | 作者      | 创建时间   | 批准时间   | 状态         |
+| --------------------------------------------------------- | ------------------------------------------------------------ | --------- | ---------- | ---------- | ------------ |
+| [RFC-2026-016](./rfc/016-compare-engine-extensions.md)    | Compare Engine — Content, Symlinks, Tolerance & Parallel     | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
+| [RFC-2026-017](./rfc/017-sync-variants-changes-custom.md) | Sync Variants — Changes Mode, Two-way, Custom & Swap         | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
+| [RFC-2026-018](./rfc/018-sync-database.md)                | Sync Database — `sync.commando_db` & Moved File Detection    | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
+| [RFC-2026-019](./rfc/019-filter-system.md)                | Filter System — Include/Exclude Glob                         | albert.li | 2026-07-29 | 2026-07-30 | ✅ Completed |
+| [RFC-2026-021](./rfc/021-cli-config.md)                   | CLI & Config — Return Codes, Profiles, Schedules             | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
+| [RFC-2026-024](./rfc/024-reports.md)                      | Reports — Session Log, LastSyncs & Email                     | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
+| [RFC-2026-027](./rfc/027-delete-operations.md)            | Delete Operations — Recycle Bin & Versioning                 | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
+| [RFC-2026-028](./rfc/028-execution-options.md)            | Execution Options — Error Handling, Verify, Fail-safe & Lock | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
 
 ### 架构设计 RFC
 
@@ -253,30 +253,31 @@ _暂无_
 
 ## 最近更新
 
-| 时间       | RFC          | 更新内容                                                               | 作者            |
-| ---------- | ------------ | ---------------------------------------------------------------------- | --------------- |
-| 2026-07-29 | RFC-2026-012 | Feature ID 全部绑定现存 Owner RFC；新增 RFC-029/030                    | Codex/albert.li |
-| 2026-07-27 | RFC-2026-013 | Dev/Prod 身份、图标、打包入口与运行时验证完成                          | Codex/albert.li |
-| 2026-07-27 | RFC-2026-013 | 用户批准 Wails Dev/Prod 身份分离方案                                   | Codex/albert.li |
-| 2026-07-27 | RFC-2026-011 | C1 应用于正式应用与平台资产，验证完成                                  | Codex/albert.li |
-| 2026-07-27 | RFC-2026-011 | 生成并验证 C1 候选，进入候选审批                                       | Codex/albert.li |
-| 2026-07-27 | RFC-2026-012 | 创建 Go Sync Module Compare Report RFC（RFC-first 治理）               | albert.li/AI    |
-| 2026-07-27 | RFC-2026-012 | v2：轻量自研 engine；拒绝第三方 sync 库；FFS 够用范围                  | albert.li/AI    |
-| 2026-07-28 | RFC-2026-012 | v3：**FFS 14.x 全功能 1:1**；§4 验收表 75+ 项；废弃裁剪                | albert.li/AI    |
-| 2026-07-28 | RFC-2026-012 | v3.9：§12 待决事项 OQ-01…05 全部关闭                                   | albert.li/AI    |
-| 2026-07-28 | RFC-2026-014 | 从 RFC-2026-012 OQ-02 拆出，创建远程存储扩展 RFC（Google Drive / MTP） | albert.li/AI    |
-| 2026-07-27 | RFC-2026-011 | 用户批准，进入候选生成阶段                                             | Codex/albert.li |
-| 2026-07-27 | RFC-2026-011 | 创建 Commando 卡通应用图标提案                                         | Codex/albert.li |
-| 2025-01-27 | RFC-2025-009 | 创建 Shell Service API 设计文档                                        | AI Assistant    |
-| 2025-01-27 | RFC-2025-008 | 创建 Window Service API 设计文档                                       | AI Assistant    |
-| 2024-12-19 | RFC-2024-005 | 清理重复文件，更新索引                                                 | albert.li/AI    |
-| 2024-12-19 | RFC-2024-004 | 转换为RFC格式并重命名                                                  | albert.li/AI    |
-| 2024-12-19 | RFC-2024-003 | 转换为RFC格式并重命名                                                  | albert.li/AI    |
-| 2024-12-19 | RFC-2024-002 | 转换为RFC格式并重命名                                                  | albert.li/AI    |
-| 2024-12-19 | RFC-2024-001 | 创建 RFC 索引系统                                                      | albert.li/AI    |
-| 2025-09-27 | RFC-2025-006 | LubanEngine 进入实施阶段，记录实现路线                                 | Codex AI        |
-| 2024-06-15 | RFC-2024-002 | 批量复制设计完成                                                       | AI+albert.li    |
-| 2024-06-09 | RFC-2024-001 | 日志模块设计完成                                                       | albert.li/AI    |
+| 时间       | RFC          | 更新内容                                                                           | 作者            |
+| ---------- | ------------ | ---------------------------------------------------------------------------------- | --------------- |
+| 2026-07-30 | RFC-2026-019 | CLI-first filter 完成：BuildPlan→engine.IndexRoot, Validate(), --include/--exclude | albert.li/AI    |
+| 2026-07-29 | RFC-2026-012 | Feature ID 全部绑定现存 Owner RFC；新增 RFC-029/030                                | Codex/albert.li |
+| 2026-07-27 | RFC-2026-013 | Dev/Prod 身份、图标、打包入口与运行时验证完成                                      | Codex/albert.li |
+| 2026-07-27 | RFC-2026-013 | 用户批准 Wails Dev/Prod 身份分离方案                                               | Codex/albert.li |
+| 2026-07-27 | RFC-2026-011 | C1 应用于正式应用与平台资产，验证完成                                              | Codex/albert.li |
+| 2026-07-27 | RFC-2026-011 | 生成并验证 C1 候选，进入候选审批                                                   | Codex/albert.li |
+| 2026-07-27 | RFC-2026-012 | 创建 Go Sync Module Compare Report RFC（RFC-first 治理）                           | albert.li/AI    |
+| 2026-07-27 | RFC-2026-012 | v2：轻量自研 engine；拒绝第三方 sync 库；FFS 够用范围                              | albert.li/AI    |
+| 2026-07-28 | RFC-2026-012 | v3：**FFS 14.x 全功能 1:1**；§4 验收表 75+ 项；废弃裁剪                            | albert.li/AI    |
+| 2026-07-28 | RFC-2026-012 | v3.9：§12 待决事项 OQ-01…05 全部关闭                                               | albert.li/AI    |
+| 2026-07-28 | RFC-2026-014 | 从 RFC-2026-012 OQ-02 拆出，创建远程存储扩展 RFC（Google Drive / MTP）             | albert.li/AI    |
+| 2026-07-27 | RFC-2026-011 | 用户批准，进入候选生成阶段                                                         | Codex/albert.li |
+| 2026-07-27 | RFC-2026-011 | 创建 Commando 卡通应用图标提案                                                     | Codex/albert.li |
+| 2025-01-27 | RFC-2025-009 | 创建 Shell Service API 设计文档                                                    | AI Assistant    |
+| 2025-01-27 | RFC-2025-008 | 创建 Window Service API 设计文档                                                   | AI Assistant    |
+| 2024-12-19 | RFC-2024-005 | 清理重复文件，更新索引                                                             | albert.li/AI    |
+| 2024-12-19 | RFC-2024-004 | 转换为RFC格式并重命名                                                              | albert.li/AI    |
+| 2024-12-19 | RFC-2024-003 | 转换为RFC格式并重命名                                                              | albert.li/AI    |
+| 2024-12-19 | RFC-2024-002 | 转换为RFC格式并重命名                                                              | albert.li/AI    |
+| 2024-12-19 | RFC-2024-001 | 创建 RFC 索引系统                                                                  | albert.li/AI    |
+| 2025-09-27 | RFC-2025-006 | LubanEngine 进入实施阶段，记录实现路线                                             | Codex AI        |
+| 2024-06-15 | RFC-2024-002 | 批量复制设计完成                                                                   | AI+albert.li    |
+| 2024-06-09 | RFC-2024-001 | 日志模块设计完成                                                                   | albert.li/AI    |
 
 ## 下一步行动
 

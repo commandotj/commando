@@ -4,7 +4,11 @@
 
 作者: albert.li
 创建时间: 2026-07-29
-状态: Approved
+状态: Completed ✅
+
+完成记录:
+
+- 2026-07-30: CLI-first 实施 — BuildPlan→engine.IndexRoot, Validate(), --include/--exclude flags, 86 tests pass
 
 批准记录:
 
