@@ -190,3 +190,39 @@ func TestOpen_BadPath(t *testing.T) {
 		t.Fatal("expected error opening db under a non-directory path")
 	}
 }
+
+func TestWriteSnapshot_AfterClose(t *testing.T) {
+	dir := t.TempDir()
+	db, _ := Open(filepath.Join(dir, "sync.commando_db"))
+	db.Close()
+
+	err := db.WriteSnapshot([]SnapshotRow{{RelativePath: "a.txt", ModTimeUnix: 1, Size: 10, FileID: "A"}})
+	if err == nil {
+		t.Fatal("expected error after close")
+	}
+}
+
+func TestLoadSnapshot_BadSchema(t *testing.T) {
+	dir := t.TempDir()
+	db, _ := Open(filepath.Join(dir, "sync.commando_db"))
+	defer db.Close()
+
+	db.conn.Exec(`DROP TABLE IF EXISTS snapshot`)
+	db.conn.Exec(`CREATE TABLE snapshot (relative_path INTEGER PRIMARY KEY, mod_time_unix INTEGER)`)
+	db.conn.Exec(`INSERT INTO snapshot VALUES (1, 2)`)
+
+	_, err := db.LoadSnapshot()
+	if err == nil {
+		t.Fatal("expected Scan error with wrong column count")
+	}
+}
+
+func TestOpen_BadDBFile(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "corrupt.db")
+	_ = os.WriteFile(path, []byte("not a valid sqlite database"), 0o644)
+	_, err := Open(path)
+	if err == nil {
+		t.Fatal("expected error opening corrupt file")
+	}
+}
