@@ -5,6 +5,8 @@ import {
     setUseChecksum,
     setErrorMode,
     setDeleteMethod,
+    setDeleteExtraneous,
+    setDryRun,
 } from "../../app/syncSlice";
 
 const SyncMoreOptions: React.FC = () => {
@@ -33,6 +35,26 @@ const SyncMoreOptions: React.FC = () => {
                             }
                         />
                         Content compare
+                    </label>
+                    <label className="sync-toggle">
+                        <input
+                            type="checkbox"
+                            checked={options.deleteExtraneous}
+                            onChange={e =>
+                                dispatch(setDeleteExtraneous(e.target.checked))
+                            }
+                        />
+                        Delete extraneous
+                    </label>
+                    <label className="sync-toggle">
+                        <input
+                            type="checkbox"
+                            checked={options.dryRun}
+                            onChange={e =>
+                                dispatch(setDryRun(e.target.checked))
+                            }
+                        />
+                        Dry run
                     </label>
                     <label className="sync-more-options__field">
                         On error
