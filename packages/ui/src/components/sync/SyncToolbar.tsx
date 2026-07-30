@@ -14,6 +14,7 @@ import { SYNC_STRATEGY_OPTIONS } from "../../constants/sync";
 import { useI18n } from "../../hooks/useI18n";
 import { ThemeSwitchButton } from "../ThemeSwitcher";
 import SyncLegend from "./SyncLegend";
+import SyncMoreOptions from "./SyncMoreOptions";
 import SyncPlanModal from "./SyncPlanModal";
 import { useSyncRootsState } from "../../hooks/useSyncRootsState";
 import { getSyncRootsOnboardingKey } from "../../common/syncRoots";
@@ -147,6 +148,7 @@ const SyncToolbar: React.FC = () => {
                     </label>
 
                     <SyncLegend />
+                    <SyncMoreOptions />
                 </div>
             </header>
 
