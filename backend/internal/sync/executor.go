@@ -8,7 +8,9 @@ import (
 	"os"
 	"path/filepath"
 
+	databaseapi "github.com/commandotj/commando/internal/sync/database"
 	dels "github.com/commandotj/commando/internal/sync/delete"
+	"github.com/commandotj/commando/internal/sync/engine"
 )
 
 // Execute runs a sync plan. ErrorMode="stop" aborts on first failure.
@@ -66,6 +68,30 @@ func Execute(ctx context.Context, plan *Plan, opts Options) (*ExecuteResult, err
 	}
 
 	return result, nil
+}
+
+// WriteSnapshot writes the current index to the DB for changes-mode use.
+func WriteSnapshot(dbPath string, idx engine.Index) error {
+	db, err := databaseapi.Open(dbPath)
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	db.ClearSnapshot()
+	for rel, entry := range idx {
+		if entry.IsDir {
+			continue
+		}
+		info, err := os.Stat(entry.AbsolutePath)
+		if err != nil {
+			continue
+		}
+		db.UpsertSnapshot(databaseapi.SnapshotRow{
+			RelativePath: rel, ModTimeUnix: entry.ModTimeUnix,
+			Size: entry.Size, FileID: databaseapi.FileID(info),
+		})
+	}
+	return nil
 }
 
 // copyFileAtomic copies source to a temporary file next to destination, then

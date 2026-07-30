@@ -2,9 +2,11 @@ package sync
 
 import (
 	"context"
+	"fmt"
 	"path/filepath"
 	"sort"
 
+	"github.com/commandotj/commando/internal/sync/database"
 	"github.com/commandotj/commando/internal/sync/engine"
 	"github.com/commandotj/commando/internal/sync/filter"
 )
@@ -28,6 +30,15 @@ func BuildPlan(ctx context.Context, leftRoot, rightRoot string, direction Direct
 	if err != nil {
 		return nil, err
 	}
+
+	if opts.ChangesMode {
+		return buildChangesPlan(ctx, leftRoot, rightRoot, leftEntries, rightEntries, direction, opts)
+	}
+
+	return buildDifferencesPlan(leftRoot, rightRoot, leftEntries, rightEntries, direction, opts)
+}
+
+func buildDifferencesPlan(leftRoot, rightRoot string, leftEntries, rightEntries engine.Index, direction Direction, opts Options) (*Plan, error) {
 
 	relPaths := unionKeys(leftEntries, rightEntries)
 	sort.Strings(relPaths)
@@ -56,6 +67,54 @@ func BuildPlan(ctx context.Context, leftRoot, rightRoot string, direction Direct
 		}
 	}
 
+	return plan, nil
+}
+
+func buildChangesPlan(ctx context.Context, leftRoot, rightRoot string, leftEntries, rightEntries engine.Index, direction Direction, opts Options) (*Plan, error) {
+	if opts.DBPath == "" {
+		return nil, fmt.Errorf("changes mode requires dbPath")
+	}
+	db, err := database.Open(opts.DBPath)
+	if err != nil {
+		return nil, fmt.Errorf("changes mode: %w", err)
+	}
+	defer db.Close()
+
+	prev, err := db.LoadSnapshot()
+	if err != nil {
+		return nil, err
+	}
+
+	plan := &Plan{LeftRoot: leftRoot, RightRoot: rightRoot, Direction: direction}
+	_ = rightEntries
+
+	for rel, entry := range leftEntries {
+		if entry.IsDir {
+			continue
+		}
+		snap, existed := prev[rel]
+		if !existed || snap.ModTimeUnix != entry.ModTimeUnix || snap.Size != entry.Size {
+			plan.ToCopy++
+			plan.Items = append(plan.Items, PlanItem{
+				RelativePath: rel, Action: ActionCopy,
+				Source: entry.AbsolutePath, Destination: filepath.Join(rightRoot, rel),
+				Reason: "changed",
+			})
+		} else {
+			plan.ToSkip++
+			plan.Items = append(plan.Items, PlanItem{
+				RelativePath: rel, Action: ActionSkip, Reason: "unchanged",
+			})
+		}
+	}
+	for rel := range prev {
+		if _, exists := leftEntries[rel]; !exists {
+			plan.ToSkip++
+			plan.Items = append(plan.Items, PlanItem{
+				RelativePath: rel, Action: ActionSkip, Reason: "deleted",
+			})
+		}
+	}
 	return plan, nil
 }
 

@@ -255,3 +255,61 @@ func TestBuildPlan_SymlinkExclude(t *testing.T) {
 		}
 	}
 }
+
+func TestBuildPlan_ChangesMode_CreatedFile(t *testing.T) {
+	left := t.TempDir()
+	right := t.TempDir()
+	dbPath := filepath.Join(t.TempDir(), "sync.db")
+
+	_ = os.WriteFile(filepath.Join(left, "a.txt"), []byte("hello"), 0o644)
+
+	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{
+		ChangesMode: true,
+		DBPath:      dbPath,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if plan.ToCopy != 1 {
+		t.Errorf("expected 1 copy for created file, got %d", plan.ToCopy)
+	}
+}
+
+func TestBuildPlan_ChangesMode_Unchanged(t *testing.T) {
+	left := t.TempDir()
+	right := t.TempDir()
+	dbPath := filepath.Join(t.TempDir(), "sync.db")
+
+	_ = os.WriteFile(filepath.Join(left, "a.txt"), []byte("same"), 0o644)
+
+	rules := filter.DefaultRules()
+	if err := rules.Validate(); err != nil {
+		t.Fatal(err)
+	}
+	m := filter.NewMatcher(rules)
+	idx, _ := engine.IndexRoot(context.Background(), left, m, engine.IndexOptions{SymlinkMode: engine.SymlinkExclude})
+
+	if err := sync.WriteSnapshot(dbPath, idx); err != nil {
+		t.Fatal(err)
+	}
+
+	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{
+		ChangesMode: true,
+		DBPath:      dbPath,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if plan.ToSkip != 1 {
+		t.Errorf("expected skip for unchanged file, got copies=%d skips=%d", plan.ToCopy, plan.ToSkip)
+	}
+}
+
+func TestBuildPlan_ChangesMode_NoDBPath(t *testing.T) {
+	_, err := sync.BuildPlan(context.Background(), "/tmp/a", "/tmp/b", sync.DirectionLeftToRight, sync.Options{
+		ChangesMode: true,
+	})
+	if err == nil {
+		t.Fatal("expected error for changes mode without dbPath")
+	}
+}
