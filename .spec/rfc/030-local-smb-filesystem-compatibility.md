@@ -4,8 +4,12 @@
 
 作者: albert.li / AI
 创建时间: 2026-07-29
-状态: Proposed
-修改历史:
+状态: Completed ✅
+
+完成记录:
+
+- 2026-07-30: REM-01 已验证 — 本地路径 Compare/Sync 正常；SMB 共享复用 Go os 路径，无需额外抽象
+  修改历史:
 
 - 2026-07-29: 创建 Owner RFC，承接 REM-01
 

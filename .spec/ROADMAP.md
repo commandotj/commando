@@ -97,12 +97,12 @@ RFC (Request for Comments) 是 commando-react 项目中用于记录和跟踪重�
 
 | 状态                | 数量   | 百分比   |
 | ------------------- | ------ | -------- |
-| 🔵 Proposed         | 10     | 32.3%    |
+| 🔵 Proposed         | 9      | 29.0%    |
 | 🟡 Under Discussion | 0      | 0%       |
 | 🟠 Under Review     | 0      | 0%       |
 | 🟢 Approved         | 7      | 22.6%    |
 | 🔵 In Progress      | 0      | 0%       |
-| ✅ Completed        | 9      | 29.0%    |
+| ✅ Completed        | 10     | 32.3%    |
 | ❌ Deprecated       | 5      | 16.1%    |
 | **总计**            | **31** | **100%** |
 
@@ -181,7 +181,7 @@ _暂无_
 | [RFC-2026-025](./rfc/025-realtimesync.md)                       | RealtimeSync — File Watcher, Idle Debounce & Service               | albert.li    | 2026-07-29 | 🔵 Proposed |
 | [RFC-2026-026](./rfc/026-remote-sftp-ftp.md)                    | Remote — SFTP & FTP Transfers                                      | albert.li    | 2026-07-29 | 🔵 Proposed |
 | [RFC-2026-029](./rfc/029-platform-distribution-and-i18n.md)     | Platform, Distribution, Localization & Scale                       | albert.li/AI | 2026-07-29 | 🔵 Proposed |
-| [RFC-2026-030](./rfc/030-local-smb-filesystem-compatibility.md) | Local & SMB Filesystem Compatibility                               | albert.li/AI | 2026-07-29 | 🔵 Proposed |
+| [RFC-2026-030](./rfc/030-local-smb-filesystem-compatibility.md) | Local & SMB Filesystem Compatibility                               | albert.li/AI | 2026-07-29 | 2026-07-30  | ✅ Completed |
 | [RFC-2026-031](./rfc/031-compare-plan-e2e-verify.md)            | Compare ↔ Plan E2E Verify（engine+planner+CLI）                    | albert.li/AI | 2026-07-29 | 🔵 Proposed |
 
 ### 已废弃的 RFC

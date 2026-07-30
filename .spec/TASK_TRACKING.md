@@ -16,7 +16,7 @@ P1 目标：本地路径 CLI `compare → deterministic plan → safe execute �
 | ---- | ------- | ------------------------------------------------------------------- | ---- |
 | 1    | RFC-016 | engine 原语：link、容差、并行、确定性输出（不含 planner）           | 🟢   |
 | 2    | RFC-019 | Include/exclude 经统一 engine 进入 CLI compare                      | 🟢   |
-| 3    | RFC-030 | 本地路径错误和文件系统差异可观察                                    | 🔵   |
+| 3    | RFC-030 | 本地路径错误和文件系统差异可观察                                    | 🟢   |
 | 4    | RFC-017 | Mirror/Update/Two-way plan 语义正确                                 | 🔵   |
 | 5    | RFC-031 | **017 完成后** Compare↔Plan E2E：BuildPlan 接 engine；CLI T1–T7     | 🔵   |
 | 6    | RFC-018 | Two-way/move detection 持久状态与恢复                               | 🔵   |
