@@ -11,11 +11,13 @@ import {
     setResume,
 } from "../../app/syncSlice";
 import { saveSettings } from "../../services/settingsService";
+import { useI18n } from "../../hooks/useI18n";
 
 const SyncMoreOptions: React.FC = () => {
     const dispatch = useAppDispatch();
     const options = useAppSelector(s => s.sync.options);
     const [open, setOpen] = useState(false);
+    const { t } = useI18n();
 
     const handleOpenChange = (v: boolean) => {
         setOpen(v);
@@ -28,16 +30,16 @@ const SyncMoreOptions: React.FC = () => {
                 <button
                     type="button"
                     className="sync-btn sync-btn--ghost"
-                    title="Settings"
+                    title={t("sync.settings.title")}
                 >
                     <GearIcon width={14} height={14} />
                 </button>
             </Dialog.Trigger>
             <Dialog.Content>
-                <Dialog.Title>Sync Settings</Dialog.Title>
+                <Dialog.Title>{t("sync.settings.title")}</Dialog.Title>
                 <Flex direction="column" gap="3" mt="3">
                     <Text size="2" weight="bold">
-                        Comparison
+                        {t("sync.settings.comparison")}
                     </Text>
                     <Text as="label" size="2">
                         <Flex gap="2" align="center">
@@ -47,12 +49,12 @@ const SyncMoreOptions: React.FC = () => {
                                     dispatch(setUseChecksum(!!v))
                                 }
                             />
-                            Content compare (checksum)
+                            {t("sync.settings.contentCompare")}
                         </Flex>
                     </Text>
 
                     <Text size="2" weight="bold">
-                        Sync Mode
+                        {t("sync.settings.syncMode")}
                     </Text>
                     <Text as="label" size="2">
                         <Flex gap="2" align="center">
@@ -62,7 +64,7 @@ const SyncMoreOptions: React.FC = () => {
                                     dispatch(setDeleteExtraneous(!!v))
                                 }
                             />
-                            Delete extraneous files
+                            {t("sync.settings.deleteExtraneous")}
                         </Flex>
                     </Text>
                     <Text as="label" size="2">
@@ -71,7 +73,7 @@ const SyncMoreOptions: React.FC = () => {
                                 checked={options.dryRun}
                                 onCheckedChange={v => dispatch(setDryRun(!!v))}
                             />
-                            Dry run (no writes)
+                            {t("sync.settings.dryRun")}
                         </Flex>
                     </Text>
                     <Text as="label" size="2">
@@ -80,12 +82,12 @@ const SyncMoreOptions: React.FC = () => {
                                 checked={options.resume ?? false}
                                 onCheckedChange={v => dispatch(setResume(!!v))}
                             />
-                            Resume previous sync
+                            {t("sync.settings.resume")}
                         </Flex>
                     </Text>
 
                     <Text size="2" weight="bold">
-                        Error Handling
+                        {t("sync.settings.errorHandling")}
                     </Text>
                     <Select.Root
                         value={options.errorMode ?? "ignore"}
@@ -96,16 +98,16 @@ const SyncMoreOptions: React.FC = () => {
                         <Select.Trigger />
                         <Select.Content>
                             <Select.Item value="ignore">
-                                Continue on error
+                                {t("sync.settings.continueOnError")}
                             </Select.Item>
                             <Select.Item value="stop">
-                                Stop on first error
+                                {t("sync.settings.stopOnError")}
                             </Select.Item>
                         </Select.Content>
                     </Select.Root>
 
                     <Text size="2" weight="bold">
-                        Delete Method
+                        {t("sync.settings.deleteMethod")}
                     </Text>
                     <Select.Root
                         value={options.deleteMethod ?? "permanent"}
@@ -120,13 +122,13 @@ const SyncMoreOptions: React.FC = () => {
                         <Select.Trigger />
                         <Select.Content>
                             <Select.Item value="permanent">
-                                Permanent delete
+                                {t("sync.settings.permanent")}
                             </Select.Item>
                             <Select.Item value="trash">
-                                Move to trash
+                                {t("sync.settings.trash")}
                             </Select.Item>
                             <Select.Item value="versioning">
-                                Keep versioned copy
+                                {t("sync.settings.versioning")}
                             </Select.Item>
                         </Select.Content>
                     </Select.Root>

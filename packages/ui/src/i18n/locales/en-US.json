@@ -128,6 +128,22 @@
             "syncing": "Syncing…",
             "compared": "Compared: {{copy}} copy, {{delete}} delete",
             "complete": "Sync complete"
+        },
+        "settings": {
+            "title": "Sync Settings",
+            "comparison": "Comparison",
+            "contentCompare": "Content compare (checksum)",
+            "syncMode": "Sync Mode",
+            "deleteExtraneous": "Delete extraneous files",
+            "dryRun": "Dry run (no writes)",
+            "resume": "Resume previous sync",
+            "errorHandling": "Error Handling",
+            "continueOnError": "Continue on error",
+            "stopOnError": "Stop on first error",
+            "deleteMethod": "Delete Method",
+            "permanent": "Permanent delete",
+            "trash": "Move to trash",
+            "versioning": "Keep versioned copy"
         }
     }
 }
