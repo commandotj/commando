@@ -115,3 +115,5 @@ ETA 计算：滑动窗口平均速度 × 剩余文件数。
 本 RFC 明确拥有：`UI-10`, `UI-20`, `UI-21`, `UI-22`, `UI-23`。
 
 Feature ID 与实施状态以 [TASK TRACKING](../TASK_TRACKING.md) 为准，优先级与 RFC 状态以 [ROADMAP](../ROADMAP.md) 为准；本 RFC 负责产品决策、Commando 设计与验收。
+Replaced by RFC-034: # RFC-2026-020: UI Progress — Compare/Sync Dialogs & Results
+Status: Deprecated — replaced by RFC-034

@@ -117,3 +117,5 @@ External Tools     → (用户定义列表)
 本 RFC 明确拥有：`UI-17`, `UI-18`, `UI-19`, `UI-25`, `UI-31`, `EXT-01`, `EXT-02`, `EXT-03`, `EXT-04`, `EXT-05`, `EXT-06`, `EXT-07`。
 
 Feature ID 与实施状态以 [TASK TRACKING](../TASK_TRACKING.md) 为准，优先级与 RFC 状态以 [ROADMAP](../ROADMAP.md) 为准；本 RFC 负责产品决策、Commando 设计与验收。
+Replaced by RFC-034: # RFC-2026-023: UI Tools — Explorer, External Tools, Context Menu & Rename
+Status: Deprecated — replaced by RFC-034

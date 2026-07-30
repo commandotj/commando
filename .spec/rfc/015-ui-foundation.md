@@ -89,3 +89,5 @@
 本 RFC 明确拥有：`UI-01`, `UI-02`, `UI-03`, `UI-04`, `UI-06`, `UI-28`, `UI-29`, `UI-34`。
 
 Feature ID 与实施状态以 [TASK TRACKING](../TASK_TRACKING.md) 为准，优先级与 RFC 状态以 [ROADMAP](../ROADMAP.md) 为准；本 RFC 负责产品决策、Commando 设计与验收。
+Replaced by RFC-034: # RFC-2026-015: UI Foundation — Folder Selection & Compare/Sync Settings
+Status: Deprecated — replaced by RFC-034
