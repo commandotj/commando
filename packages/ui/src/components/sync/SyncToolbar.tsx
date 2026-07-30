@@ -5,8 +5,6 @@ import { fetchDirectory } from "../../app/fileManagerSlice";
 import {
     compareSync,
     runSync,
-    setDeleteExtraneous,
-    setDryRun,
     setPlanModalOpen,
     setStrategyId,
 } from "../../app/syncSlice";
@@ -19,14 +17,14 @@ import SyncProgressBar from "./SyncProgressBar";
 import SyncResultPanel from "./SyncResultPanel";
 import SyncPlanModal from "./SyncPlanModal";
 import { useSyncRootsState } from "../../hooks/useSyncRootsState";
-import { getSyncRootsOnboardingKey } from "../../common/syncRoots";
 import SyncSummaryStrip from "./SyncSummaryStrip";
 
 const SyncToolbar: React.FC = () => {
     const dispatch = useAppDispatch();
     const { t } = useI18n();
-    const { strategyId, options, plan, status, error, planModalOpen } =
-        useAppSelector(state => state.sync);
+    const { strategyId, plan, status, error, planModalOpen } = useAppSelector(
+        state => state.sync
+    );
     const {
         leftRoot,
         rightRoot,
@@ -99,17 +97,8 @@ const SyncToolbar: React.FC = () => {
                         className="sync-btn sync-btn--ghost"
                         disabled={!rootsReady || busy}
                         onClick={handleCompare}
-                        title={
-                            !rootsReady
-                                ? t(getSyncRootsOnboardingKey(rootsState))
-                                : undefined
-                        }
                     >
-                        <CounterClockwiseClockIcon
-                            width={14}
-                            height={14}
-                            aria-hidden
-                        />
+                        <CounterClockwiseClockIcon width={14} height={14} />
                         {busy && status === "comparing"
                             ? t("sync.toolbar.comparing")
                             : t("sync.toolbar.compare")}
@@ -121,33 +110,11 @@ const SyncToolbar: React.FC = () => {
                         disabled={!rootsReady || busy}
                         onClick={handleSync}
                     >
-                        <PlayIcon width={14} height={14} aria-hidden />
+                        <PlayIcon width={14} height={14} />
                         {busy && status === "syncing"
                             ? t("sync.toolbar.syncing")
                             : t("sync.toolbar.sync")}
                     </button>
-
-                    <label className="sync-toggle">
-                        <input
-                            type="checkbox"
-                            checked={options.deleteExtraneous}
-                            onChange={e =>
-                                dispatch(setDeleteExtraneous(e.target.checked))
-                            }
-                        />
-                        {t("sync.toolbar.deleteExtraneous")}
-                    </label>
-
-                    <label className="sync-toggle">
-                        <input
-                            type="checkbox"
-                            checked={options.dryRun}
-                            onChange={e =>
-                                dispatch(setDryRun(e.target.checked))
-                            }
-                        />
-                        {t("sync.toolbar.dryRun")}
-                    </label>
 
                     <SyncLegend />
                     <SyncMoreOptions />
