@@ -57,11 +57,11 @@ const SyncToolbar: React.FC = () => {
     return (
         <>
             <header className="sync-toolbar">
-                <div className="sync-toolbar__title wails-drag">
+                <div className="sync-toolbar__top wails-drag">
                     <span className="sync-toolbar__brand">Commando Sync</span>
                     <ThemeSwitchButton />
                 </div>
-                <div className="sync-toolbar__controls wails-no-drag">
+                <div className="sync-toolbar__bottom wails-no-drag">
                     <select
                         className="sync-select"
                         value={strategyId}
