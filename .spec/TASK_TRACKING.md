@@ -17,7 +17,7 @@ P1 目标：本地路径 CLI `compare → deterministic plan → safe execute �
 | 1    | RFC-016 | engine 原语：link、容差、并行、确定性输出（不含 planner）           | 🟢   |
 | 2    | RFC-019 | Include/exclude 经统一 engine 进入 CLI compare                      | 🟢   |
 | 3    | RFC-030 | 本地路径错误和文件系统差异可观察                                    | 🟢   |
-| 4    | RFC-017 | Mirror/Update/Two-way plan 语义正确                                 | 🔵   |
+| 4    | RFC-017 | Mirror/Update/Two-way plan 语义正确                                 | 🟢   |
 | 5    | RFC-031 | **017 完成后** Compare↔Plan E2E：BuildPlan 接 engine；CLI T1–T7     | 🔵   |
 | 6    | RFC-018 | Two-way/move detection 持久状态与恢复                               | 🔵   |
 | 7    | RFC-027 | Permanent/Trash/Versioning 删除语义                                 | 🔵   |
@@ -75,15 +75,16 @@ P1 RFC 内的 UI-only、email/HTML、remote、RealtimeSync、distribution 任务
 
 ### RFC-017 — Sync Variants (11 actionable)
 
-| Task                                          | IDs                   | Status |
-| --------------------------------------------- | --------------------- | ------ |
-| Mirror / Update 变体（已有）                  | VAR-01, 02            | 🟢     |
-| 冲突识别（已有）                              | CMP-15                | 🟢     |
-| Two-way 使用 DB changes；删除 mtime-only 决策 | VAR-04                | 🔵     |
-| Changes Mode（按变更检测同步）                | VAR-03, DB-01, 02, 03 | 🔵     |
-| Custom 自定义规则                             | VAR-05, 06            | 🔵     |
-| 跨变体保留过滤器                              | VAR-07                | 🔵     |
-| 安全交换左右路径                              | VAR-08                | 🔵     |
+| Task                                          | IDs                   | Status       |
+| --------------------------------------------- | --------------------- | ------------ |
+| Mirror / Update 变体（已有）                  | VAR-01, 02            | 🟢           |
+| 冲突识别（已有）                              | CMP-15                | 🟢           |
+| 安全交换左右路径（Swap）                      | VAR-08                | 🟢           |
+| Custom 自定义规则（differences 模式）         | VAR-05                | 🟢           |
+| 跨变体保留过滤器                              | VAR-07                | 🟢           |
+| Changes Mode（按变更检测同步）                | VAR-03, DB-01, 02, 03 | 🔵 → RFC-018 |
+| Two-way 使用 DB changes；删除 mtime-only 决策 | VAR-04                | 🔵 → RFC-018 |
+| Custom (changes)                              | VAR-06                | 🔵 → RFC-018 |
 
 ### RFC-018 — Sync Database (3 actionable)
 

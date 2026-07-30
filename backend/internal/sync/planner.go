@@ -82,6 +82,15 @@ func resolveItem(
 	direction Direction,
 	opts Options,
 ) PlanItem {
+	// VAR-05: custom action overrides take priority
+	cat, _, _ := engine.Categorize(
+		entryPtr(left, hasLeft), entryPtr(right, hasRight),
+		engine.TimeAndSize, engine.CompareSettings{},
+	)
+	if act, ok := opts.CustomActions[cat]; ok {
+		return itemForAction(act, rel, left, right, leftRoot, rightRoot, hasLeft, hasRight)
+	}
+
 	switch {
 	case hasLeft && !hasRight:
 		return planMissingSide(rel, left, leftRoot, rightRoot, direction, opts, true)
@@ -89,6 +98,33 @@ func resolveItem(
 		return planMissingSide(rel, right, rightRoot, leftRoot, direction, opts, false)
 	default:
 		return planBothSides(rel, left, right, leftRoot, rightRoot, direction, opts)
+	}
+}
+
+func entryPtr(e engine.Entry, has bool) *engine.Entry {
+	if !has {
+		return nil
+	}
+	return &e
+}
+
+func itemForAction(act Action, rel string, left, right engine.Entry, leftRoot, rightRoot string, hasLeft, hasRight bool) PlanItem {
+	switch act {
+	case ActionCopy:
+		src, dest := left, filepath.Join(rightRoot, rel)
+		if !hasLeft {
+			src, dest = right, filepath.Join(leftRoot, rel)
+		}
+		return PlanItem{RelativePath: rel, Action: ActionCopy, Source: src.AbsolutePath, Destination: dest, Reason: "custom action"}
+	case ActionDelete:
+		if hasLeft {
+			return PlanItem{RelativePath: rel, Action: ActionDelete, Source: left.AbsolutePath, Reason: "custom action"}
+		}
+		return PlanItem{RelativePath: rel, Action: ActionDelete, Source: right.AbsolutePath, Reason: "custom action"}
+	case ActionConflict:
+		return PlanItem{RelativePath: rel, Action: ActionConflict, Source: left.AbsolutePath, Reason: "custom action"}
+	default:
+		return PlanItem{RelativePath: rel, Action: ActionSkip, Reason: "custom action"}
 	}
 }
 

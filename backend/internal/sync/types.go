@@ -1,7 +1,10 @@
 // Package sync implements two-pane folder synchronization planning and execution.
 package sync
 
-import "github.com/commandotj/commando/internal/sync/filter"
+import (
+	"github.com/commandotj/commando/internal/sync/engine"
+	"github.com/commandotj/commando/internal/sync/filter"
+)
 
 // Direction controls how changes flow between the left and right pane roots.
 type Direction string
@@ -53,8 +56,9 @@ type ExecuteResult struct {
 
 // Options tune planner and executor behavior.
 type Options struct {
-	DeleteExtraneous bool              `json:"deleteExtraneous"`
-	DryRun           bool              `json:"dryRun"`
-	UseChecksum      bool              `json:"useChecksum"`
-	Filter           filter.FilterRules `json:"filter"`
+	DeleteExtraneous bool                          `json:"deleteExtraneous"`
+	DryRun           bool                          `json:"dryRun"`
+	UseChecksum      bool                          `json:"useChecksum"`
+	Filter           filter.FilterRules            `json:"filter"`
+	CustomActions    map[engine.Category]Action    `json:"customActions,omitempty"`
 }

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/commandotj/commando/internal/sync"
+	"github.com/commandotj/commando/internal/sync/engine"
 	"github.com/commandotj/commando/internal/sync/filter"
 )
 
@@ -115,5 +116,53 @@ func TestBuildPlan_DefaultFilterExcludesGit(t *testing.T) {
 	}
 	if plan.ToCopy != 1 {
 		t.Errorf("expected 1 copy (a.txt), got copies=%d", plan.ToCopy)
+	}
+}
+
+func TestStrategy_Swap(t *testing.T) {
+	s, err := sync.ResolveStrategy(sync.StrategyMirrorRight)
+	if err != nil {
+		t.Fatal(err)
+	}
+	swapped := s.Swap()
+	if swapped.ID != sync.StrategyMirrorLeft {
+		t.Errorf("expected mirror-left, got %s", swapped.ID)
+	}
+	if swapped.Direction != sync.DirectionRightToLeft {
+		t.Errorf("expected right-to-left, got %s", swapped.Direction)
+	}
+}
+
+func TestStrategy_Swap_TwoWay_IsIdentity(t *testing.T) {
+	s, _ := sync.ResolveStrategy(sync.StrategyTwoWay)
+	swapped := s.Swap()
+	if swapped.ID != s.ID || swapped.Direction != s.Direction {
+		t.Error("two-way swap should be identity")
+	}
+}
+
+func TestBuildPlan_CustomAction_SkipsEqual(t *testing.T) {
+	left := t.TempDir()
+	right := t.TempDir()
+
+	content := []byte("same")
+	now := time.Now()
+	lf := filepath.Join(left, "a.txt")
+	rf := filepath.Join(right, "a.txt")
+	_ = os.WriteFile(lf, content, 0o644)
+	_ = os.WriteFile(rf, content, 0o644)
+	_ = os.Chtimes(lf, now, now)
+	_ = os.Chtimes(rf, now, now)
+
+	plan, err := sync.BuildPlan(left, right, sync.DirectionLeftToRight, sync.Options{
+		CustomActions: map[engine.Category]sync.Action{
+			engine.Equal: sync.ActionConflict,
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(plan.Items) != 1 || plan.Items[0].Action != sync.ActionConflict {
+		t.Errorf("expected Conflict from custom action, got %v", plan.Items)
 	}
 }

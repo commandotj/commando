@@ -91,3 +91,33 @@ func (s Strategy) PlannerOptions(overrides Options) Options {
 	opts.DeleteExtraneous = overrides.DeleteExtraneous
 	return opts
 }
+
+// Swap returns the strategy with left and right panes exchanged.
+// Two-way is symmetric and returns itself unchanged.
+func (s Strategy) Swap() Strategy {
+	if s.Direction == DirectionBidirectional {
+		return s
+	}
+	out := s
+	switch s.Direction {
+	case DirectionLeftToRight:
+		out.Direction = DirectionRightToLeft
+	case DirectionRightToLeft:
+		out.Direction = DirectionLeftToRight
+	}
+	switch s.ID {
+	case StrategyMirrorRight:
+		out.ID = StrategyMirrorLeft
+		out.Label = "Mirror → Left"
+	case StrategyUpdateRight:
+		out.ID = StrategyUpdateLeft
+		out.Label = "Update → Left"
+	case StrategyMirrorLeft:
+		out.ID = StrategyMirrorRight
+		out.Label = "Mirror → Right"
+	case StrategyUpdateLeft:
+		out.ID = StrategyUpdateRight
+		out.Label = "Update → Right"
+	}
+	return out
+}
