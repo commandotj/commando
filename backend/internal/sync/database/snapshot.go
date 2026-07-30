@@ -62,3 +62,47 @@ func (db *DB) LoadSnapshot() (map[string]SnapshotRow, error) {
 	}
 	return result, rows.Err()
 }
+
+type ProgressRow struct {
+	JobID        string
+	RelativePath string
+	Action       string
+	Mtime        int64
+	Size         int64
+}
+
+// MarkDone records a completed item with mtime+size for resume verification.
+func (db *DB) MarkDone(jobID, relPath, action string, mtime, size int64) error {
+	_, err := db.conn.Exec(
+		`INSERT OR REPLACE INTO progress (job_id, relative_path, action, status, mtime, size, updated_at)
+		 VALUES (?, ?, ?, 'done', ?, ?, datetime('now'))`,
+		jobID, relPath, action, mtime, size,
+	)
+	return err
+}
+
+// DonePaths returns completed paths with their recorded mtime+size.
+func (db *DB) DonePaths(jobID string) (map[string]ProgressRow, error) {
+	rows, err := db.conn.Query(
+		`SELECT relative_path, action, mtime, size FROM progress WHERE job_id = ? AND status = 'done'`, jobID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	done := make(map[string]ProgressRow)
+	for rows.Next() {
+		var r ProgressRow
+		if err := rows.Scan(&r.RelativePath, &r.Action, &r.Mtime, &r.Size); err != nil {
+			return nil, err
+		}
+		done[r.RelativePath] = r
+	}
+	return done, rows.Err()
+}
+
+// ClearProgress removes all progress for a job.
+func (db *DB) ClearProgress(jobID string) error {
+	_, err := db.conn.Exec(`DELETE FROM progress WHERE job_id = ?`, jobID)
+	return err
+}

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"os/signal"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -62,6 +63,9 @@ func init() {
 		Use:   "run",
 		Short: "Execute a sync between two folders",
 		RunE: func(cmd *cobra.Command, _ []string) error {
+			ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+			defer stop()
+
 			left, _ := cmd.Flags().GetString("left")
 			right, _ := cmd.Flags().GetString("right")
 			dirFlag, _ := cmd.Flags().GetString("direction")
@@ -79,7 +83,7 @@ func init() {
 				return err
 			}
 
-			plan, err := sync.BuildPlan(context.Background(), left, right, dir, sync.Options{
+			plan, err := sync.BuildPlan(ctx, left, right, dir, sync.Options{
 				DryRun: dryRun,
 				Filter: rules,
 			})
@@ -87,7 +91,18 @@ func init() {
 				return err
 			}
 
-			result, err := sync.Execute(context.Background(), plan, sync.Options{DryRun: dryRun})
+			result, err := sync.Execute(ctx, plan, sync.Options{DryRun: dryRun},
+				func(rel string, act sync.Action, done, total int, itemErr error) {
+					evt := map[string]any{
+						"type": "progress", "file": rel, "action": string(act),
+						"done": done, "total": total,
+					}
+					if itemErr != nil {
+						evt["error"] = itemErr.Error()
+					}
+					b, _ := json.Marshal(evt)
+					fmt.Println(string(b))
+				})
 			if err != nil {
 				return err
 			}

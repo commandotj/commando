@@ -66,5 +66,7 @@ type Options struct {
 	ErrorMode        string                        `json:"errorMode,omitempty"`
 	VerifyCopies     bool                          `json:"verifyCopies,omitempty"`
 	ChangesMode      bool                          `json:"changesMode,omitempty"`  // VAR-03: use DB for change detection
-	DBPath           string                        `json:"dbPath,omitempty"`      // path to sync.commando_db
+	DBPath           string                        `json:"dbPath,omitempty"`
+	Resume           bool                          `json:"resume,omitempty"`
+	Reset            bool                          `json:"reset,omitempty"`
 }

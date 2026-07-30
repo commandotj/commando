@@ -226,3 +226,43 @@ func TestOpen_BadDBFile(t *testing.T) {
 		t.Fatal("expected error opening corrupt file")
 	}
 }
+
+func TestMarkDone_And_DonePaths(t *testing.T) {
+	dir := t.TempDir()
+	db, _ := Open(filepath.Join(dir, "sync.db"))
+	defer db.Close()
+
+	db.MarkDone("job1", "a.txt", "copy", 100, 42)
+	db.MarkDone("job1", "b.txt", "copy", 200, 84)
+	db.MarkDone("job2", "a.txt", "copy", 999, 1)
+
+	done, err := db.DonePaths("job1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(done) != 2 {
+		t.Fatalf("expected 2 done paths, got %d", len(done))
+	}
+	if done["a.txt"].Mtime != 100 || done["a.txt"].Size != 42 {
+		t.Error("wrong mtime/size for a.txt")
+	}
+}
+
+func TestClearProgress_ByJob(t *testing.T) {
+	dir := t.TempDir()
+	db, _ := Open(filepath.Join(dir, "sync.db"))
+	defer db.Close()
+
+	db.MarkDone("job1", "a.txt", "copy", 1, 1)
+	db.MarkDone("job2", "b.txt", "copy", 2, 2)
+	db.ClearProgress("job1")
+
+	done1, _ := db.DonePaths("job1")
+	done2, _ := db.DonePaths("job2")
+	if len(done1) != 0 {
+		t.Error("job1 should be cleared")
+	}
+	if len(done2) != 1 {
+		t.Error("job2 should remain")
+	}
+}

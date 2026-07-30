@@ -38,10 +38,24 @@ func BuildPlan(ctx context.Context, leftRoot, rightRoot string, direction Direct
 	return buildDifferencesPlan(leftRoot, rightRoot, leftEntries, rightEntries, direction, opts)
 }
 
+func jobIDForRoots(leftRoot, rightRoot string, direction Direction) string {
+	return leftRoot + "|" + rightRoot + "|" + string(direction)
+}
+
 func buildDifferencesPlan(leftRoot, rightRoot string, leftEntries, rightEntries engine.Index, direction Direction, opts Options) (*Plan, error) {
 
 	relPaths := unionKeys(leftEntries, rightEntries)
 	sort.Strings(relPaths)
+
+	// --resume: skip items already done with matching mtime+size
+	var done map[string]database.ProgressRow
+	if opts.Resume && opts.DBPath != "" {
+		db, err := database.Open(opts.DBPath)
+		if err == nil {
+			done, _ = db.DonePaths(jobIDForRoots(leftRoot, rightRoot, direction))
+			db.Close()
+		}
+	}
 
 	plan := &Plan{
 		LeftRoot:  leftRoot,
@@ -53,6 +67,14 @@ func buildDifferencesPlan(leftRoot, rightRoot string, leftEntries, rightEntries 
 	for _, rel := range relPaths {
 		left, hasLeft := leftEntries[rel]
 		right, hasRight := rightEntries[rel]
+		// resume skip: done + mtime+size match
+		if pr, ok := done[rel]; ok && hasLeft && !left.IsDir &&
+			left.ModTimeUnix == pr.Mtime && left.Size == pr.Size {
+			item := PlanItem{RelativePath: rel, Action: ActionSkip, Reason: "resumed"}
+			plan.Items = append(plan.Items, item)
+			plan.ToSkip++
+			continue
+		}
 		item := resolveItem(rel, left, right, hasLeft, hasRight, leftRoot, rightRoot, direction, opts)
 		plan.Items = append(plan.Items, item)
 		switch item.Action {
@@ -71,8 +93,9 @@ func buildDifferencesPlan(leftRoot, rightRoot string, leftEntries, rightEntries 
 }
 
 func buildChangesPlan(ctx context.Context, leftRoot, rightRoot string, leftEntries, rightEntries engine.Index, direction Direction, opts Options) (*Plan, error) {
-	if opts.DBPath == "" {
-		return nil, fmt.Errorf("changes mode requires dbPath")
+	dbPath := opts.DBPath
+	if dbPath == "" {
+		dbPath = filepath.Join(leftRoot, ".commando", "sync.db")
 	}
 	db, err := database.Open(opts.DBPath)
 	if err != nil {
