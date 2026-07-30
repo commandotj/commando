@@ -29,7 +29,6 @@ func Open(dbPath string) (*DB, error) {
 
 	db := &DB{conn: conn, path: dbPath}
 	if err := db.migrate(); err != nil {
-		conn.Close()
 		return nil, err
 	}
 	return db, nil
