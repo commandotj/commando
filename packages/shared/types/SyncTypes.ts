@@ -85,4 +85,9 @@ export interface SyncProgressPayload {
     status?: string;
     result?: unknown;
     error?: string;
+    // Per-item progress (RFC-034)
+    file?: string;
+    action?: SyncAction;
+    done?: number;
+    total?: number;
 }
