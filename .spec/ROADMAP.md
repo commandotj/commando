@@ -115,7 +115,7 @@ P1 只包含完成本地路径 CLI `compare → plan → safe execute → termin
 | 顺序 | RFC                                                                       | P1 责任                   | Gate                                                       |
 | ---- | ------------------------------------------------------------------------- | ------------------------- | ---------------------------------------------------------- |
 | 1    | [RFC-2026-016](./rfc/completed/016-compare-engine-extensions.md)          | Compare engine            | engine 原语+单测；**不含** planner 接线                    |
-| 2    | [RFC-2026-019](./rfc/019-filter-system.md)                                | Filter CLI-first ✅       | matcher 经统一 engine 进入 CLI compare；非法 glob 报错     |
+| 2    | [RFC-2026-019](./rfc/completed/019-filter-system.md)                      | Filter CLI-first ✅       | matcher 经统一 engine 进入 CLI compare；非法 glob 报错     |
 | 3    | [RFC-2026-030](./rfc/completed/030-local-smb-filesystem-compatibility.md) | Local filesystem baseline | 本地路径错误与文件系统差异可观察                           |
 | 4    | [RFC-2026-017](./rfc/017-sync-variants-changes-custom.md)                 | Plan semantics            | Mirror/Update/Two-way 不用名称掩盖错误语义                 |
 | 5    | [RFC-2026-031](./rfc/completed/031-compare-plan-e2e-verify.md)            | Compare↔Plan E2E verify   | **017 完成后**；BuildPlan 接 engine；CLI T1–T7 全绿        |
@@ -154,7 +154,7 @@ P1 完成前，UI（RFC-015/020/022/023）、report 增强（RFC-024）、platfo
 | [RFC-2026-016](./rfc/completed/016-compare-engine-extensions.md) | Compare Engine — Content, Symlinks, Tolerance & Parallel     | albert.li | 2026-07-29 | 2026-07-30 | ✅ Completed |
 | [RFC-2026-017](./rfc/017-sync-variants-changes-custom.md)        | Sync Variants — Changes Mode, Two-way, Custom & Swap         | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
 | [RFC-2026-018](./rfc/018-sync-database.md)                       | Sync Database — `sync.commando_db` & Moved File Detection    | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
-| [RFC-2026-019](./rfc/019-filter-system.md)                       | Filter System — Include/Exclude Glob                         | albert.li | 2026-07-29 | 2026-07-30 | ✅ Completed |
+| [RFC-2026-019](./rfc/completed/019-filter-system.md)             | Filter System — Include/Exclude Glob                         | albert.li | 2026-07-29 | 2026-07-30 | ✅ Completed |
 | [RFC-2026-021](./rfc/021-cli-config.md)                          | CLI & Config — Return Codes, Profiles, Schedules             | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
 | [RFC-2026-024](./rfc/024-reports.md)                             | Reports — Session Log, LastSyncs & Email                     | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
 | [RFC-2026-027](./rfc/027-delete-operations.md)                   | Delete Operations — Recycle Bin & Versioning                 | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
