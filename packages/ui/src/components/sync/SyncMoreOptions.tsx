@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { GearIcon, Cross1Icon } from "@radix-ui/react-icons";
+import { GearIcon } from "@radix-ui/react-icons";
+import { Dialog, Flex, Text, Checkbox, Select } from "@radix-ui/themes";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
     setUseChecksum,
@@ -16,170 +17,122 @@ const SyncMoreOptions: React.FC = () => {
     const options = useAppSelector(s => s.sync.options);
     const [open, setOpen] = useState(false);
 
-    const close = () => {
-        setOpen(false);
-        saveSettings(options);
+    const handleOpenChange = (v: boolean) => {
+        setOpen(v);
+        if (!v) saveSettings(options);
     };
 
     return (
-        <div className="sync-more-options">
-            <button
-                type="button"
-                className="sync-btn sync-btn--ghost"
-                onClick={() => setOpen(true)}
-                title="Settings"
-            >
-                <GearIcon width={14} height={14} />
-            </button>
-            {open && (
-                <div
-                    className="sync-overlay"
-                    role="dialog"
-                    aria-modal="true"
-                    onClick={close}
+        <Dialog.Root open={open} onOpenChange={handleOpenChange}>
+            <Dialog.Trigger>
+                <button
+                    type="button"
+                    className="sync-btn sync-btn--ghost"
+                    title="Settings"
                 >
-                    <div
-                        className="sync-settings-modal"
-                        onClick={e => e.stopPropagation()}
+                    <GearIcon width={14} height={14} />
+                </button>
+            </Dialog.Trigger>
+            <Dialog.Content>
+                <Dialog.Title>Sync Settings</Dialog.Title>
+                <Flex direction="column" gap="3" mt="3">
+                    <Text size="2" weight="bold">
+                        Comparison
+                    </Text>
+                    <Text as="label" size="2">
+                        <Flex gap="2" align="center">
+                            <Checkbox
+                                checked={options.useChecksum}
+                                onCheckedChange={v =>
+                                    dispatch(setUseChecksum(!!v))
+                                }
+                            />
+                            Content compare (checksum)
+                        </Flex>
+                    </Text>
+
+                    <Text size="2" weight="bold">
+                        Sync Mode
+                    </Text>
+                    <Text as="label" size="2">
+                        <Flex gap="2" align="center">
+                            <Checkbox
+                                checked={options.deleteExtraneous}
+                                onCheckedChange={v =>
+                                    dispatch(setDeleteExtraneous(!!v))
+                                }
+                            />
+                            Delete extraneous files
+                        </Flex>
+                    </Text>
+                    <Text as="label" size="2">
+                        <Flex gap="2" align="center">
+                            <Checkbox
+                                checked={options.dryRun}
+                                onCheckedChange={v => dispatch(setDryRun(!!v))}
+                            />
+                            Dry run (no writes)
+                        </Flex>
+                    </Text>
+                    <Text as="label" size="2">
+                        <Flex gap="2" align="center">
+                            <Checkbox
+                                checked={options.resume ?? false}
+                                onCheckedChange={v => dispatch(setResume(!!v))}
+                            />
+                            Resume previous sync
+                        </Flex>
+                    </Text>
+
+                    <Text size="2" weight="bold">
+                        Error Handling
+                    </Text>
+                    <Select.Root
+                        value={options.errorMode ?? "ignore"}
+                        onValueChange={v =>
+                            dispatch(setErrorMode(v as "stop" | "ignore"))
+                        }
                     >
-                        <div className="sync-settings-modal__header">
-                            <h3>Sync Settings</h3>
-                            <button
-                                className="sync-btn sync-btn--ghost"
-                                onClick={close}
-                                aria-label="Close"
-                            >
-                                <Cross1Icon width={16} height={16} />
-                            </button>
-                        </div>
+                        <Select.Trigger />
+                        <Select.Content>
+                            <Select.Item value="ignore">
+                                Continue on error
+                            </Select.Item>
+                            <Select.Item value="stop">
+                                Stop on first error
+                            </Select.Item>
+                        </Select.Content>
+                    </Select.Root>
 
-                        <div className="sync-settings-modal__body">
-                            <div className="sync-settings-modal__section">
-                                <h4 className="sync-settings-modal__section-title">
-                                    Comparison
-                                </h4>
-                                <label className="sync-toggle">
-                                    <input
-                                        type="checkbox"
-                                        checked={options.useChecksum}
-                                        onChange={e =>
-                                            dispatch(
-                                                setUseChecksum(e.target.checked)
-                                            )
-                                        }
-                                    />
-                                    Content compare (checksum)
-                                </label>
-                            </div>
-
-                            <div className="sync-settings-modal__section">
-                                <h4 className="sync-settings-modal__section-title">
-                                    Sync Mode
-                                </h4>
-                                <label className="sync-toggle">
-                                    <input
-                                        type="checkbox"
-                                        checked={options.deleteExtraneous}
-                                        onChange={e =>
-                                            dispatch(
-                                                setDeleteExtraneous(
-                                                    e.target.checked
-                                                )
-                                            )
-                                        }
-                                    />
-                                    Delete extraneous files
-                                </label>
-                                <label className="sync-toggle">
-                                    <input
-                                        type="checkbox"
-                                        checked={options.dryRun}
-                                        onChange={e =>
-                                            dispatch(
-                                                setDryRun(e.target.checked)
-                                            )
-                                        }
-                                    />
-                                    Dry run (no writes)
-                                </label>
-                                <label className="sync-toggle">
-                                    <input
-                                        type="checkbox"
-                                        checked={options.resume ?? false}
-                                        onChange={e =>
-                                            dispatch(
-                                                setResume(e.target.checked)
-                                            )
-                                        }
-                                    />
-                                    Resume previous sync
-                                </label>
-                            </div>
-
-                            <div className="sync-settings-modal__section">
-                                <h4 className="sync-settings-modal__section-title">
-                                    Error Handling
-                                </h4>
-                                <label className="sync-settings-modal__field">
-                                    On error
-                                    <select
-                                        value={options.errorMode ?? "ignore"}
-                                        onChange={e =>
-                                            dispatch(
-                                                setErrorMode(
-                                                    e.target.value as
-                                                        "stop" | "ignore"
-                                                )
-                                            )
-                                        }
-                                    >
-                                        <option value="ignore">
-                                            Continue on error
-                                        </option>
-                                        <option value="stop">
-                                            Stop on first error
-                                        </option>
-                                    </select>
-                                </label>
-                            </div>
-
-                            <div className="sync-settings-modal__section">
-                                <h4 className="sync-settings-modal__section-title">
-                                    Delete Method
-                                </h4>
-                                <label className="sync-settings-modal__field">
-                                    <select
-                                        value={
-                                            options.deleteMethod ?? "permanent"
-                                        }
-                                        onChange={e =>
-                                            dispatch(
-                                                setDeleteMethod(
-                                                    e.target.value as
-                                                        | "permanent"
-                                                        | "trash"
-                                                        | "versioning"
-                                                )
-                                            )
-                                        }
-                                    >
-                                        <option value="permanent">
-                                            Permanent delete
-                                        </option>
-                                        <option value="trash">
-                                            Move to trash
-                                        </option>
-                                        <option value="versioning">
-                                            Keep versioned copy
-                                        </option>
-                                    </select>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </div>
+                    <Text size="2" weight="bold">
+                        Delete Method
+                    </Text>
+                    <Select.Root
+                        value={options.deleteMethod ?? "permanent"}
+                        onValueChange={v =>
+                            dispatch(
+                                setDeleteMethod(
+                                    v as "permanent" | "trash" | "versioning"
+                                )
+                            )
+                        }
+                    >
+                        <Select.Trigger />
+                        <Select.Content>
+                            <Select.Item value="permanent">
+                                Permanent delete
+                            </Select.Item>
+                            <Select.Item value="trash">
+                                Move to trash
+                            </Select.Item>
+                            <Select.Item value="versioning">
+                                Keep versioned copy
+                            </Select.Item>
+                        </Select.Content>
+                    </Select.Root>
+                </Flex>
+            </Dialog.Content>
+        </Dialog.Root>
     );
 };
 export default SyncMoreOptions;
