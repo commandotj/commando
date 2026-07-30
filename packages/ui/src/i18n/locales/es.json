@@ -1,0 +1,92 @@
+{
+    "sync": {
+        "toolbar": {
+            "strategy": "Estrategia",
+            "compare": "Comparar",
+            "comparing": "Comparando…",
+            "sync": "Sincronizar",
+            "syncing": "Sincronizando…"
+        },
+        "strategy": {
+            "mirrorRight": "Reflejar → Derecha",
+            "mirrorRightDesc": "Izquierda sobrescribe derecha; eliminar extras",
+            "updateRight": "Actualizar → Derecha",
+            "updateRightDesc": "Copiar archivos nuevos/modificados a la derecha",
+            "mirrorLeft": "Reflejar → Izquierda",
+            "mirrorLeftDesc": "Derecha sobrescribe izquierda; eliminar extras",
+            "updateLeft": "Actualizar → Izquierda",
+            "updateLeftDesc": "Copiar archivos nuevos/modificados a la izquierda",
+            "twoWay": "Bidireccional",
+            "twoWayDesc": "Sincronizar versiones más recientes en ambas direcciones"
+        },
+        "stats": {
+            "copy": "copiar",
+            "delete": "eliminar",
+            "conflicts": "conflictos",
+            "skip": "omitir",
+            "changed": "cambiado"
+        },
+        "legend": {
+            "title": "Leyenda",
+            "copy": "Se copiará",
+            "delete": "Se eliminará",
+            "conflict": "Conflicto"
+        },
+        "onboarding": {
+            "pickFolders": "Elija carpetas de sincronización diferentes para los paneles",
+            "setLeftRoot": "Izquierda: navegue a la carpeta de origen",
+            "setRightRoot": "Derecha: navegue a una carpeta de destino diferente",
+            "sameRoots": "Las raíces deben ser diferentes",
+            "clickCompare": "Haga clic en Comparar para ver diferencias",
+            "leftRootSet": "Raíz izquierda establecida. Elija un destino diferente a la derecha.",
+            "rightRootSet": "Raíz derecha establecida. Elija un origen diferente a la izquierda.",
+            "duplicateRoot": "No puede coincidir con la raíz del otro panel"
+        },
+        "pane": {
+            "left": "Izquierda",
+            "right": "Derecha",
+            "noRoot": "Sin raíz",
+            "setRoot": "Establecer raíz",
+            "browse": "Explorar"
+        },
+        "plan": {
+            "title": "Vista previa",
+            "summary": "{{copy}} a copiar, {{delete}} a eliminar, {{conflicts}} conflictos",
+            "inSync": "Carpetas ya sincronizadas",
+            "cancel": "Cancelar",
+            "confirm": "Iniciar sincronización",
+            "syncing": "Sincronizando…"
+        },
+        "status": {
+            "ready": "Listo",
+            "missingLeft": "Establezca la raíz izquierda",
+            "missingRight": "Establezca la raíz derecha",
+            "sameRoots": "Raíces idénticas",
+            "comparing": "Comparando…",
+            "syncing": "Sincronizando…",
+            "compared": "Comparado: {{copy}} copiar, {{delete}} eliminar",
+            "complete": "Sincronización completa"
+        },
+        "table": { "status": "Estado" }
+    },
+    "ui": {
+        "drives": {
+            "scanning": "Escaneando…",
+            "refreshing": "Actualizando…",
+            "loadingFailed": "Error al cargar",
+            "homeDirectory": "Inicio"
+        },
+        "table": {
+            "name": "Nombre",
+            "dateModified": "Modificado",
+            "size": "Tamaño",
+            "type": "Tipo"
+        },
+        "file": {
+            "typeFolder": "Carpeta",
+            "typeFile": "Archivo",
+            "itemsCount": "elementos",
+            "selectedCount": "seleccionados"
+        }
+    }
+}
