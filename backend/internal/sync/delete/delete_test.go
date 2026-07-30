@@ -82,3 +82,40 @@ func TestDelete_CtxCancel(t *testing.T) {
 		t.Error("expected context error")
 	}
 }
+
+func TestDelete_DefaultMethod(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "delme.txt")
+	_ = os.WriteFile(path, []byte("x"), 0o644)
+
+	if err := Delete(context.Background(), path, Method(99), "", ""); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(path); !os.IsNotExist(err) {
+		t.Error("default method should be permanent delete")
+	}
+}
+
+func TestVersion_MkdirAllError(t *testing.T) {
+	dir := t.TempDir()
+	_ = os.WriteFile(filepath.Join(dir, "file"), []byte("x"), 0o644)
+	path := filepath.Join(dir, "data.txt")
+	_ = os.WriteFile(path, []byte("x"), 0o644)
+
+	err := Delete(context.Background(), path, Versioning, filepath.Join(dir, "file", "sub"), "")
+	if err == nil {
+		t.Fatal("expected MkdirAll error")
+	}
+}
+
+func TestVersionReplace_MkdirAllError(t *testing.T) {
+	dir := t.TempDir()
+	_ = os.WriteFile(filepath.Join(dir, "file"), []byte("x"), 0o644)
+	path := filepath.Join(dir, "data.txt")
+	_ = os.WriteFile(path, []byte("x"), 0o644)
+
+	err := Delete(context.Background(), path, VersionReplace, filepath.Join(dir, "file", "sub"), "")
+	if err == nil {
+		t.Fatal("expected MkdirAll error")
+	}
+}
