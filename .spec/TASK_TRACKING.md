@@ -135,12 +135,13 @@ P1 RFC 内的 UI-only、email/HTML、remote、RealtimeSync、distribution 任务
 
 ### RFC-027 — Delete Operations (8 actionable)
 
-| Task                                 | IDs                    | Status |
-| ------------------------------------ | ---------------------- | ------ |
-| 永久删除（已有）                     | SYN-03                 | 🟢     |
-| 回收站删除（macOS Finder/Linux XDG） | SYN-04                 | 🟢     |
-| Versioning（时间戳重命名）           | SYN-05, 06             | 🟢     |
-| 替换/宏路径（待后续）                | SYN-07, 08, VER-01, 02 | 🔵     |
+| Task                                 | IDs                | Status |
+| ------------------------------------ | ------------------ | ------ |
+| 永久删除（已有）                     | SYN-03             | 🟢     |
+| 回收站删除（macOS Finder/Linux XDG） | SYN-04             | 🟢     |
+| Versioning（时间戳重命名）           | SYN-05, 06         | 🟢     |
+| Versioning Replace（覆盖）           | SYN-07             | 🟢     |
+| 宏路径（待后续）                     | SYN-08, VER-01, 02 | 🔵     |
 
 ### RFC-028 — Execution Options
 

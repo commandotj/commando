@@ -31,3 +31,16 @@ func version(ctx context.Context, path string, destDir string) error {
 	}
 	return os.Rename(path, dest)
 }
+
+func versionReplace(ctx context.Context, path string, destDir string) error {
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	default:
+	}
+	if err := os.MkdirAll(destDir, 0o755); err != nil {
+		return err
+	}
+	dest := filepath.Join(destDir, filepath.Base(path))
+	return os.Rename(path, dest)
+}

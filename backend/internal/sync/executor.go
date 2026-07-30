@@ -56,7 +56,7 @@ func Execute(ctx context.Context, plan *Plan, opts Options) (*ExecuteResult, err
 				continue
 			}
 			method := deleteMethod(opts.DeleteMethod)
-			if err := dels.Delete(ctx, item.Source, method, opts.VersionDir); err != nil {
+			if err := dels.Delete(ctx, item.Source, method, opts.VersionDir, ""); err != nil {
 				result.Errors = append(result.Errors, fmt.Sprintf("%s: %v", item.RelativePath, err))
 				if opts.ErrorMode == "stop" {
 					return result, fmt.Errorf("delete %s: %w", item.RelativePath, err)
@@ -164,6 +164,8 @@ func deleteMethod(s string) dels.Method {
 		return dels.Trash
 	case "versioning":
 		return dels.Versioning
+	case "versionreplace":
+		return dels.VersionReplace
 	default:
 		return dels.Permanent
 	}

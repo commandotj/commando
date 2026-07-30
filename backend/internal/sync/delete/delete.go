@@ -13,13 +13,13 @@ type Method int
 const (
 	Permanent Method = iota
 	Trash
-	Versioning
+	Versioning      // timestamped copy
+	VersionReplace  // overwrite previous
 )
 
-// Delete removes path according to method. For Versioning, destDir is the
-// target directory where the timestamped copy is placed; for Trash and
-// Permanent it is ignored.
-func Delete(ctx context.Context, path string, method Method, destDir string) error {
+// Delete removes path according to method. template is used by Versioning
+// for path patterns (empty = default timestamp in destDir).
+func Delete(ctx context.Context, path string, method Method, destDir string, template string) error {
 	switch method {
 	case Permanent:
 		return os.Remove(path)
@@ -27,6 +27,8 @@ func Delete(ctx context.Context, path string, method Method, destDir string) err
 		return trash(ctx, path)
 	case Versioning:
 		return version(ctx, path, destDir)
+	case VersionReplace:
+		return versionReplace(ctx, path, destDir)
 	default:
 		return os.Remove(path)
 	}
