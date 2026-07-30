@@ -57,7 +57,7 @@ func (s *SyncService) Execute(plan sync.Plan, opts sync.Options) (SyncJobResult,
 		if err := ctx.Err(); err != nil {
 			return nil, err
 		}
-		return sync.Execute(ctx, &plan, opts)
+		return sync.Execute(ctx, &plan, opts, nil)
 	})
 }
 

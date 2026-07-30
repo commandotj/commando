@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/commandotj/commando/internal/sync"
+	databaseapi "github.com/commandotj/commando/internal/sync/database"
 	"github.com/commandotj/commando/internal/sync/filter"
 )
 
@@ -72,6 +74,9 @@ func init() {
 			dryRun, _ := cmd.Flags().GetBool("dry-run")
 			include, _ := cmd.Flags().GetString("include")
 			exclude, _ := cmd.Flags().GetString("exclude")
+			showProgress, _ := cmd.Flags().GetBool("progress")
+			resume, _ := cmd.Flags().GetBool("resume")
+			reset, _ := cmd.Flags().GetBool("reset")
 
 			dir, err := parseDirection(dirFlag)
 			if err != nil {
@@ -83,16 +88,25 @@ func init() {
 				return err
 			}
 
-			plan, err := sync.BuildPlan(ctx, left, right, dir, sync.Options{
-				DryRun: dryRun,
-				Filter: rules,
-			})
+			opts := sync.Options{
+				DryRun:  dryRun,
+				Filter:  rules,
+				DBPath:  filepath.Join(left, ".commando", "sync.db"),
+				Resume:  resume,
+				Reset:   reset,
+			}
+			if reset {
+				clearResume(opts.DBPath, jobIDForSync(left, right, dir))
+			}
+
+			plan, err := sync.BuildPlan(ctx, left, right, dir, opts)
 			if err != nil {
 				return err
 			}
 
-			result, err := sync.Execute(ctx, plan, sync.Options{DryRun: dryRun},
-				func(rel string, act sync.Action, done, total int, itemErr error) {
+			var progressFn sync.ProgressFn
+			if showProgress {
+				progressFn = func(rel string, act sync.Action, done, total int, itemErr error) {
 					evt := map[string]any{
 						"type": "progress", "file": rel, "action": string(act),
 						"done": done, "total": total,
@@ -102,9 +116,16 @@ func init() {
 					}
 					b, _ := json.Marshal(evt)
 					fmt.Println(string(b))
-				})
+				}
+			}
+
+			result, err := sync.Execute(ctx, plan, opts, progressFn)
 			if err != nil {
-				return err
+				fmt.Fprintln(os.Stderr, "error:", err)
+				return nil
+			}
+			if len(result.Errors) == 0 {
+				clearResume(opts.DBPath, jobIDForSync(left, right, dir))
 			}
 
 			enc := json.NewEncoder(os.Stdout)
@@ -123,6 +144,9 @@ func init() {
 	runCmd.Flags().Bool("dry-run", false, "show actions without writing")
 	runCmd.Flags().String("include", "", "include glob pattern (comma-separated, default: **)")
 	runCmd.Flags().String("exclude", "", "exclude glob pattern (comma-separated)")
+	runCmd.Flags().Bool("progress", false, "output NDJSON progress lines")
+	runCmd.Flags().Bool("resume", false, "skip already-completed items")
+	runCmd.Flags().Bool("reset", false, "clear progress and start fresh")
 	_ = runCmd.MarkFlagRequired("left")
 	_ = runCmd.MarkFlagRequired("right")
 
@@ -164,4 +188,17 @@ func parseDirection(value string) (sync.Direction, error) {
 	default:
 		return "", fmt.Errorf("unknown direction: %q (expected l2r, r2l, or both)", value)
 	}
+}
+
+func jobIDForSync(left, right string, dir sync.Direction) string {
+	return left + "|" + right + "|" + string(dir)
+}
+
+func clearResume(dbPath, jobID string) {
+	db, err := databaseapi.Open(dbPath)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+	db.ClearProgress(jobID)
 }
