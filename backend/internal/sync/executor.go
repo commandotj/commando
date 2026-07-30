@@ -1,10 +1,13 @@
 package sync
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+
+	dels "github.com/commandotj/commando/internal/sync/delete"
 )
 
 // Execute runs a sync plan. Skips conflict rows unless the caller resolved them first.
@@ -31,7 +34,8 @@ func Execute(plan *Plan, opts Options) (*ExecuteResult, error) {
 				result.Deleted++
 				continue
 			}
-			if err := os.Remove(item.Source); err != nil {
+			method := deleteMethod(opts.DeleteMethod)
+			if err := dels.Delete(context.Background(), item.Source, method, opts.VersionDir); err != nil {
 				result.Errors = append(result.Errors, fmt.Sprintf("%s: %v", item.RelativePath, err))
 				continue
 			}
@@ -69,4 +73,15 @@ func copyFile(source, destination string) error {
 	}
 
 	return os.Chtimes(destination, srcInfo.ModTime(), srcInfo.ModTime())
+}
+
+func deleteMethod(s string) dels.Method {
+	switch s {
+	case "trash":
+		return dels.Trash
+	case "versioning":
+		return dels.Versioning
+	default:
+		return dels.Permanent
+	}
 }

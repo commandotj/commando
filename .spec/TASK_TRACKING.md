@@ -20,7 +20,7 @@ P1 目标：本地路径 CLI `compare → deterministic plan → safe execute �
 | 4    | RFC-017 | Mirror/Update/Two-way plan 语义正确                                 | 🟢   |
 | 5    | RFC-031 | **017 完成后** Compare↔Plan E2E：BuildPlan 接 engine；CLI T1–T7     | 🟢   |
 | 6    | RFC-018 | Two-way/move detection 有持久状态与恢复                             | 🟢   |
-| 7    | RFC-027 | Permanent/Trash/Versioning 删除语义                                 | 🔵   |
+| 7    | RFC-027 | Permanent/Trash/Versioning 删除语义                                 | 🟢   |
 | 8    | RFC-028 | core-owned plan；context、fail-safe、verify、lock、truthful Outcome | 🔵   |
 | 9    | RFC-021 | 严格输入、NDJSON stdout、stderr 诊断、稳定退出码                    | 🔵   |
 
@@ -135,11 +135,12 @@ P1 RFC 内的 UI-only、email/HTML、remote、RealtimeSync、distribution 任务
 
 ### RFC-027 — Delete Operations (8 actionable)
 
-| Task                             | IDs                            | Status |
-| -------------------------------- | ------------------------------ | ------ |
-| 永久删除（已有）                 | SYN-03                         | 🟢     |
-| 回收站删除                       | SYN-04                         | 🔵     |
-| Versioning（时间戳/替换/宏路径） | SYN-05, 06, 07, 08, VER-01, 02 | 🔵     |
+| Task                                 | IDs                    | Status |
+| ------------------------------------ | ---------------------- | ------ |
+| 永久删除（已有）                     | SYN-03                 | 🟢     |
+| 回收站删除（macOS Finder/Linux XDG） | SYN-04                 | 🟢     |
+| Versioning（时间戳重命名）           | SYN-05, 06             | 🟢     |
+| 替换/宏路径（待后续）                | SYN-07, 08, VER-01, 02 | 🔵     |
 
 ### RFC-028 — Execution Options
 

@@ -61,4 +61,6 @@ type Options struct {
 	UseChecksum      bool                          `json:"useChecksum"`
 	Filter           filter.FilterRules            `json:"filter"`
 	CustomActions    map[engine.Category]Action    `json:"customActions,omitempty"`
+	DeleteMethod     string                        `json:"deleteMethod,omitempty"` // "permanent", "trash", "versioning"
+	VersionDir       string                        `json:"versionDir,omitempty"`   // dest for versioning
 }
