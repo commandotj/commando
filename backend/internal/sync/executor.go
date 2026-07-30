@@ -1,6 +1,7 @@
 package sync
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -10,11 +11,16 @@ import (
 	dels "github.com/commandotj/commando/internal/sync/delete"
 )
 
-// Execute runs a sync plan. Skips conflict rows unless the caller resolved them first.
-func Execute(plan *Plan, opts Options) (*ExecuteResult, error) {
+// Execute runs a sync plan. ErrorMode="stop" aborts on first failure.
+func Execute(ctx context.Context, plan *Plan, opts Options) (*ExecuteResult, error) {
 	result := &ExecuteResult{}
 
 	for _, item := range plan.Items {
+		select {
+		case <-ctx.Done():
+			return result, ctx.Err()
+		default:
+		}
 		switch item.Action {
 		case ActionSkip, ActionConflict:
 			result.Skipped++
@@ -24,9 +30,22 @@ func Execute(plan *Plan, opts Options) (*ExecuteResult, error) {
 				result.Copied++
 				continue
 			}
-			if err := copyFile(item.Source, item.Destination); err != nil {
-				result.Errors = append(result.Errors, fmt.Sprintf("%s: %v", item.RelativePath, err))
+			cpErr := copyFileAtomic(item.Source, item.Destination)
+			if cpErr != nil {
+				result.Errors = append(result.Errors, fmt.Sprintf("%s: %v", item.RelativePath, cpErr))
+				if opts.ErrorMode == "stop" {
+					return result, fmt.Errorf("copy %s: %w", item.RelativePath, cpErr)
+				}
 				continue
+			}
+			if opts.VerifyCopies {
+				if !filesEqual(item.Source, item.Destination) {
+					result.Errors = append(result.Errors, fmt.Sprintf("%s: verify failed", item.RelativePath))
+					if opts.ErrorMode == "stop" {
+						return result, fmt.Errorf("verify %s: mismatch", item.RelativePath)
+					}
+					continue
+				}
 			}
 			result.Copied++
 		case ActionDelete:
@@ -35,8 +54,11 @@ func Execute(plan *Plan, opts Options) (*ExecuteResult, error) {
 				continue
 			}
 			method := deleteMethod(opts.DeleteMethod)
-			if err := dels.Delete(context.Background(), item.Source, method, opts.VersionDir); err != nil {
+			if err := dels.Delete(ctx, item.Source, method, opts.VersionDir); err != nil {
 				result.Errors = append(result.Errors, fmt.Sprintf("%s: %v", item.RelativePath, err))
+				if opts.ErrorMode == "stop" {
+					return result, fmt.Errorf("delete %s: %w", item.RelativePath, err)
+				}
 				continue
 			}
 			result.Deleted++
@@ -46,7 +68,9 @@ func Execute(plan *Plan, opts Options) (*ExecuteResult, error) {
 	return result, nil
 }
 
-func copyFile(source, destination string) error {
+// copyFileAtomic copies source to a temporary file next to destination, then
+// renames it atomically. Destination mode and mtime are preserved from source.
+func copyFileAtomic(source, destination string) error {
 	if err := os.MkdirAll(filepath.Dir(destination), 0o755); err != nil {
 		return err
 	}
@@ -62,17 +86,50 @@ func copyFile(source, destination string) error {
 		return err
 	}
 
-	dst, err := os.OpenFile(destination, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, srcInfo.Mode().Perm())
+	tmpPath := destination + ".commando-tmp"
+	dst, err := os.OpenFile(tmpPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, srcInfo.Mode().Perm())
 	if err != nil {
 		return err
 	}
-	defer dst.Close()
+	_, copyErr := io.Copy(dst, src)
+	dst.Close()
+	if copyErr != nil {
+		os.Remove(tmpPath)
+		return copyErr
+	}
 
-	if _, err := io.Copy(dst, src); err != nil {
+	if err := os.Chtimes(tmpPath, srcInfo.ModTime(), srcInfo.ModTime()); err != nil {
+		os.Remove(tmpPath)
 		return err
 	}
 
-	return os.Chtimes(destination, srcInfo.ModTime(), srcInfo.ModTime())
+	return os.Rename(tmpPath, destination)
+}
+
+func filesEqual(a, b string) bool {
+	fa, err := os.Open(a)
+	if err != nil {
+		return false
+	}
+	defer fa.Close()
+	fb, err := os.Open(b)
+	if err != nil {
+		return false
+	}
+	defer fb.Close()
+
+	bufA := make([]byte, 64*1024)
+	bufB := make([]byte, 64*1024)
+	for {
+		na, _ := fa.Read(bufA)
+		nb, _ := fb.Read(bufB)
+		if na != nb || !bytes.Equal(bufA[:na], bufB[:nb]) {
+			return false
+		}
+		if na == 0 {
+			return true
+		}
+	}
 }
 
 func deleteMethod(s string) dels.Method {

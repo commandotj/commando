@@ -1,6 +1,7 @@
 package sync_test
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -20,7 +21,7 @@ func TestBuildPlan_LeftToRightCopiesMissingFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	plan, err := sync.BuildPlan(left, right, sync.DirectionLeftToRight, sync.Options{})
+	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -56,7 +57,7 @@ func TestBuildPlan_BidirectionalUsesNewerSide(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	plan, err := sync.BuildPlan(left, right, sync.DirectionBidirectional, sync.Options{})
+	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionBidirectional, sync.Options{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -76,7 +77,7 @@ func TestBuildPlan_FilterExcludesFile(t *testing.T) {
 	_ = os.WriteFile(filepath.Join(left, "include_me.txt"), []byte("a"), 0o644)
 	_ = os.WriteFile(filepath.Join(left, "skip_me.tmp"), []byte("b"), 0o644)
 
-	plan, err := sync.BuildPlan(left, right, sync.DirectionLeftToRight, sync.Options{
+	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{
 		Filter: filter.FilterRules{
 			Include: []string{"**"},
 			Exclude: []string{"*.tmp"},
@@ -104,7 +105,7 @@ func TestBuildPlan_DefaultFilterExcludesGit(t *testing.T) {
 	_ = os.WriteFile(filepath.Join(left, ".git", "config"), []byte("x"), 0o644)
 	_ = os.WriteFile(filepath.Join(left, "a.txt"), []byte("hello"), 0o644)
 
-	plan, err := sync.BuildPlan(left, right, sync.DirectionLeftToRight, sync.Options{})
+	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -154,7 +155,7 @@ func TestBuildPlan_CustomAction_SkipsEqual(t *testing.T) {
 	_ = os.Chtimes(lf, now, now)
 	_ = os.Chtimes(rf, now, now)
 
-	plan, err := sync.BuildPlan(left, right, sync.DirectionLeftToRight, sync.Options{
+	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{
 		CustomActions: map[engine.Category]sync.Action{
 			engine.Equal: sync.ActionConflict,
 		},
@@ -180,7 +181,7 @@ func TestBuildPlan_UseChecksum_DifferentContent(t *testing.T) {
 	_ = os.Chtimes(lf, now, now)
 	_ = os.Chtimes(rf, now, now)
 
-	plan, err := sync.BuildPlan(left, right, sync.DirectionLeftToRight, sync.Options{UseChecksum: true})
+	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{UseChecksum: true})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -202,7 +203,7 @@ func TestBuildPlan_ContentMode_SameContent_Equal(t *testing.T) {
 	_ = os.Chtimes(lf, time.Now(), time.Now())
 	_ = os.Chtimes(rf, time.Now().Add(-time.Hour), time.Now().Add(-time.Hour))
 
-	plan, err := sync.BuildPlan(left, right, sync.DirectionLeftToRight, sync.Options{UseChecksum: true})
+	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{UseChecksum: true})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -225,7 +226,7 @@ func TestBuildPlan_Tolerance_WithinBounds(t *testing.T) {
 	_ = os.Chtimes(lf, now, now)
 	_ = os.Chtimes(rf, now.Add(1*time.Second), now.Add(1*time.Second))
 
-	plan, err := sync.BuildPlan(left, right, sync.DirectionBidirectional, sync.Options{})
+	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionBidirectional, sync.Options{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -244,7 +245,7 @@ func TestBuildPlan_SymlinkExclude(t *testing.T) {
 		t.Skipf("symlink unsupported: %v", err)
 	}
 
-	plan, err := sync.BuildPlan(left, right, sync.DirectionLeftToRight, sync.Options{})
+	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{})
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -21,7 +21,7 @@ P1 目标：本地路径 CLI `compare → deterministic plan → safe execute �
 | 5    | RFC-031 | **017 完成后** Compare↔Plan E2E：BuildPlan 接 engine；CLI T1–T7     | 🟢   |
 | 6    | RFC-018 | Two-way/move detection 有持久状态与恢复                             | 🟢   |
 | 7    | RFC-027 | Permanent/Trash/Versioning 删除语义                                 | 🟢   |
-| 8    | RFC-028 | core-owned plan；context、fail-safe、verify、lock、truthful Outcome | 🔵   |
+| 8    | RFC-028 | core-owned plan；context、fail-safe、verify、lock、truthful Outcome | 🟢   |
 | 9    | RFC-021 | 严格输入、NDJSON stdout、stderr 诊断、稳定退出码                    | 🔵   |
 
 **RFC-012 伞：** ✅ Completed（领域 RFC 已齐）。不占上表序号。
@@ -144,23 +144,22 @@ P1 RFC 内的 UI-only、email/HTML、remote、RealtimeSync、distribution 任务
 
 ### RFC-028 — Execution Options
 
-| Task                                                    | IDs             | Status |
-| ------------------------------------------------------- | --------------- | ------ |
-| 自动创建目标目录（已有）                                | SYN-13          | 🟢     |
-| 保留 mtime 原语已有；权限/ADS 端到端未完成              | SYN-14          | 🔵     |
-| Truthful typed Outcome；item error 不得 success         | EXEC-01         | 🔵     |
-| Core-owned PreparedPlan、路径 containment 与 stale 校验 | EXEC-01         | 🔵     |
-| Context 取消贯穿 walk/compare/copy/delete               | EXEC-02         | 🔵     |
-| 首错停止 / 忽略继续                                     | SYN-09, 10      | 🔵     |
-| 复制后校验                                              | SYN-11          | 🔵     |
-| VSS 卷影复制（Windows）                                 | SYN-12          | 🔵     |
-| 唯一复制实现；temp+flush+verify+atomic replace          | SYN-15          | 🔵     |
-| 每设备并行数配置                                        | SYN-16          | 🔵     |
-| 执行顺序优化降峰值                                      | SYN-17          | 🔵     |
-| 文件夹锁文件                                            | SYN-18          | 🔵     |
-| 降低 IO 优先级                                          | SYN-19          | 🔵     |
-| NTFS 元数据保留（压缩/加密/DACL/ADS）                   | META-01, 02, 03 | 🔵     |
-| HFS+ 元数据保留（扩展属性/ACL）                         | META-04, 05     | 🔵     |
+| Task                                           | IDs                | Status |
+| ---------------------------------------------- | ------------------ | ------ |
+| 自动创建目标目录（已有）                       | SYN-13             | 🟢     |
+| 保留 mtime（copyFileAtomic 已含 Chtimes）      | SYN-14             | 🟢     |
+| Truthful typed Outcome + ErrorMode stop/ignore | EXEC-01, SYN-09,10 | 🟢     |
+| Context 取消贯穿 BuildPlan/Execute/copy/delete | EXEC-02            | 🟢     |
+| 复制后二进制校验                               | SYN-11             | 🟢     |
+| Fail-safe copy（temp+rename atomic）           | SYN-15             | 🟢     |
+| VSS 卷影复制（Windows）                        | SYN-12             | 🔵     |
+| 唯一复制实现；temp+flush+verify+atomic replace | SYN-15             | 🔵     |
+| 每设备并行数配置                               | SYN-16             | 🔵     |
+| 执行顺序优化降峰值                             | SYN-17             | 🔵     |
+| 文件夹锁文件                                   | SYN-18             | 🔵     |
+| 降低 IO 优先级                                 | SYN-19             | 🔵     |
+| NTFS 元数据保留（压缩/加密/DACL/ADS）          | META-01, 02, 03    | 🔵     |
+| HFS+ 元数据保留（扩展属性/ACL）                | META-04, 05        | 🔵     |
 
 ---
 

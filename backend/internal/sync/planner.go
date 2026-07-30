@@ -9,7 +9,7 @@ import (
 	"github.com/commandotj/commando/internal/sync/filter"
 )
 
-func BuildPlan(leftRoot, rightRoot string, direction Direction, opts Options) (*Plan, error) {
+func BuildPlan(ctx context.Context, leftRoot, rightRoot string, direction Direction, opts Options) (*Plan, error) {
 	leftRoot = filepath.Clean(leftRoot)
 	rightRoot = filepath.Clean(rightRoot)
 
@@ -20,11 +20,11 @@ func BuildPlan(leftRoot, rightRoot string, direction Direction, opts Options) (*
 	m := filter.NewMatcher(rules)
 
 	engOpts := engine.IndexOptions{SymlinkMode: engine.SymlinkExclude}
-	leftEntries, err := engine.IndexRoot(context.Background(), leftRoot, m, engOpts)
+	leftEntries, err := engine.IndexRoot(ctx, leftRoot, m, engOpts)
 	if err != nil {
 		return nil, err
 	}
-	rightEntries, err := engine.IndexRoot(context.Background(), rightRoot, m, engOpts)
+	rightEntries, err := engine.IndexRoot(ctx, rightRoot, m, engOpts)
 	if err != nil {
 		return nil, err
 	}

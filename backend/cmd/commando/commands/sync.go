@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"context"
 	"encoding/json"
 	"os"
 	"strings"
@@ -31,7 +32,7 @@ func init() {
 				exitOnError(err)
 			}
 
-			plan, err := sync.BuildPlan(left, right, parseDirection(direction), sync.Options{
+			plan, err := sync.BuildPlan(context.Background(), left, right, parseDirection(direction), sync.Options{
 				DryRun: true,
 				Filter: rules,
 			})
@@ -66,13 +67,13 @@ func init() {
 				exitOnError(err)
 			}
 
-			plan, err := sync.BuildPlan(left, right, parseDirection(direction), sync.Options{
+			plan, err := sync.BuildPlan(context.Background(), left, right, parseDirection(direction), sync.Options{
 				DryRun: dryRun,
 				Filter: rules,
 			})
 			exitOnError(err)
 
-			result, err := sync.Execute(plan, sync.Options{DryRun: dryRun})
+			result, err := sync.Execute(context.Background(), plan, sync.Options{DryRun: dryRun})
 			exitOnError(err)
 
 			enc := json.NewEncoder(os.Stdout)
