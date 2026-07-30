@@ -2,7 +2,6 @@ import React from "react";
 import { useI18n } from "../../hooks/useI18n";
 import type { SyncPlan } from "@commandojs/shared/types/SyncTypes";
 import type { SyncRootsState } from "../../common/syncRoots";
-import { getSyncRootsOnboardingKey } from "../../common/syncRoots";
 
 interface SyncSummaryStripProps {
     plan: SyncPlan | null;
@@ -26,26 +25,11 @@ const SyncSummaryStrip: React.FC<SyncSummaryStripProps> = ({
     }
 
     if (rootsState.kind !== "ready") {
-        return (
-            <div
-                className={`sync-summary sync-summary--hint${
-                    rootsState.kind === "same-path"
-                        ? " sync-summary--warning"
-                        : ""
-                }`}
-                role="status"
-            >
-                {t(getSyncRootsOnboardingKey(rootsState))}
-            </div>
-        );
+        return null;
     }
 
-    if (!plan) {
-        return (
-            <div className="sync-summary sync-summary--hint" role="status">
-                {t("sync.onboarding.clickCompare")}
-            </div>
-        );
+    if (!plan && !comparing) {
+        return null;
     }
 
     return (
