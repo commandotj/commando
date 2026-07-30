@@ -7,6 +7,7 @@ import {
     setDeleteMethod,
     setDeleteExtraneous,
     setDryRun,
+    setResume,
 } from "../../app/syncSlice";
 
 const SyncMoreOptions: React.FC = () => {
@@ -55,6 +56,16 @@ const SyncMoreOptions: React.FC = () => {
                             }
                         />
                         Dry run
+                    </label>
+                    <label className="sync-toggle">
+                        <input
+                            type="checkbox"
+                            checked={options.resume ?? false}
+                            onChange={e =>
+                                dispatch(setResume(e.target.checked))
+                            }
+                        />
+                        Resume previous sync
                     </label>
                     <label className="sync-more-options__field">
                         On error

@@ -20,6 +20,7 @@ export interface SyncOptions {
     useChecksum: boolean;
     errorMode?: "stop" | "ignore";
     deleteMethod?: "permanent" | "trash" | "versioning";
+    resume?: boolean;
     filter?: SyncFilterRules;
 }
 
