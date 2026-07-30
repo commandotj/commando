@@ -3,6 +3,7 @@ package commands
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"os"
 	"strings"
 
@@ -20,27 +21,33 @@ func init() {
 	planCmd := &cobra.Command{
 		Use:   "plan",
 		Short: "Build a sync plan without writing files",
-		Run: func(cmd *cobra.Command, _ []string) {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			left, _ := cmd.Flags().GetString("left")
 			right, _ := cmd.Flags().GetString("right")
-			direction, _ := cmd.Flags().GetString("direction")
+			dirFlag, _ := cmd.Flags().GetString("direction")
 			include, _ := cmd.Flags().GetString("include")
 			exclude, _ := cmd.Flags().GetString("exclude")
 
-			rules := filterRules(include, exclude)
-			if err := rules.Validate(); err != nil {
-				exitOnError(err)
+			dir, err := parseDirection(dirFlag)
+			if err != nil {
+				return err
 			}
 
-			plan, err := sync.BuildPlan(context.Background(), left, right, parseDirection(direction), sync.Options{
+			rules := filterRules(include, exclude)
+			if err := rules.Validate(); err != nil {
+				return err
+			}
+
+			plan, err := sync.BuildPlan(context.Background(), left, right, dir, sync.Options{
 				DryRun: true,
 				Filter: rules,
 			})
-			exitOnError(err)
+			if err != nil {
+				return err
+			}
 
 			enc := json.NewEncoder(os.Stdout)
-			enc.SetIndent("", "  ")
-			exitOnError(enc.Encode(plan))
+			return enc.Encode(plan)
 		},
 	}
 	planCmd.Flags().String("left", "", "left pane root")
@@ -54,31 +61,45 @@ func init() {
 	runCmd := &cobra.Command{
 		Use:   "run",
 		Short: "Execute a sync between two folders",
-		Run: func(cmd *cobra.Command, _ []string) {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			left, _ := cmd.Flags().GetString("left")
 			right, _ := cmd.Flags().GetString("right")
-			direction, _ := cmd.Flags().GetString("direction")
+			dirFlag, _ := cmd.Flags().GetString("direction")
 			dryRun, _ := cmd.Flags().GetBool("dry-run")
 			include, _ := cmd.Flags().GetString("include")
 			exclude, _ := cmd.Flags().GetString("exclude")
 
-			rules := filterRules(include, exclude)
-			if err := rules.Validate(); err != nil {
-				exitOnError(err)
+			dir, err := parseDirection(dirFlag)
+			if err != nil {
+				return err
 			}
 
-			plan, err := sync.BuildPlan(context.Background(), left, right, parseDirection(direction), sync.Options{
+			rules := filterRules(include, exclude)
+			if err := rules.Validate(); err != nil {
+				return err
+			}
+
+			plan, err := sync.BuildPlan(context.Background(), left, right, dir, sync.Options{
 				DryRun: dryRun,
 				Filter: rules,
 			})
-			exitOnError(err)
+			if err != nil {
+				return err
+			}
 
 			result, err := sync.Execute(context.Background(), plan, sync.Options{DryRun: dryRun})
-			exitOnError(err)
+			if err != nil {
+				return err
+			}
 
 			enc := json.NewEncoder(os.Stdout)
-			enc.SetIndent("", "  ")
-			exitOnError(enc.Encode(result))
+			if err := enc.Encode(result); err != nil {
+				return err
+			}
+			if len(result.Errors) > 0 {
+				return fmt.Errorf("%d errors", len(result.Errors))
+			}
+			return nil
 		},
 	}
 	runCmd.Flags().String("left", "", "left pane root")
@@ -117,13 +138,15 @@ func splitTrim(s string) []string {
 	return result
 }
 
-func parseDirection(value string) sync.Direction {
+func parseDirection(value string) (sync.Direction, error) {
 	switch value {
 	case "l2r", "left-to-right":
-		return sync.DirectionLeftToRight
+		return sync.DirectionLeftToRight, nil
 	case "r2l", "right-to-left":
-		return sync.DirectionRightToLeft
+		return sync.DirectionRightToLeft, nil
+	case "both", "bidirectional":
+		return sync.DirectionBidirectional, nil
 	default:
-		return sync.DirectionBidirectional
+		return "", fmt.Errorf("unknown direction: %q (expected l2r, r2l, or both)", value)
 	}
 }

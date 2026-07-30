@@ -22,7 +22,7 @@ P1 目标：本地路径 CLI `compare → deterministic plan → safe execute �
 | 6    | RFC-018 | Two-way/move detection 有持久状态与恢复                             | 🟢   |
 | 7    | RFC-027 | Permanent/Trash/Versioning 删除语义                                 | 🟢   |
 | 8    | RFC-028 | core-owned plan；context、fail-safe、verify、lock、truthful Outcome | 🟢   |
-| 9    | RFC-021 | 严格输入、NDJSON stdout、stderr 诊断、稳定退出码                    | 🔵   |
+| 9    | RFC-021 | 严格输入、NDJSON stdout、stderr 诊断、稳定退出码                    | 🟢   |
 
 **RFC-012 伞：** ✅ Completed（领域 RFC 已齐）。不占上表序号。
 

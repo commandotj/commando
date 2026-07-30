@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/commandotj/commando/cmd/commando/commands"
@@ -8,6 +9,7 @@ import (
 
 func main() {
 	if err := commands.Execute(); err != nil {
-		os.Exit(1)
+		fmt.Fprintln(os.Stderr, "error:", err)
+		os.Exit(2)
 	}
 }
