@@ -29,6 +29,7 @@ const SyncToolbar: React.FC = () => {
     const busy = status === "comparing" || status === "syncing";
 
     const handleCompare = (): void => {
+        if (leftRoot && rightRoot && leftRoot === rightRoot) return;
         void dispatch(compareSync());
     };
 

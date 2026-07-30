@@ -137,6 +137,9 @@ const syncSlice = createSlice({
         ) {
             state.options.deleteMethod = action.payload;
         },
+        setResume(state, action: PayloadAction<boolean>) {
+            state.options.resume = action.payload;
+        },
         setPlanModalOpen(state, action: PayloadAction<boolean>) {
             state.planModalOpen = action.payload;
         },
@@ -190,6 +193,7 @@ export const {
     setUseChecksum,
     setErrorMode,
     setDeleteMethod,
+    setResume,
     setPlanModalOpen,
     clearSyncPlan,
 } = syncSlice.actions;
