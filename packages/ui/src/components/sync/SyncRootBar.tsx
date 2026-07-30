@@ -58,11 +58,6 @@ const SyncRootBar: React.FC<SyncRootBarProps> = ({
     const label = paneIndex === 0 ? t("sync.pane.left") : t("sync.pane.right");
     const displayPath = syncRoot || currentPath || t("sync.pane.noRoot");
     const hintKey = paneHintKey(paneIndex, syncRoot, otherSyncRoot);
-    const duplicateTarget =
-        Boolean(currentPath) &&
-        Boolean(otherSyncRoot) &&
-        areSyncRootsEqual(currentPath, otherSyncRoot);
-
     const volumePaths = volumes.flatMap(d => d.mountpoints.map(mp => mp.path));
 
     const handlePathSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -101,12 +96,8 @@ const SyncRootBar: React.FC<SyncRootBarProps> = ({
                     type="button"
                     className="sync-btn sync-btn--ghost sync-root-bar__btn"
                     onClick={() => onSetSyncRoot(currentPath)}
-                    disabled={!currentPath || duplicateTarget}
-                    title={
-                        duplicateTarget
-                            ? t("sync.onboarding.duplicateRoot")
-                            : t("sync.pane.setRoot")
-                    }
+                    disabled={!currentPath}
+                    title={t("sync.pane.setRoot")}
                 >
                     {t("sync.pane.setRoot")}
                 </button>
@@ -124,37 +115,21 @@ const SyncRootBar: React.FC<SyncRootBarProps> = ({
                     </button>
                     {open && (
                         <div className="sync-root-bar__menu" role="menu">
-                            {volumePaths.map(path => {
-                                const isDuplicate =
-                                    Boolean(otherSyncRoot) &&
-                                    areSyncRootsEqual(path, otherSyncRoot);
-                                return (
-                                    <button
-                                        key={path}
-                                        type="button"
-                                        role="menuitem"
-                                        className="sync-root-bar__menu-item"
-                                        disabled={isDuplicate}
-                                        title={
-                                            isDuplicate
-                                                ? t(
-                                                      "sync.onboarding.duplicateRoot"
-                                                  )
-                                                : undefined
-                                        }
-                                        onClick={() => {
-                                            if (isDuplicate) {
-                                                return;
-                                            }
-                                            onNavigate(path);
-                                            onSetSyncRoot(path);
-                                            setOpen(false);
-                                        }}
-                                    >
-                                        {path}
-                                    </button>
-                                );
-                            })}
+                            {volumePaths.map(path => (
+                                <button
+                                    key={path}
+                                    type="button"
+                                    role="menuitem"
+                                    className="sync-root-bar__menu-item"
+                                    onClick={() => {
+                                        onNavigate(path);
+                                        onSetSyncRoot(path);
+                                        setOpen(false);
+                                    }}
+                                >
+                                    {path}
+                                </button>
+                            ))}
                         </div>
                     )}
                 </div>
