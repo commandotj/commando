@@ -28,6 +28,9 @@ interface SyncState {
     error: string | null;
     lastJobId: string | null;
     planModalOpen: boolean;
+    progressFile: string | null;
+    progressDone: number;
+    progressTotal: number;
 }
 
 const initialState: SyncState = {
@@ -40,6 +43,9 @@ const initialState: SyncState = {
     error: null,
     lastJobId: null,
     planModalOpen: false,
+    progressFile: null,
+    progressDone: 0,
+    progressTotal: 0,
 };
 
 function buildDiffMap(report: CompareReport): DiffMap {

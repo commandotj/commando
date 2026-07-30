@@ -15,6 +15,8 @@ import { useI18n } from "../../hooks/useI18n";
 import { ThemeSwitchButton } from "../ThemeSwitcher";
 import SyncLegend from "./SyncLegend";
 import SyncMoreOptions from "./SyncMoreOptions";
+import SyncProgressBar from "./SyncProgressBar";
+import SyncResultPanel from "./SyncResultPanel";
 import SyncPlanModal from "./SyncPlanModal";
 import { useSyncRootsState } from "../../hooks/useSyncRootsState";
 import { getSyncRootsOnboardingKey } from "../../common/syncRoots";
@@ -165,6 +167,8 @@ const SyncToolbar: React.FC = () => {
                     {error}
                 </div>
             )}
+            <SyncProgressBar />
+            <SyncResultPanel />
         </>
     );
 };
