@@ -19,7 +19,7 @@ func BuildPlan(leftRoot, rightRoot string, direction Direction, opts Options) (*
 	}
 	m := filter.NewMatcher(rules)
 
-	engOpts := engine.IndexOptions{SymlinkMode: engine.SymlinkFollow}
+	engOpts := engine.IndexOptions{SymlinkMode: engine.SymlinkExclude}
 	leftEntries, err := engine.IndexRoot(context.Background(), leftRoot, m, engOpts)
 	if err != nil {
 		return nil, err
@@ -202,7 +202,11 @@ func planBothSides(
 		return PlanItem{RelativePath: rel, Action: ActionSkip, Reason: "directory already exists on both sides"}
 	}
 
-	if entriesEqual(left, right, opts) {
+	mode := engine.TimeAndSize
+	if opts.UseChecksum {
+		mode = engine.Content
+	}
+	if eq, _ := engine.IsEqual(left, right, mode, engine.CompareSettings{}); eq {
 		return PlanItem{RelativePath: rel, Action: ActionSkip, Reason: "already in sync"}
 	}
 
@@ -255,13 +259,4 @@ func planBidirectional(rel string, left, right engine.Entry, leftRoot, rightRoot
 			Reason:       "same mtime but different size",
 		}
 	}
-}
-
-func entriesEqual(left, right engine.Entry, opts Options) bool {
-	mode := engine.TimeAndSize
-	if opts.UseChecksum {
-		mode = engine.Content
-	}
-	eq, _ := engine.IsEqual(left, right, mode, engine.CompareSettings{})
-	return eq
 }

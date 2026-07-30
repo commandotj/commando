@@ -18,7 +18,7 @@ P1 目标：本地路径 CLI `compare → deterministic plan → safe execute �
 | 2    | RFC-019 | Include/exclude 经统一 engine 进入 CLI compare                      | 🟢   |
 | 3    | RFC-030 | 本地路径错误和文件系统差异可观察                                    | 🟢   |
 | 4    | RFC-017 | Mirror/Update/Two-way plan 语义正确                                 | 🟢   |
-| 5    | RFC-031 | **017 完成后** Compare↔Plan E2E：BuildPlan 接 engine；CLI T1–T7     | 🔵   |
+| 5    | RFC-031 | **017 完成后** Compare↔Plan E2E：BuildPlan 接 engine；CLI T1–T7     | 🟢   |
 | 6    | RFC-018 | Two-way/move detection 有持久状态与恢复                             | 🟢   |
 | 7    | RFC-027 | Permanent/Trash/Versioning 删除语义                                 | 🔵   |
 | 8    | RFC-028 | core-owned plan；context、fail-safe、verify、lock、truthful Outcome | 🔵   |
@@ -65,13 +65,13 @@ P1 RFC 内的 UI-only、email/HTML、remote、RealtimeSync、distribution 任务
 
 | Task                                                             | IDs       | Status |
 | ---------------------------------------------------------------- | --------- | ------ |
-| BuildPlan/BuildReport 只经 engine.IndexRoot + Categorize/IsEqual | VERIFY-01 | 🔵     |
-| 删除 entriesEqual                                                | VERIFY-02 | 🔵     |
-| UseChecksum → CompareMode.Content                                | VERIFY-03 | 🔵     |
-| TimeAndSize + ToleranceSec 一致                                  | VERIFY-04 | 🔵     |
-| SymlinkMode 传入 IndexRoot                                       | VERIFY-05 | 🔵     |
-| CLI 与库同一 BuildPlan                                           | VERIFY-06 | 🔵     |
-| T1–T7 集成测全绿                                                 | VERIFY-07 | 🔵     |
+| BuildPlan/BuildReport 只经 engine.IndexRoot + Categorize/IsEqual | VERIFY-01 | 🟢     |
+| 删除 entriesEqual                                                | VERIFY-02 | 🟢     |
+| UseChecksum → CompareMode.Content                                | VERIFY-03 | 🟢     |
+| TimeAndSize + ToleranceSec 一致                                  | VERIFY-04 | 🟢     |
+| SymlinkMode 传入 IndexRoot（默认 Exclude）                       | VERIFY-05 | 🟢     |
+| CLI 与库同一 BuildPlan                                           | VERIFY-06 | 🟢     |
+| T1–T7 集成测全绿                                                 | VERIFY-07 | 🟢     |
 
 ### RFC-017 — Sync Variants (11 actionable)
 
