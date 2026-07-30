@@ -97,12 +97,12 @@ RFC (Request for Comments) 是 commando-react 项目中用于记录和跟踪重�
 
 | 状态                | 数量   | 百分比   |
 | ------------------- | ------ | -------- |
-| 🔵 Proposed         | 9      | 29.0%    |
+| 🔵 Proposed         | 8      | 25.8%    |
 | 🟡 Under Discussion | 0      | 0%       |
 | 🟠 Under Review     | 0      | 0%       |
-| 🟢 Approved         | 7      | 22.6%    |
+| 🟢 Approved         | 6      | 19.4%    |
 | 🔵 In Progress      | 0      | 0%       |
-| ✅ Completed        | 10     | 32.3%    |
+| ✅ Completed        | 12     | 38.7%    |
 | ❌ Deprecated       | 5      | 16.1%    |
 | **总计**            | **31** | **100%** |
 
@@ -112,17 +112,17 @@ RFC (Request for Comments) 是 commando-react 项目中用于记录和跟踪重�
 
 P1 只包含完成本地路径 CLI `compare → plan → safe execute → terminal outcome` 闭环所需 RFC。
 
-| 顺序 | RFC                                                             | P1 责任                   | Gate                                                       |
-| ---- | --------------------------------------------------------------- | ------------------------- | ---------------------------------------------------------- |
-| 1    | [RFC-2026-016](./rfc/016-compare-engine-extensions.md)          | Compare engine            | engine 原语+单测；**不含** planner 接线                    |
-| 2    | [RFC-2026-019](./rfc/019-filter-system.md)                      | Filter CLI-first ✅       | matcher 经统一 engine 进入 CLI compare；非法 glob 报错     |
-| 3    | [RFC-2026-030](./rfc/030-local-smb-filesystem-compatibility.md) | Local filesystem baseline | 本地路径错误与文件系统差异可观察                           |
-| 4    | [RFC-2026-017](./rfc/017-sync-variants-changes-custom.md)       | Plan semantics            | Mirror/Update/Two-way 不用名称掩盖错误语义                 |
-| 5    | [RFC-2026-031](./rfc/031-compare-plan-e2e-verify.md)            | Compare↔Plan E2E verify   | **017 完成后**；BuildPlan 接 engine；CLI T1–T7 全绿        |
-| 6    | [RFC-2026-018](./rfc/018-sync-database.md)                      | Changes database          | Two-way/move detection 有持久状态与恢复                    |
-| 7    | [RFC-2026-027](./rfc/027-delete-operations.md)                  | Delete semantics          | Permanent/Trash/Versioning 行为显式                        |
-| 8    | [RFC-2026-028](./rfc/028-execution-options.md)                  | Safe execution            | core-owned plan；truthful Outcome；context；atomic replace |
-| 9    | [RFC-2026-021](./rfc/021-cli-config.md)                         | CLI contract              | 严格输入、NDJSON stdout、stderr 诊断、稳定退出码           |
+| 顺序 | RFC                                                                       | P1 责任                   | Gate                                                       |
+| ---- | ------------------------------------------------------------------------- | ------------------------- | ---------------------------------------------------------- |
+| 1    | [RFC-2026-016](./rfc/completed/016-compare-engine-extensions.md)          | Compare engine            | engine 原语+单测；**不含** planner 接线                    |
+| 2    | [RFC-2026-019](./rfc/019-filter-system.md)                                | Filter CLI-first ✅       | matcher 经统一 engine 进入 CLI compare；非法 glob 报错     |
+| 3    | [RFC-2026-030](./rfc/completed/030-local-smb-filesystem-compatibility.md) | Local filesystem baseline | 本地路径错误与文件系统差异可观察                           |
+| 4    | [RFC-2026-017](./rfc/017-sync-variants-changes-custom.md)                 | Plan semantics            | Mirror/Update/Two-way 不用名称掩盖错误语义                 |
+| 5    | [RFC-2026-031](./rfc/completed/031-compare-plan-e2e-verify.md)            | Compare↔Plan E2E verify   | **017 完成后**；BuildPlan 接 engine；CLI T1–T7 全绿        |
+| 6    | [RFC-2026-018](./rfc/018-sync-database.md)                                | Changes database          | Two-way/move detection 有持久状态与恢复                    |
+| 7    | [RFC-2026-027](./rfc/027-delete-operations.md)                            | Delete semantics          | Permanent/Trash/Versioning 行为显式                        |
+| 8    | [RFC-2026-028](./rfc/028-execution-options.md)                            | Safe execution            | core-owned plan；truthful Outcome；context；atomic replace |
+| 9    | [RFC-2026-021](./rfc/021-cli-config.md)                                   | CLI contract              | 严格输入、NDJSON stdout、stderr 诊断、稳定退出码           |
 
 **伞 RFC：** [RFC-2026-012](./rfc/completed/012-sync-module-compare-report.md) 为能力目录/Owner 章程。领域 RFC（014–031）均已打开后 **012 = Completed**，不占 P1 实现序号、不挡 016。
 
@@ -149,16 +149,16 @@ P1 完成前，UI（RFC-015/020/022/023）、report 增强（RFC-024）、platfo
 
 ### 已批准的 RFC
 
-| RFC 编号                                                  | 标题                                                         | 作者      | 创建时间   | 批准时间   | 状态         |
-| --------------------------------------------------------- | ------------------------------------------------------------ | --------- | ---------- | ---------- | ------------ |
-| [RFC-2026-016](./rfc/016-compare-engine-extensions.md)    | Compare Engine — Content, Symlinks, Tolerance & Parallel     | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
-| [RFC-2026-017](./rfc/017-sync-variants-changes-custom.md) | Sync Variants — Changes Mode, Two-way, Custom & Swap         | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
-| [RFC-2026-018](./rfc/018-sync-database.md)                | Sync Database — `sync.commando_db` & Moved File Detection    | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
-| [RFC-2026-019](./rfc/019-filter-system.md)                | Filter System — Include/Exclude Glob                         | albert.li | 2026-07-29 | 2026-07-30 | ✅ Completed |
-| [RFC-2026-021](./rfc/021-cli-config.md)                   | CLI & Config — Return Codes, Profiles, Schedules             | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
-| [RFC-2026-024](./rfc/024-reports.md)                      | Reports — Session Log, LastSyncs & Email                     | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
-| [RFC-2026-027](./rfc/027-delete-operations.md)            | Delete Operations — Recycle Bin & Versioning                 | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
-| [RFC-2026-028](./rfc/028-execution-options.md)            | Execution Options — Error Handling, Verify, Fail-safe & Lock | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
+| RFC 编号                                                         | 标题                                                         | 作者      | 创建时间   | 批准时间   | 状态         |
+| ---------------------------------------------------------------- | ------------------------------------------------------------ | --------- | ---------- | ---------- | ------------ |
+| [RFC-2026-016](./rfc/completed/016-compare-engine-extensions.md) | Compare Engine — Content, Symlinks, Tolerance & Parallel     | albert.li | 2026-07-29 | 2026-07-30 | ✅ Completed |
+| [RFC-2026-017](./rfc/017-sync-variants-changes-custom.md)        | Sync Variants — Changes Mode, Two-way, Custom & Swap         | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
+| [RFC-2026-018](./rfc/018-sync-database.md)                       | Sync Database — `sync.commando_db` & Moved File Detection    | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
+| [RFC-2026-019](./rfc/019-filter-system.md)                       | Filter System — Include/Exclude Glob                         | albert.li | 2026-07-29 | 2026-07-30 | ✅ Completed |
+| [RFC-2026-021](./rfc/021-cli-config.md)                          | CLI & Config — Return Codes, Profiles, Schedules             | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
+| [RFC-2026-024](./rfc/024-reports.md)                             | Reports — Session Log, LastSyncs & Email                     | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
+| [RFC-2026-027](./rfc/027-delete-operations.md)                   | Delete Operations — Recycle Bin & Versioning                 | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
+| [RFC-2026-028](./rfc/028-execution-options.md)                   | Execution Options — Error Handling, Verify, Fail-safe & Lock | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
 
 ### 架构设计 RFC
 
@@ -171,18 +171,18 @@ _暂无_
 
 ### 提案中的 RFC
 
-| RFC 编号                                                        | 标题                                                               | 作者         | 创建时间   | 状态        |
-| --------------------------------------------------------------- | ------------------------------------------------------------------ | ------------ | ---------- | ----------- |
-| [RFC-2026-014](./rfc/014-remote-provider-gdrive-mtp.md)         | 远程存储扩展 — Google Drive / MTP                                  | albert.li/AI | 2026-07-28 | 🔵 Proposed |
-| [RFC-2026-015](./rfc/015-ui-foundation.md)                      | UI Foundation — Folder Selection & Compare/Sync Settings           | albert.li    | 2026-07-29 | 🔵 Proposed |
-| [RFC-2026-020](./rfc/020-ui-progress.md)                        | UI Progress — Compare/Sync Dialogs & Results                       | albert.li    | 2026-07-29 | 🔵 Proposed |
-| [RFC-2026-022](./rfc/022-ui-panels.md)                          | UI Panels — Tree Overview, Category Filter, Direction & Multi-pair | albert.li    | 2026-07-29 | 🔵 Proposed |
-| [RFC-2026-023](./rfc/023-ui-tools.md)                           | UI Tools — Explorer, External Tools, Context Menu & Rename         | albert.li    | 2026-07-29 | 🔵 Proposed |
-| [RFC-2026-025](./rfc/025-realtimesync.md)                       | RealtimeSync — File Watcher, Idle Debounce & Service               | albert.li    | 2026-07-29 | 🔵 Proposed |
-| [RFC-2026-026](./rfc/026-remote-sftp-ftp.md)                    | Remote — SFTP & FTP Transfers                                      | albert.li    | 2026-07-29 | 🔵 Proposed |
-| [RFC-2026-029](./rfc/029-platform-distribution-and-i18n.md)     | Platform, Distribution, Localization & Scale                       | albert.li/AI | 2026-07-29 | 🔵 Proposed |
-| [RFC-2026-030](./rfc/030-local-smb-filesystem-compatibility.md) | Local & SMB Filesystem Compatibility                               | albert.li/AI | 2026-07-29 | 2026-07-30  | ✅ Completed |
-| [RFC-2026-031](./rfc/031-compare-plan-e2e-verify.md)            | Compare ↔ Plan E2E Verify（engine+planner+CLI）                    | albert.li/AI | 2026-07-29 | 🔵 Proposed |
+| RFC 编号                                                                  | 标题                                                               | 作者         | 创建时间   | 状态        |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------ | ------------ | ---------- | ----------- |
+| [RFC-2026-014](./rfc/014-remote-provider-gdrive-mtp.md)                   | 远程存储扩展 — Google Drive / MTP                                  | albert.li/AI | 2026-07-28 | 🔵 Proposed |
+| [RFC-2026-015](./rfc/015-ui-foundation.md)                                | UI Foundation — Folder Selection & Compare/Sync Settings           | albert.li    | 2026-07-29 | 🔵 Proposed |
+| [RFC-2026-020](./rfc/020-ui-progress.md)                                  | UI Progress — Compare/Sync Dialogs & Results                       | albert.li    | 2026-07-29 | 🔵 Proposed |
+| [RFC-2026-022](./rfc/022-ui-panels.md)                                    | UI Panels — Tree Overview, Category Filter, Direction & Multi-pair | albert.li    | 2026-07-29 | 🔵 Proposed |
+| [RFC-2026-023](./rfc/023-ui-tools.md)                                     | UI Tools — Explorer, External Tools, Context Menu & Rename         | albert.li    | 2026-07-29 | 🔵 Proposed |
+| [RFC-2026-025](./rfc/025-realtimesync.md)                                 | RealtimeSync — File Watcher, Idle Debounce & Service               | albert.li    | 2026-07-29 | 🔵 Proposed |
+| [RFC-2026-026](./rfc/026-remote-sftp-ftp.md)                              | Remote — SFTP & FTP Transfers                                      | albert.li    | 2026-07-29 | 🔵 Proposed |
+| [RFC-2026-029](./rfc/029-platform-distribution-and-i18n.md)               | Platform, Distribution, Localization & Scale                       | albert.li/AI | 2026-07-29 | 🔵 Proposed |
+| [RFC-2026-030](./rfc/completed/030-local-smb-filesystem-compatibility.md) | Local & SMB Filesystem Compatibility                               | albert.li/AI | 2026-07-29 | 2026-07-30  | ✅ Completed |
+| [RFC-2026-031](./rfc/completed/031-compare-plan-e2e-verify.md)            | Compare ↔ Plan E2E Verify（engine+planner+CLI）                    | albert.li/AI | 2026-07-29 | 2026-07-30  | ✅ Completed |
 
 ### 已废弃的 RFC
 
