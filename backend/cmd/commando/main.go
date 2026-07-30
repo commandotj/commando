@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/systembugtj/commando/cmd/commando/commands"
+	"github.com/commandotj/commando/cmd/commando/commands"
 )
 
 func main() {

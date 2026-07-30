@@ -13,7 +13,7 @@ Guide for AI agents working on **Commando** — folder sync tool (FreeFileSync-s
 ```text
 commando-react/
 ├── backend/                 Go module (NOT named "go/")
-│   ├── go.mod               module github.com/systembug/commando
+│   ├── go.mod               module github.com/commandotj/commando
 │   ├── cmd/commando/        CLI entry
 │   └── internal/            sync, copy, file, drive, worker, fsutil
 ├── apps/desktop/            Wails app (thin Go adapter + Vite frontend)
@@ -33,7 +33,7 @@ commando-react/
 | **package** (folder)  | **mod**             |
 | **go.work**           | **Cargo workspace** |
 
-- Module path: `github.com/systembug/commando` — never import as `go/...` or `backend/...`
+- Module path: `github.com/commandotj/commando` — never import as `go/...` or `backend/...`
 - Private code: `backend/internal/*`
 - Binaries: `backend/cmd/<name>/`
 - Heavy work: `backend/internal/worker` — never block Wails binding thread
@@ -104,7 +104,7 @@ Go tasks live in `Makefile`. pnpm is the entry point; make runs the Go toolchain
 
 ```go
 // apps/desktop/go.mod
-replace github.com/systembug/commando => ../../backend
+replace github.com/commandotj/commando => ../../backend
 ```
 
 ## Quality gates

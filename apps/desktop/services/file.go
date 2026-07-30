@@ -1,6 +1,6 @@
 package services
 
-import "github.com/systembugtj/commando/internal/file"
+import "github.com/commandotj/commando/internal/file"
 
 type (
 	DirectoryEntry     = file.Entry

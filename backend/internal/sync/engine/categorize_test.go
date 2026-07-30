@@ -108,6 +108,18 @@ func TestCategorize_ToleranceExceed(t *testing.T) {
 	}
 }
 
+func TestCategorize_ContentError_Propagates(t *testing.T) {
+	dir := t.TempDir()
+	rightPath := writeTempFile(t, dir, "right.txt", "hello")
+	left := &Entry{RelativePath: "x.txt", AbsolutePath: dir + "/does-not-exist.txt"}
+	right := &Entry{RelativePath: "x.txt", AbsolutePath: rightPath}
+
+	_, _, err := Categorize(left, right, Content, CompareSettings{})
+	if err == nil {
+		t.Fatal("expected error when IsEqual fails in Content mode")
+	}
+}
+
 func TestIsEqual_Content_LeftFileMissing_ReturnsError(t *testing.T) {
 	dir := t.TempDir()
 	rightPath := writeTempFile(t, dir, "right.txt", "hello")

@@ -3,13 +3,14 @@ package engine
 import (
 	"context"
 
-	"github.com/systembugtj/commando/internal/fsutil"
-	"github.com/systembugtj/commando/internal/sync/filter"
+	"github.com/commandotj/commando/internal/fsutil"
+	"github.com/commandotj/commando/internal/sync/filter"
 )
 
 // IndexOptions configures IndexRoot's traversal.
 type IndexOptions struct {
 	SymlinkMode SymlinkMode
+	Parallelism int // >1 enables parallel sub-directory walk via errgroup
 }
 
 func toFsutilSymlinkMode(mode SymlinkMode) fsutil.SymlinkMode {
@@ -30,6 +31,10 @@ func toFsutilSymlinkMode(mode SymlinkMode) fsutil.SymlinkMode {
 // The ctx parameter is reserved for cancellation and parallelism (CMP-10);
 // it is not yet wired through fsutil.Walk.
 func IndexRoot(ctx context.Context, root string, matcher filter.Matcher, opts IndexOptions) (Index, error) {
+	if opts.Parallelism > 1 {
+		return indexRootParallel(ctx, root, matcher, opts)
+	}
+
 	entries, err := fsutil.Walk(root, fsutil.WalkOptions{SymlinkMode: toFsutilSymlinkMode(opts.SymlinkMode)})
 	if err != nil {
 		return nil, err

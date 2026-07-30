@@ -27,4 +27,14 @@ type CompareSettings struct {
 	ToleranceSec int64
 	SymlinkMode  SymlinkMode
 	Parallelism  int
+	CaseMode     CaseMode
 }
+
+// CaseMode controls case-sensitivity for path and name matching.
+type CaseMode int
+
+const (
+	CaseSensitive   CaseMode = iota // exact match (case-sensitive volumes, Linux)
+	CaseInsensitive                 // case-insensitive match (macOS HFS+/APFS default, Windows NTFS)
+	CaseAuto                        // detect from filesystem (default)
+)

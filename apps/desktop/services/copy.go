@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
-	"github.com/systembugtj/commando/internal/copy"
+	"github.com/commandotj/commando/internal/copy"
 )
 
 type CopyBatchResult = copy.BatchResult

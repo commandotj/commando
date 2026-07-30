@@ -66,7 +66,7 @@ commando CLI
 
 P1 必须满足：
 
-1. CLI 与 Desktop 共用同一 Go core；P1 验收不依赖 Wails 或 React；Go module 路径统一为 `github.com/systembug/commando`。
+1. CLI 与 Desktop 共用同一 Go core；P1 验收不依赖 Wails 或 React；Go module 路径统一为 `github.com/commandotj/commando`。
 2. Compare、filter、variant、sync database、copy、delete 与 execution safety 形成单一数据流；禁止 `sync` 与 `copy` 各自维护文件复制实现。
 3. Content/checksum 原语在 RFC-016；**CLI `BuildPlan` 接入 engine 的端到端验收在 RFC-031**（P1 顺序：017 之后）。局部 `IsEqual` 不得标端到端完成。
 4. `context.Context` 取消传播到遍历、比较、复制与删除；不得只在任务开始前检查一次。
@@ -128,7 +128,7 @@ UI workspace、progress dialog、file tools、HTML/email report、RealtimeSync�
 
 ### 4.1 强制架构护栏
 
-1. Go module 权威路径是 `github.com/systembug/commando`；`backend/go.mod`、Desktop require/replace 和全部 import 必须一致。`github.com/systembugtj/commando` 不得作为兼容别名长期保留。
+1. Go module 权威路径是 `github.com/commandotj/commando`；`backend/go.mod`、Desktop require/replace 和全部 import 必须一致。旧 module path 不得作为兼容别名长期保留。
 2. 不新增第二套 task/job manager。需要 progress、subscription 或结果缓存时扩展 `worker.Runner` 或在 Wails adapter 建立薄事件桥。
 3. Go 包依赖必须是 DAG。共享 plan/action 数据放无上游依赖的叶子包，禁止 `plan → variant → plan`。
 4. `packages/ui` 不新增 `shellService`、Wails import 或平台命令。平台能力经 Go service + generated binding + frontend adapter 注入。
@@ -140,17 +140,17 @@ UI workspace、progress dialog、file tools、HTML/email report、RealtimeSync�
 
 ### 4.2 现有 P1 代码审计结论
 
-| 缺口                                              | 当前证据                                                        | Owner   |
-| ------------------------------------------------- | --------------------------------------------------------------- | ------- |
-| item error 被收集后仍返回 `nil` error             | `sync.Execute` 最终固定 `return result, nil`                    | RFC-028 |
-| 覆盖目标先 `O_TRUNC`                              | `sync/executor.go` 与 `copy/copy.go` 均直接打开目标             | RFC-028 |
-| Two-way 仅依据 mtime                              | `planner.go:planBidirectional`                                  | RFC-017 |
-| checksum/content 未接入 planner（假 UseChecksum） | `entriesEqual(UseChecksum)` 固定返回 false                      | RFC-031 |
-| context 未进入 walk/compare/copy/delete           | `BuildPlan`/`Execute` 无 context；Wails 只在入口检查            | RFC-028 |
-| filter 原语未接入 CLI compare                     | `BuildPlan` 直接调用 `fsutil.WalkRoot`，绕过 `engine.IndexRoot` | RFC-019 |
-| renderer 可提交任意绝对 Source/Destination plan   | Wails `Execute(plan)` 直接交给 core                             | RFC-028 |
-| CLI 输出、退出码与输入校验不符合机器协议          | pretty JSON、单一 exit 1、未知 direction 静默变成 bidirectional | RFC-021 |
-| Go module 路径与仓库架构约定不一致                | 当前 `github.com/systembugtj/commando`，权威路径为无 `tj` 版本  | RFC-012 |
+| 缺口                                              | 当前证据                                                              | Owner   |
+| ------------------------------------------------- | --------------------------------------------------------------------- | ------- |
+| item error 被收集后仍返回 `nil` error             | `sync.Execute` 最终固定 `return result, nil`                          | RFC-028 |
+| 覆盖目标先 `O_TRUNC`                              | `sync/executor.go` 与 `copy/copy.go` 均直接打开目标                   | RFC-028 |
+| Two-way 仅依据 mtime                              | `planner.go:planBidirectional`                                        | RFC-017 |
+| checksum/content 未接入 planner（假 UseChecksum） | `entriesEqual(UseChecksum)` 固定返回 false                            | RFC-031 |
+| context 未进入 walk/compare/copy/delete           | `BuildPlan`/`Execute` 无 context；Wails 只在入口检查                  | RFC-028 |
+| filter 原语未接入 CLI compare                     | `BuildPlan` 直接调用 `fsutil.WalkRoot`，绕过 `engine.IndexRoot`       | RFC-019 |
+| renderer 可提交任意绝对 Source/Destination plan   | Wails `Execute(plan)` 直接交给 core                                   | RFC-028 |
+| CLI 输出、退出码与输入校验不符合机器协议          | pretty JSON、单一 exit 1、未知 direction 静默变成 bidirectional       | RFC-021 |
+| Go module 路径与仓库架构约定不一致                | 审计时使用旧 module path；现已迁移到 `github.com/commandotj/commando` | RFC-012 |
 
 上述缺口关闭前，现有代码只能视为 prototype。局部单元测试、`go vet` 或 race test 通过不能作为 P1 完成证据。
 
@@ -225,7 +225,7 @@ Owner RFC 拥有来源事实、Commando 决策、设计和验收；实施状态�
 ### 8.1 012 Start / CORE-01
 
 - [ ] ROADMAP P1 含 031，顺序 017→031。
-- [ ] `backend/go.mod`、Desktop require/replace、Go import 全部 `github.com/systembug/commando`（当前代码仍为 `systembugtj`，CORE-01 待做）。
+- [x] `backend/go.mod`、Desktop require/replace、Go import 全部使用 `github.com/commandotj/commando`。
 - [ ] `go test` / `go build` 在 rename 后绿。
 
 ### 8.2 012 Completed（治理）

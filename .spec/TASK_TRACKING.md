@@ -14,7 +14,7 @@ P1 目标：本地路径 CLI `compare → deterministic plan → safe execute �
 
 | 顺序 | RFC     | 原子 Gate                                                           | 状态 |
 | ---- | ------- | ------------------------------------------------------------------- | ---- |
-| 1    | RFC-016 | engine 原语：link、容差、并行、确定性输出（不含 planner）           | 🔵   |
+| 1    | RFC-016 | engine 原语：link、容差、并行、确定性输出（不含 planner）           | 🟢   |
 | 2    | RFC-019 | Include/exclude 经统一 engine 进入 CLI compare                      | 🔵   |
 | 3    | RFC-030 | 本地路径错误和文件系统差异可观察                                    | 🔵   |
 | 4    | RFC-017 | Mirror/Update/Two-way plan 语义正确                                 | 🔵   |
@@ -28,11 +28,11 @@ P1 目标：本地路径 CLI `compare → deterministic plan → safe execute �
 
 **卫生 CORE-\***（可与 P1 并行，不挡 016）：
 
-| Task                                        | IDs     | Status |
-| ------------------------------------------- | ------- | ------ |
-| Go module → `github.com/systembug/commando` | CORE-01 | 🔵     |
-| CLI/Desktop 单一 compare/copy/execute core  | CORE-02 | 🔵     |
-| P1 末段 CLI destructive/integration 证据    | CORE-03 | 🔵     |
+| Task                                         | IDs     | Status |
+| -------------------------------------------- | ------- | ------ |
+| Go module → `github.com/commandotj/commando` | CORE-01 | 🟢     |
+| CLI/Desktop 单一 compare/copy/execute core   | CORE-02 | 🔵     |
+| P1 末段 CLI destructive/integration 证据     | CORE-03 | 🔵     |
 
 P1 RFC 内的 UI-only、email/HTML、remote、RealtimeSync、distribution 任务不进入 P1 gate。
 
@@ -46,19 +46,20 @@ P1 RFC 内的 UI-only、email/HTML、remote、RealtimeSync、distribution 任务
 
 ### RFC-016 — Compare Engine（engine only；接线见 031）
 
-| Task                                    | IDs                     | Status |
-| --------------------------------------- | ----------------------- | ------ |
-| 并行目录遍历 WalkDir                    | CMP-10                  | 🔵     |
-| 并行二进制比较                          | CMP-11                  | 🔵     |
-| Content 原语 `IsEqual(Content)`（已有） | CMP-02                  | 🟢     |
-| 文件时间/大小比较（已有）               | CMP-01, 03              | 🟢     |
-| Symbolic link 处理（已有）              | CMP-04, 05, 06, LINK-01 | 🟢     |
-| 文件时间容差配置（已有）                | CMP-08                  | 🟢     |
-| Unicode 路径支持（已有）                | CMP-13                  | 🟢     |
-| Junction/Mount/WSL 链接识别             | CMP-07, LINK-02, 03, 04 | 🔵     |
-| FAT 夏令时处理                          | CMP-09                  | 🔵     |
-| Windows 长路径支持                      | CMP-12                  | 🔵     |
-| 大小写敏感同步                          | CMP-14                  | 🔵     |
+| Task                                                   | IDs                                | Status                       |
+| ------------------------------------------------------ | ---------------------------------- | ---------------------------- |
+| 并行目录遍历 WalkDir（errgroup+semaphore，确定性排序） | CMP-10                             | 🟢                           |
+| 并行二进制比较（批量 ParallelCompare，buffer pool）    | CMP-11                             | 🟢                           |
+| Content 原语 `IsEqual(Content)`（已有）                | CMP-02                             | 🟢                           |
+| 文件时间/大小比较（已有）                              | CMP-01, 03                         | 🟢                           |
+| Symbolic link 处理（已有）                             | CMP-04, 05, 06, LINK-01            | 🟢                           |
+| 文件时间容差配置（已有）                               | CMP-08                             | 🟢                           |
+| Unicode 路径支持（已有 + 新增测试）                    | CMP-13                             | 🟢                           |
+| Symlink Follow 循环检测（路径-based + visited set）    | CMP-07 (partial)                   | 🟢                           |
+| CaseMode 配置（sensitive/insensitive/auto）            | CMP-14                             | 🟢                           |
+| Junction/Mount/WSL 链接种类识别                        | CMP-07 (linkKind), LINK-02, 03, 04 | 🔵 skip — Windows-only，记债 |
+| FAT 夏令时处理                                         | CMP-09                             | 🔵 Defer                     |
+| Windows 长路径支持（`\\?\` 前缀）                      | CMP-12                             | 🔵 skip — Windows-only，记债 |
 
 ### RFC-031 — Compare ↔ Plan E2E Verify
 

@@ -1,6 +1,6 @@
 package services
 
-import "github.com/systembugtj/commando/internal/drive"
+import "github.com/commandotj/commando/internal/drive"
 
 type DriveInfo = drive.Info
 

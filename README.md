@@ -5,7 +5,7 @@ Folder sync tool (FreeFileSync-style). **CLI-first Go core**, Wails desktop UI, 
 ## Workspace layout
 
 ```text
-backend/               Go module github.com/systembug/commando (no package.json)
+backend/               Go module github.com/commandotj/commando (no package.json)
 apps/desktop/          Wails 3 shell (@commando/desktop)
 packages/ui/           @commando/ui
 packages/shared/       @commando/shared

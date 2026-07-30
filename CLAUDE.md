@@ -170,7 +170,7 @@ export default class MyService implements BaseService {
 ### 目录结构
 
 ```
-backend/              # Go module github.com/systembug/commando (CLI + core)
+backend/              # Go module github.com/commandotj/commando (CLI + core)
   cmd/commando/       # CLI
   internal/           # sync, copy, file, worker
 apps/desktop/         # Wails 薄适配层

@@ -63,15 +63,15 @@ func IndexRoot(root string, matcher filter.Matcher, opts IndexOptions) (Index, e
 
 `engine.SymlinkMode` ≠ `fsutil.SymlinkMode`；`toFsutilSymlinkMode` 转换。勿给 `WalkRoot` 加 symlink 参数。
 
-## 4. 已知 engine 缺口（开工前/中修）
+## 4. 已知 engine 缺口（已关闭，2026-07-29）
 
-| 缺口                              | 影响                         | 动作                                                  |
-| --------------------------------- | ---------------------------- | ----------------------------------------------------- |
-| `Categorize` 丢弃 `IsEqual` error | Content I/O 失败当 not-equal | 返回 error 或 fail-closed API                         |
-| `engine.Entry` 无 `SymlinkTarget` | AsLink 身份不完整            | 从 fsutil 拷贝字段                                    |
-| `IndexRoot` 无 `context.Context`  | 无法取消/并行结构化          | 加 ctx（CMP-10 前置）                                 |
-| `Parallelism` 未接线              | 字段空转                     | CMP-10/11                                             |
-| `fsutil.shouldSkip` 硬编码        | 过滤越权到 fsutil            | 记债；理想归 filter（019 可协作，不挡 016 原语 Done） |
+| 缺口                              | 状态                                            |
+| --------------------------------- | ----------------------------------------------- |
+| `Categorize` 丢弃 `IsEqual` error | ✅ 已修复：返回 `(Category, string, error)`     |
+| `engine.Entry` 无 `SymlinkTarget` | ✅ 已修复：添加字段，`IndexRoot` 从 fsutil 拷贝 |
+| `IndexRoot` 无 `context.Context`  | ✅ 已修复：添加 `ctx` 参数                      |
+| `Parallelism` 未接线              | ✅ CMP-10/11 完成（errgroup + semaphore）       |
+| `fsutil.shouldSkip` 硬编码        | 记债→RFC-019                                    |
 
 ## 5. 剩余范围（engine only）
 
@@ -114,17 +114,17 @@ func IndexRoot(root string, matcher filter.Matcher, opts IndexOptions) (Index, e
 
 **Start 后第一刀：** §4 正确性三件套，再 CMP-10/11。
 
-## 9. Done 定义（016 Completed）
+## 9. Done 定义（016 Completed ✅）
 
 - [x] CMP-01/02 原语/03/04–06/08/LINK-01 + 现有测
-- [ ] §4 缺口关闭 + 测
-- [ ] CMP-10/11 绿（或 Parallelism 文档化默认串行且测锁串行行为——若砍并行须改决策）
-- [ ] CMP-07 薄 + LINK-02…04 证据或 skip 债登记
-- [ ] CMP-13 测；CMP-14 CaseMode 或明确砍到后续 RFC
-- [ ] CMP-12 Win 测或 skip 债
-- [ ] CMP-09 保持 Defer
-- [ ] TASK_TRACKING 016 节与本文一致；**无** VERIFY/BuildPlan 任务
-- [ ] **不要求** RFC-031 / CLI 绿
+- [x] §4 缺口关闭 + 测
+- [x] CMP-10/11 绿（`indexRootParallel` + `ParallelCompare`，errgroup+semaphore）
+- [x] CMP-07 循环检测（path-based visited set） + LINK-02…04 skip 债登记
+- [x] CMP-13 测（Unicode round-trip）
+- [x] CMP-14 CaseMode（`CaseMode` 类型 + 单元矩阵）
+- [x] CMP-12 Win 长路径 → skip 债登记；CMP-09 保持 Defer
+- [x] TASK_TRACKING 016 节已同步；**无** VERIFY/BuildPlan 任务
+- [x] 66 tests pass（11 packages），`go build ./...` 通过
 
 ## 10. 后续
 

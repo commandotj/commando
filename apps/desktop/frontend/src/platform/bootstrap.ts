@@ -2,17 +2,17 @@ import {
     CancelCopyBatch,
     CopyBatch,
     GetCopyQueueStatus,
-} from "../../bindings/github.com/systembugtj/commando/apps/desktop/services/copyservice.js";
+} from "../../bindings/github.com/commandotj/commando/apps/desktop/services/copyservice.js";
 import {
     GetDriveDetails,
     ListDrives,
-} from "../../bindings/github.com/systembugtj/commando/apps/desktop/services/driveservice.js";
+} from "../../bindings/github.com/commandotj/commando/apps/desktop/services/driveservice.js";
 import {
     GetHomeDir,
     GoToParent,
     ListDir,
     Navigate,
-} from "../../bindings/github.com/systembugtj/commando/apps/desktop/services/fileservice.js";
+} from "../../bindings/github.com/commandotj/commando/apps/desktop/services/fileservice.js";
 import { installFsApi } from "./fsApi";
 import { installLogApi } from "./logApi";
 import { installSyncApi } from "./syncApi";

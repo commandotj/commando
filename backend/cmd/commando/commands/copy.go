@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/systembugtj/commando/internal/copy"
+	"github.com/commandotj/commando/internal/copy"
 )
 
 func init() {

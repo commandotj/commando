@@ -5,7 +5,7 @@ import (
 	"log"
 	"runtime"
 
-	"github.com/systembugtj/commando/apps/desktop/services"
+	"github.com/commandotj/commando/apps/desktop/services"
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 

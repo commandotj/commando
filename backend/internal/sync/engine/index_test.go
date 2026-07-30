@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/systembugtj/commando/internal/sync/filter"
+	"github.com/commandotj/commando/internal/sync/filter"
 )
 
 func TestIndexRoot_SkipsGit(t *testing.T) {

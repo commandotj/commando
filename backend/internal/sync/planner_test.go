@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/systembugtj/commando/internal/sync"
+	"github.com/commandotj/commando/internal/sync"
 )
 
 func TestBuildPlan_LeftToRightCopiesMissingFile(t *testing.T) {

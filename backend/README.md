@@ -1,6 +1,6 @@
 # Backend (Go module)
 
-Core: `github.com/systembug/commando` — pure Go, no `package.json`.
+Core: `github.com/commandotj/commando` — pure Go, no `package.json`.
 
 ```text
 backend/

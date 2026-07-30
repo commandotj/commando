@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"sort"
 
-	"github.com/systembugtj/commando/internal/fsutil"
+	"github.com/commandotj/commando/internal/fsutil"
 )
 
 // BuildPlan compares two pane roots and returns the actions required for the given direction.
