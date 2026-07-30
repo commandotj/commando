@@ -18,6 +18,12 @@ export interface SyncOptions {
     deleteExtraneous: boolean;
     dryRun: boolean;
     useChecksum: boolean;
+    filter?: SyncFilterRules;
+}
+
+export interface SyncFilterRules {
+    include: string[];
+    exclude: string[];
 }
 
 export interface SyncPlanItem {

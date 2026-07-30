@@ -15,7 +15,7 @@ P1 目标：本地路径 CLI `compare → deterministic plan → safe execute �
 | 顺序 | RFC     | 原子 Gate                                                           | 状态 |
 | ---- | ------- | ------------------------------------------------------------------- | ---- |
 | 1    | RFC-016 | engine 原语：link、容差、并行、确定性输出（不含 planner）           | 🟢   |
-| 2    | RFC-019 | Include/exclude 经统一 engine 进入 CLI compare                      | 🔵   |
+| 2    | RFC-019 | Include/exclude 经统一 engine 进入 CLI compare                      | 🟢   |
 | 3    | RFC-030 | 本地路径错误和文件系统差异可观察                                    | 🔵   |
 | 4    | RFC-017 | Mirror/Update/Two-way plan 语义正确                                 | 🔵   |
 | 5    | RFC-031 | **017 完成后** Compare↔Plan E2E：BuildPlan 接 engine；CLI T1–T7     | 🔵   |
@@ -95,12 +95,12 @@ P1 RFC 内的 UI-only、email/HTML、remote、RealtimeSync、distribution 任务
 
 ### RFC-019 — Filter System
 
-| Task                                                    | IDs                        | Status |
-| ------------------------------------------------------- | -------------------------- | ------ |
-| Matcher 原语已有；统一 planner/BuildReport/CLI 集成未做 | FLT-01, 02, 03, 04, 05, 08 | 🔵     |
-| 非法 glob 返回 typed configuration error                | FLT-03                     | 🔵     |
-| 路径分隔符规范化（已有）                                | FLT-07                     | 🟢     |
-| 快速排除 UI 入口                                        | FLT-06                     | 🔵     |
+| Task                                                          | IDs                    | Status       |
+| ------------------------------------------------------------- | ---------------------- | ------------ |
+| Matcher 原语已有；planner/CLI 集成完成（BuildPlan→IndexRoot） | FLT-01, 02, 04, 05, 08 | 🟢           |
+| 非法 glob 返回 typed configuration error                      | FLT-03                 | 🟢           |
+| 路径分隔符规范化（已有）                                      | FLT-07                 | 🟢           |
+| 快速排除 UI 入口                                              | FLT-06                 | 🔵 → RFC-032 |
 
 ### RFC-021 — CLI & Config
 

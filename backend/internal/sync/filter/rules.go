@@ -1,10 +1,33 @@
 package filter
 
+import (
+	"fmt"
+
+	"github.com/bmatcuk/doublestar/v4"
+)
+
 // FilterRules defines which relative paths a sync operation should include
 // or exclude, mirroring FreeFileSync's include/exclude filter lists.
 type FilterRules struct {
-	Include []string
-	Exclude []string
+	Include []string `json:"include"`
+	Exclude []string `json:"exclude"`
+}
+
+// Validate checks that every glob pattern is syntactically valid. Returns nil
+// on success, or an error wrapping the first invalid pattern encountered.
+// (RFC-019 FLT-03: illegal glob must produce typed configuration error.)
+func (r FilterRules) Validate() error {
+	for _, p := range r.Include {
+		if !doublestar.ValidatePattern(p) {
+			return fmt.Errorf("invalid include pattern: %q", p)
+		}
+	}
+	for _, p := range r.Exclude {
+		if !doublestar.ValidatePattern(p) {
+			return fmt.Errorf("invalid exclude pattern: %q", p)
+		}
+	}
+	return nil
 }
 
 // DefaultRules returns Commando's default filter: include everything except

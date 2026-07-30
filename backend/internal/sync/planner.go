@@ -1,22 +1,30 @@
 package sync
 
 import (
+	"context"
 	"path/filepath"
 	"sort"
 
-	"github.com/commandotj/commando/internal/fsutil"
+	"github.com/commandotj/commando/internal/sync/engine"
+	"github.com/commandotj/commando/internal/sync/filter"
 )
 
-// BuildPlan compares two pane roots and returns the actions required for the given direction.
 func BuildPlan(leftRoot, rightRoot string, direction Direction, opts Options) (*Plan, error) {
 	leftRoot = filepath.Clean(leftRoot)
 	rightRoot = filepath.Clean(rightRoot)
 
-	leftEntries, err := fsutil.WalkRoot(leftRoot)
+	rules := opts.Filter
+	if len(rules.Include) == 0 {
+		rules = filter.DefaultRules()
+	}
+	m := filter.NewMatcher(rules)
+
+	engOpts := engine.IndexOptions{SymlinkMode: engine.SymlinkFollow}
+	leftEntries, err := engine.IndexRoot(context.Background(), leftRoot, m, engOpts)
 	if err != nil {
 		return nil, err
 	}
-	rightEntries, err := fsutil.WalkRoot(rightRoot)
+	rightEntries, err := engine.IndexRoot(context.Background(), rightRoot, m, engOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +59,7 @@ func BuildPlan(leftRoot, rightRoot string, direction Direction, opts Options) (*
 	return plan, nil
 }
 
-func unionKeys(left, right map[string]fsutil.Entry) []string {
+func unionKeys(left, right engine.Index) []string {
 	seen := make(map[string]struct{}, len(left)+len(right))
 	for key := range left {
 		seen[key] = struct{}{}
@@ -68,7 +76,7 @@ func unionKeys(left, right map[string]fsutil.Entry) []string {
 
 func resolveItem(
 	rel string,
-	left, right fsutil.Entry,
+	left, right engine.Entry,
 	hasLeft, hasRight bool,
 	leftRoot, rightRoot string,
 	direction Direction,
@@ -86,7 +94,7 @@ func resolveItem(
 
 func planMissingSide(
 	rel string,
-	source fsutil.Entry,
+	source engine.Entry,
 	sourceRoot, destRoot string,
 	direction Direction,
 	opts Options,
@@ -96,7 +104,6 @@ func planMissingSide(
 		return PlanItem{RelativePath: rel, Action: ActionSkip, Reason: "directory placeholder"}
 	}
 
-	// File only on one side.
 	if direction == DirectionLeftToRight {
 		if sourceIsLeft {
 			return PlanItem{
@@ -139,7 +146,6 @@ func planMissingSide(
 		return PlanItem{RelativePath: rel, Action: ActionSkip, Reason: "only on left; update strategy skips"}
 	}
 
-	// Bidirectional: copy missing file from the side that has it.
 	return PlanItem{
 		RelativePath: rel,
 		Action:       ActionCopy,
@@ -151,7 +157,7 @@ func planMissingSide(
 
 func planBothSides(
 	rel string,
-	left, right fsutil.Entry,
+	left, right engine.Entry,
 	leftRoot, rightRoot string,
 	direction Direction,
 	opts Options,
@@ -186,7 +192,7 @@ func planBothSides(
 	}
 }
 
-func planBidirectional(rel string, left, right fsutil.Entry, leftRoot, rightRoot string) PlanItem {
+func planBidirectional(rel string, left, right engine.Entry, leftRoot, rightRoot string) PlanItem {
 	switch {
 	case left.ModTimeUnix > right.ModTimeUnix:
 		return PlanItem{
@@ -215,12 +221,11 @@ func planBidirectional(rel string, left, right fsutil.Entry, leftRoot, rightRoot
 	}
 }
 
-func entriesEqual(left, right fsutil.Entry, opts Options) bool {
-	if left.Size != right.Size {
-		return false
-	}
+func entriesEqual(left, right engine.Entry, opts Options) bool {
+	mode := engine.TimeAndSize
 	if opts.UseChecksum {
-		return false
+		mode = engine.Content
 	}
-	return left.ModTimeUnix == right.ModTimeUnix
+	eq, _ := engine.IsEqual(left, right, mode, engine.CompareSettings{})
+	return eq
 }

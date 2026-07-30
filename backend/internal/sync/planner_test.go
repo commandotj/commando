@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/commandotj/commando/internal/sync"
+	"github.com/commandotj/commando/internal/sync/filter"
 )
 
 func TestBuildPlan_LeftToRightCopiesMissingFile(t *testing.T) {
@@ -64,5 +65,55 @@ func TestBuildPlan_BidirectionalUsesNewerSide(t *testing.T) {
 	}
 	if plan.Items[0].Source != leftFile {
 		t.Fatalf("expected left to win, got %s", plan.Items[0].Source)
+	}
+}
+
+func TestBuildPlan_FilterExcludesFile(t *testing.T) {
+	left := t.TempDir()
+	right := t.TempDir()
+
+	_ = os.WriteFile(filepath.Join(left, "include_me.txt"), []byte("a"), 0o644)
+	_ = os.WriteFile(filepath.Join(left, "skip_me.tmp"), []byte("b"), 0o644)
+
+	plan, err := sync.BuildPlan(left, right, sync.DirectionLeftToRight, sync.Options{
+		Filter: filter.FilterRules{
+			Include: []string{"**"},
+			Exclude: []string{"*.tmp"},
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, item := range plan.Items {
+		if item.RelativePath == "skip_me.tmp" && item.Action != sync.ActionSkip {
+			t.Errorf("expected skip_me.tmp to be excluded from plan, got action=%s", item.Action)
+		}
+	}
+	if plan.ToCopy != 1 {
+		t.Errorf("expected 1 copy (include_me.txt), got %d", plan.ToCopy)
+	}
+}
+
+func TestBuildPlan_DefaultFilterExcludesGit(t *testing.T) {
+	left := t.TempDir()
+	right := t.TempDir()
+
+	_ = os.MkdirAll(filepath.Join(left, ".git"), 0o755)
+	_ = os.WriteFile(filepath.Join(left, ".git", "config"), []byte("x"), 0o644)
+	_ = os.WriteFile(filepath.Join(left, "a.txt"), []byte("hello"), 0o644)
+
+	plan, err := sync.BuildPlan(left, right, sync.DirectionLeftToRight, sync.Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, item := range plan.Items {
+		if item.RelativePath == ".git/config" {
+			t.Errorf("expected .git/config to be excluded by default filter")
+		}
+	}
+	if plan.ToCopy != 1 {
+		t.Errorf("expected 1 copy (a.txt), got copies=%d", plan.ToCopy)
 	}
 }

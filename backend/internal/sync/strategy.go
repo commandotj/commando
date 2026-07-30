@@ -82,6 +82,7 @@ func (s Strategy) PlannerOptions(overrides Options) Options {
 	opts := Options{
 		DryRun:      overrides.DryRun,
 		UseChecksum: overrides.UseChecksum,
+		Filter:      overrides.Filter,
 	}
 	if s.DeleteExtraneous {
 		opts.DeleteExtraneous = true
