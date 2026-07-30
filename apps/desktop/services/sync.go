@@ -53,12 +53,46 @@ func (s *SyncService) Plan(req SyncRequest) (SyncJobResult, error) {
 
 // Execute runs a sync plan on a background goroutine.
 func (s *SyncService) Execute(plan sync.Plan, opts sync.Options) (SyncJobResult, error) {
-	return s.startJob(func(ctx context.Context) (any, error) {
-		if err := ctx.Err(); err != nil {
-			return nil, err
+	jobID := uuid.NewString()
+	emit := s.runtime.Events
+
+	err := s.runtime.Tasks.Start(jobID, func(ctx context.Context) error {
+		emit(EventSyncProgress, map[string]any{
+			"jobId":  jobID,
+			"type":   "progress",
+			"status": "running",
+		})
+
+		result, runErr := sync.Execute(ctx, &plan, opts,
+			func(rel string, act sync.Action, done, total int, itemErr error) {
+				payload := map[string]any{
+					"jobId": jobID, "type": "progress",
+					"file": rel, "action": string(act), "done": done, "total": total,
+				}
+				if itemErr != nil {
+					payload["error"] = itemErr.Error()
+				}
+				emit(EventSyncProgress, payload)
+			})
+
+		status := "done"
+		if runErr != nil {
+			if errors.Is(runErr, context.Canceled) {
+				status = "canceled"
+			} else {
+				status = "error"
+			}
 		}
-		return sync.Execute(ctx, &plan, opts, nil)
+		emit(EventSyncProgress, map[string]any{
+			"jobId": jobID, "type": "done", "status": status,
+			"result": result, "error": errorString(runErr),
+		})
+		return runErr
 	})
+	if err != nil {
+		return SyncJobResult{}, err
+	}
+	return SyncJobResult{JobID: jobID}, nil
 }
 
 // Compare builds a strategy-aware report on a background goroutine.
