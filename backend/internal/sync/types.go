@@ -52,11 +52,18 @@ type Plan struct {
 
 // ExecuteResult summarizes a completed sync run.
 type ExecuteResult struct {
-	PlanID    string   `json:"planId"`
-	Copied    int      `json:"copied"`
-	Skipped   int      `json:"skipped"`
-	Deleted   int      `json:"deleted"`
-	Errors    []string `json:"errors"`
+	PlanID     string         `json:"planId"`
+	Copied     int            `json:"copied"`
+	Skipped    int            `json:"skipped"`
+	Deleted    int            `json:"deleted"`
+	Errors     []string       `json:"errors"`
+	Restorable []RestoreEntry `json:"restorable,omitempty"`
+}
+
+type RestoreEntry struct {
+	RelativePath string `json:"relativePath"`
+	OriginalPath string `json:"originalPath"`
+	BackupPath   string `json:"backupPath"`
 }
 
 // Options tune planner and executor behavior.

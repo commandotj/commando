@@ -96,6 +96,11 @@ func Execute(ctx context.Context, plan *Plan, opts Options, progress ProgressFn)
 				}
 			}
 			result.Deleted++
+			if restorePath != "" {
+				result.Restorable = append(result.Restorable, RestoreEntry{
+					RelativePath: item.RelativePath, OriginalPath: item.Source, BackupPath: restorePath,
+				})
+			}
 		}
 	}
 
