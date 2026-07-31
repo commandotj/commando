@@ -1,4 +1,4 @@
-# RFC-2026-035: Compare Flow — CLI Subprocess & Diff View Switch
+# RFC-2026-037: Compare Flow — CLI Subprocess & Diff View Switch
 
 ---
 
@@ -58,18 +58,33 @@
 
 **现状（`backend/cmd/commando/commands/sync.go` line 44-53）：** `planCmd` 直接调 `sync.BuildPlan` 后一次性 `json.NewEncoder(os.Stdout).Encode(plan)`，中途完全静默，无进度、无 `--strategy` 参数（只有 `--direction`/`--include`/`--exclude`）。
 
-**新增 `--progress` 后的输出（沿用 `runCmd` 已有的 NDJSON 事件形状，`sync.ProgressFn` 签名不变）：**
+**唯一权威 payload 类型：`SyncProgressPayload`（`packages/shared/types/SyncTypes.ts:85-96`，已存在，不新造）：**
+
+```typescript
+export interface SyncProgressPayload {
+    jobId?: string;
+    type?: string; // "progress" | "done" —— 现状只有这两个值，没有第三个 "result"
+    status?: string; // type=done 时: "done" | "error" | "canceled"
+    result?: unknown; // type=done 时装终态数据
+    error?: string;
+    file?: string; // type=progress 时的当前文件
+    action?: SyncAction;
+    done?: number;
+    total?: number;
+}
+```
+
+**新增 `--progress` 后的 CLI 输出（每行是一个 `SyncProgressPayload` 的 JSON 序列化，跟 Wails event 走的是同一个类型，不是两套）：**
 
 ```
 $ commando sync plan --left /a --right /b --direction both --progress
 {"type":"progress","file":"a.txt","action":"scan","done":12,"total":0}
 {"type":"progress","file":"b.txt","action":"scan","done":45,"total":45}
-{"relativePath":"a.txt","action":"copy","source":"...","destination":"...","reason":"left-newer"}
-{"relativePath":"c.txt","action":"conflict","source":"...","destination":"...","reason":"conflict"}
+{"type":"done","status":"done","result":{"leftRoot":"/a","rightRoot":"/b","items":[...],"toCopy":3,"toDelete":1,"conflicts":1,"toSkip":40}}
 ```
 
 - 复用 `sync.ProgressFn`（`func(rel string, act sync.Action, done, total int, err error)`），跟 `run --progress` 是**同一个类型**，不新造一套进度回调签名——`BuildPlan` 需要接受可选 `ProgressFn` 参数（现状不接受，需要改签名）
-- 最后仍以完整 `Plan` JSON（`plan.Items[]`，非逐行 `item` 事件）结束，兼容现有 `enc.Encode(plan)` 一次性输出格式，不打散成 NDJSON 逐条 item——**改动最小化**：只加过程进度，不改变终态输出结构
+- **只有最后一行**是 `type:"done"`，其余全是 `type:"progress"`——`streamNDJSONAsEvents`（§5）靠这个字段区分，不是靠"是不是最后一行"这种位置猜测。`result` 字段装完整 `Plan`（`CompareReport` 的 `plan` 部分），不单独发 per-item `{"relativePath":...}` 行
 - 退出码沿用 RFC-012 §4.6 CLI-05：0 成功 / 1 警告（有 conflict/skip）/ 2 错误 / 3 中止（Ctrl+C）
 
 **策略/变体参数缺口，具体换算路径（已核实，非假设）：**
@@ -103,15 +118,18 @@ func (s *SyncService) Compare(req SyncRequest) (jobID string, err error) {
     s.jobCancels.Store(jobID, cancel)
 
     stdout, _ := cmd.StdoutPipe()
-    go streamNDJSONAsEvents(jobID, stdout, s.ctx)
+    sawDone := &atomic.Bool{}
+    go streamNDJSONAsEvents(jobID, stdout, s.ctx, sawDone) // 见下方状态机说明
     go func() {
         err := cmd.Wait()
         s.jobCancels.Delete(jobID)
-        status := "done"
+        if sawDone.Load() {
+            return // CLI 自己已经发过 type:"done"（正常完成路径），不重复发
+        }
+        // 子进程被杀/异常退出、没能写出自己的 type:"done" 行 —— Wails 层兜底补发一次终态事件
+        status := "error"
         if ctx.Err() == context.Canceled {
-            status = "canceled" // 用户主动取消，非错误
-        } else if err != nil {
-            status = "error"
+            status = "canceled"
         }
         emit(EventSyncProgress, map[string]any{"jobId": jobID, "type": "done", "status": status})
     }()
@@ -128,6 +146,50 @@ func (s *SyncService) CancelSync(jobID string) (map[string]any, error) {
 ```
 
 `exec.CommandContext` 是标准库对"进程级取消"的原生支持（ctx 取消 → 自动 SIGKILL 子进程），不需要手写信号处理逻辑。取消后 stdout pipe 会因子进程退出而 EOF，`streamNDJSONAsEvents` 的读循环自然结束，不需要额外清理。
+
+**`streamNDJSONAsEvents` 状态机（不是无脑转发，明确写出判断逻辑）：**
+
+**Go 侧缺口：** 现有 Go 代码全程用裸 `map[string]any` 手搓事件 payload（`apps/desktop/services/sync.go` 各处 `emit(EventSyncProgress, map[string]any{...})`），**没有对应 `SyncProgressPayload` Go struct**。本 RFC 新增一个，字段跟 TS 类型（`packages/shared/types/SyncTypes.ts:85-96`）逐一对齐，两边手动保持同步（现有代码库没有 Go↔TS 类型自动生成机制，是已知的现状约束，不在本 RFC 解决）：
+
+```go
+// apps/desktop/services/sync.go 新增（本 RFC 新增类型，现状不存在）
+type SyncProgressPayload struct {
+    JobID  string `json:"jobId,omitempty"`
+    Type   string `json:"type,omitempty"`   // "progress" | "done"
+    Status string `json:"status,omitempty"` // type=done 时: done | error | canceled
+    Result any    `json:"result,omitempty"`
+    Error  string `json:"error,omitempty"`
+    File   string `json:"file,omitempty"`
+    Action string `json:"action,omitempty"`
+    Done   int    `json:"done,omitempty"`
+    Total  int    `json:"total,omitempty"`
+}
+```
+
+```go
+// streamNDJSONAsEvents 逐行读 stdout，每行反序列化为 SyncProgressPayload
+// 并原样转发为 Wails event。sawDone 用于告知调用方"CLI 是否已经自己
+// 发过终态行"，避免 cmd.Wait() 之后重复补发一次 type:"done"。
+func streamNDJSONAsEvents(jobID string, stdout io.Reader, ctx context.Context, sawDone *atomic.Bool) {
+    scanner := bufio.NewScanner(stdout)
+    for scanner.Scan() {
+        var payload SyncProgressPayload
+        if err := json.Unmarshal(scanner.Bytes(), &payload); err != nil {
+            continue // 单行解析失败跳过，不中止整个流（见 §9 风险表）
+        }
+        payload.JobID = jobID
+        if payload.Type == "done" {
+            sawDone.Store(true)
+        }
+        emit(EventSyncProgress, payload)
+    }
+    // scanner 遇 EOF 或截断行自然结束；截断的半行 JSON 会在 Unmarshal
+    // 失败分支被跳过，不 emit——具体行为需 §9a 的
+    // TestStreamNDJSONAsEvents_PartialLineOnKill_NoCorruptEvent 验证
+}
+```
+
+**判定规则（唯一权威，其余小节引用这里不重复定义）：** `payload.Type == "done"` 是终态的唯一标志，不存在其他判断方式（不是"最后一行"、不是"stdout 关闭"）。`§4` CLI 侧和这里的 Go 侧、以及 `§6` 前端侧，三处对"什么是终态"的判断必须都是这一条规则，不能各自为政。
 
 **Compare 阶段也要有真实进度事件**（不是现有代码那种"开始/结束各一次"）：CLI `--progress` 输出的 `"progress"` 行（§4 契约）经 `streamNDJSONAsEvents` 逐行转发为 Wails event，前端才有真实数据可显示，不是假进度条。
 
@@ -154,20 +216,31 @@ interface SyncState {
 
 ```typescript
 // compareSync thunk 改为流式 dispatch，不再是一次性 await
+// payload 类型统一用 SyncProgressPayload（packages/shared/types/SyncTypes.ts），
+// 判定规则与 §5 streamNDJSONAsEvents 完全一致：type==="done" 才是终态，
+// 没有第三种 type 值，不存在 payload.report 这个字段（是 payload.result）
 export const compareSync = createAsyncThunk(
     "sync/compare",
-    async (_, { dispatch, getState, rejectWithValue }) => {
+    async (_, { dispatch, rejectWithValue }) => {
         // ...校验 leftRoot/rightRoot...
         const { jobId } = await window.syncApi.compare(request);
-        return new Promise((resolve, reject) => {
-            window.syncApi.onProgress(payload => {
+        return new Promise<CompareReport>((resolve, reject) => {
+            window.syncApi.onProgress((payload: SyncProgressPayload) => {
                 if (payload.jobId !== jobId) return;
                 if (payload.type === "progress") {
-                    dispatch(progressUpdated(payload)); // 关键修复：中间事件要 dispatch
+                    dispatch(progressUpdated(payload));
                     return;
                 }
-                if (payload.type === "result") {
-                    resolve(payload.report);
+                if (payload.type === "done") {
+                    if (payload.status === "error" || payload.error) {
+                        reject(new Error(payload.error ?? "Compare failed"));
+                        return;
+                    }
+                    if (payload.status === "canceled") {
+                        reject(new Error("Compare canceled"));
+                        return;
+                    }
+                    resolve(payload.result as CompareReport);
                 }
             });
         });
@@ -175,7 +248,7 @@ export const compareSync = createAsyncThunk(
 );
 ```
 
-`compareSync.fulfilled` reducer 存 `plan`/`report`（`syncSlice`）；同一 thunk 内额外 `dispatch(setViewMode("diff"))`（`fileManagerSlice` 的新 action），两个 slice 各自更新自己的状态，不互相直接改对方的 state。
+`compareSync.fulfilled` reducer 存 `compareReport`（`syncSlice`）；同一 thunk 内额外 `dispatch(setViewMode("diff"))`（`fileManagerSlice` 的新 action），两个 slice 各自更新自己的状态，不互相直接改对方的 state。
 
 ## 7. Diff 视图具体规格（`SyncDiffView.tsx`，新建）
 
@@ -210,14 +283,14 @@ export const compareSync = createAsyncThunk(
 
 ## 8. 文件变更
 
-| 文件                                               | 职责                                                                     |
-| -------------------------------------------------- | ------------------------------------------------------------------------ |
-| `packages/ui/src/components/sync/SyncDiffView.tsx` | 新建：§7 规格的单列表 diff 展示，复用 `VirtualizedTable`                 |
-| `packages/ui/src/components/sync/SyncPane.tsx`     | 按 `fileManagerSlice.viewMode` 条件渲染 `SyncDiffView` 或原有文件列表    |
-| `packages/ui/src/app/fileManagerSlice.ts`          | `viewMode` 状态 + `setViewMode` action                                   |
-| `packages/ui/src/app/syncSlice.ts`                 | `compareReport` 状态 + `progressUpdated` reducer + `compareSync` 改流式  |
-| `apps/desktop/services/sync.go`                    | Compare 改为 spawn CLI 子进程 + `exec.CommandContext` 取消 + NDJSON 转发 |
-| `backend/cmd/commando/commands/sync.go`            | `planCmd` 加 `--progress` flag + `sync.BuildPlan` 接受 `ProgressFn`      |
+| 文件                                               | 职责                                                                                                                                                           |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/ui/src/components/sync/SyncDiffView.tsx` | 新建：§7 规格的单列表 diff 展示，复用 `VirtualizedTable`                                                                                                       |
+| `packages/ui/src/components/sync/SyncPane.tsx`     | 按 `fileManagerSlice.viewMode` 条件渲染 `SyncDiffView` 或原有文件列表                                                                                          |
+| `packages/ui/src/app/fileManagerSlice.ts`          | `viewMode` 状态 + `setViewMode` action                                                                                                                         |
+| `packages/ui/src/app/syncSlice.ts`                 | `compareReport` 状态 + `progressUpdated` reducer + `compareSync` 改流式                                                                                        |
+| `apps/desktop/services/sync.go`                    | 新增 `SyncProgressPayload` struct（现状不存在）+ Compare 改为 spawn CLI 子进程 + `exec.CommandContext` 取消 + `streamNDJSONAsEvents` 状态机（§5）+ NDJSON 转发 |
+| `backend/cmd/commando/commands/sync.go`            | `planCmd` 加 `--progress` flag + `sync.BuildPlan` 接受 `ProgressFn`                                                                                            |
 
 **切回浏览态：** 用户点击"返回浏览"或发起新的 Compare 才 `dispatch(setViewMode("browse"))`；Sync 执行完成后同样切回浏览态并刷新两侧目录内容。
 
@@ -233,21 +306,24 @@ export const compareSync = createAsyncThunk(
 
 ## 9a. 测试计划（TDD 前置，非事后补测）
 
-| 层    | 测试名                                                                            | 验证什么                                                                                                                                                                              |
-| ----- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CLI   | `TestPlanCmd_ProgressFlag_EmitsNDJSONLines`                                       | `sync plan --progress` stdout 每行可独立 `json.Unmarshal`；最后一行是完整 `Plan`                                                                                                      |
-| CLI   | `TestPlanCmd_NoProgressFlag_UnchangedOutput`                                      | 不传 `--progress` 时行为与现状完全一致（一次性 JSON），回归保护                                                                                                                       |
-| CLI   | `TestBuildPlan_NilProgressFn_NoPanic`                                             | `ProgressFn` 传 `nil`（现有调用方式）不崩，向后兼容                                                                                                                                   |
-| Wails | `TestCompare_SpawnsRealSubprocess`                                                | `SyncService.Compare()` 内部真的调 `exec.Command`，不是直调 `sync.BuildReport`（防回归到直调）                                                                                        |
-| Wails | `TestCompare_ResolveStrategyError_ReturnsEarlyNoSpawn`                            | `req.strategyID()` 是非法值时 `ResolveStrategy` 报错，不应 spawn 子进程                                                                                                               |
-| Wails | `TestCancelSync_KillsRunningSubprocess`                                           | 取消后子进程进程号不再存在（非 zombie），`status:"canceled"` 事件已发出                                                                                                               |
-| Wails | `TestCancelSync_UnknownJobID_ReturnsFalseNoError`                                 | 取消一个不存在的 jobID 不 panic，返回 `cancelled:false`                                                                                                                               |
-| Wails | `TestStreamNDJSONAsEvents_PartialLineOnKill_NoCorruptEvent`                       | **需先手工验证真实行为再定断言**：SIGKILL 子进程时 stdout 可能截断半行 JSON，确认 `streamNDJSONAsEvents` 对半行的处理是丢弃还是报错，再写断言——不要在不知道真实行为前先编好"应该怎样" |
-| Redux | `progressUpdated reducer 合并 payload 到 progressFile/progressDone/progressTotal` | 修复 task #6 的核心断言：确认这三个字段真的被更新，不再停留在初始值                                                                                                                   |
-| Redux | `compareSync.fulfilled 触发 fileManagerSlice setViewMode("diff")`                 | 验证视图切换真的发生，且跨 slice 触发路径正确                                                                                                                                         |
-| Redux | `setViewMode("browse") 把 fileManagerSlice.viewMode 设回 browse`                  | 验证切回逻辑，防止卡死在 diff 态                                                                                                                                                      |
-| UI    | `SyncDiffView 渲染 conflict 组永远展开且置顶`                                     | S-04 铁律的 UI 层验证，防止未来重构悄悄破坏这条安全规则                                                                                                                               |
-| UI    | `SyncDiffView skip 组默认折叠`                                                    | §7 分组行为回归保护                                                                                                                                                                   |
+| 层    | 测试名                                                                                        | 验证什么                                                                                                                                                                              |
+| ----- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CLI   | `TestPlanCmd_ProgressFlag_EmitsNDJSONLines`                                                   | `sync plan --progress` stdout 每行可独立 `json.Unmarshal` 成 `SyncProgressPayload` 形状；仅最后一行 `type=="done"`，其余全是 `type=="progress"`                                       |
+| CLI   | `TestPlanCmd_ProgressFlag_DonePayloadContainsFullPlan`                                        | 终态行的 `result` 字段反序列化后等于 `sync.BuildPlan` 的返回值（字段一一对应，不丢数据）                                                                                              |
+| CLI   | `TestPlanCmd_NoProgressFlag_UnchangedOutput`                                                  | 不传 `--progress` 时行为与现状完全一致（一次性裸 JSON，无 NDJSON 包装），回归保护                                                                                                     |
+| CLI   | `TestBuildPlan_NilProgressFn_NoPanic`                                                         | `ProgressFn` 传 `nil`（现有调用方式）不崩，向后兼容                                                                                                                                   |
+| Wails | `TestCompare_SpawnsRealSubprocess`                                                            | mock 包级 `execCommand` 变量，断言调用参数含 `["sync","plan","--left",...,"--progress"]`（不是直调 `sync.BuildReport`）                                                               |
+| Wails | `TestCompare_ResolveStrategyError_ReturnsEarlyNoSpawn`                                        | `req.strategyID()` 是非法值时 `ResolveStrategy` 报错，`execCommand` 未被调用（断言 mock 调用次数为 0）                                                                                |
+| Wails | `TestCancelSync_KillsRunningSubprocess`                                                       | 取消后子进程进程号不再存在（非 zombie），且仅收到一次 `type:"done"` 事件（验证 §5 修复的重复终态 bug 不再发生）                                                                       |
+| Wails | `TestCancelSync_UnknownJobID_ReturnsFalseNoError`                                             | 取消一个不存在的 jobID 不 panic，返回 `cancelled:false`                                                                                                                               |
+| Wails | `TestStreamNDJSONAsEvents_NormalCompletion_NoDoubleTerminalEvent`                             | CLI 自己发出 `type:"done"` 正常退出时，`cmd.Wait()` 之后的 goroutine 不再补发第二个终态事件（`sawDone` 标志生效）                                                                     |
+| Wails | `TestStreamNDJSONAsEvents_PartialLineOnKill_NoCorruptEvent`                                   | **需先手工验证真实行为再定断言**：SIGKILL 子进程时 stdout 可能截断半行 JSON，确认 `json.Unmarshal` 失败分支正确跳过该行、不 emit 半成品 payload——先跑一次确认真实截断点在哪，再写断言 |
+| Redux | `progressUpdated reducer 合并 SyncProgressPayload 到 progressFile/progressDone/progressTotal` | 修复 task #6 的核心断言：确认这三个字段真的被更新，不再停留在初始值                                                                                                                   |
+| Redux | `compareSync 解析 payload.type==="done" 时用 payload.result 而非 payload.report`              | 防止字段名再度漂移回上一版编造的 `.report`                                                                                                                                            |
+| Redux | `compareSync.fulfilled 触发 fileManagerSlice setViewMode("diff")`                             | 验证视图切换真的发生，且跨 slice 触发路径正确                                                                                                                                         |
+| Redux | `setViewMode("browse") 把 fileManagerSlice.viewMode 设回 browse`                              | 验证切回逻辑，防止卡死在 diff 态                                                                                                                                                      |
+| UI    | `SyncDiffView 渲染 conflict 组永远展开且置顶`                                                 | S-04 铁律的 UI 层验证，防止未来重构悄悄破坏这条安全规则                                                                                                                               |
+| UI    | `SyncDiffView skip 组默认折叠`                                                                | §7 分组行为回归保护                                                                                                                                                                   |
 
 **门禁：** 本 RFC 涉及的新增/修改文件（`SyncDiffView.tsx` + 修改的 `sync.go`×2 + `syncSlice.ts` + `fileManagerSlice.ts`）比照 RFC-012 §6 的逐包覆盖率纪律，Go 侧新增代码需要 100%（`.coverage-required` 标记同已完成的 `fsutil`/`filter`/`engine`），前端侧至少覆盖上表列出的每一条。
 
