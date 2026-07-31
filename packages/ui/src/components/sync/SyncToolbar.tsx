@@ -54,8 +54,10 @@ const SyncToolbar: React.FC = () => {
             <header className="sync-toolbar">
                 <div className="sync-toolbar__top wails-drag">
                     <span className="sync-toolbar__brand">Commando Sync</span>
-                    <SyncLocaleSelector />
-                    <ThemeSwitchButton />
+                    <div className="sync-toolbar__actions">
+                        <SyncLocaleSelector />
+                        <ThemeSwitchButton />
+                    </div>
                 </div>
                 <div className="sync-toolbar__bottom wails-no-drag">
                     <select

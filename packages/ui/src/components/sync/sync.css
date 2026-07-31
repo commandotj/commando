@@ -104,6 +104,13 @@ html.dark,
   user-select: none;
 }
 
+.sync-toolbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-left: auto;
+}
+
 .sync-toolbar__top {
   justify-content: space-between;
 }
