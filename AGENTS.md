@@ -17,8 +17,8 @@ commando-react/
 │   ├── cmd/commando/        CLI entry
 │   └── internal/            sync, copy, file, drive, worker, fsutil
 ├── apps/desktop/            Wails app (thin Go adapter + Vite frontend)
-├── packages/ui/             @commando/ui — React UI
-├── packages/shared/         @commando/shared — TS types/constants (npm only)
+├── packages/ui/             @commandojs/ui — React UI
+├── packages/shared/         @commandojs/shared — TS types/constants (npm only)
 ├── legacy/electron/         archived Electron code — do not extend
 ├── go.work                  links backend + apps/desktop
 ├── Makefile                 Go tasks (called by pnpm)
@@ -74,14 +74,18 @@ Go tasks live in `Makefile`. pnpm is the entry point; make runs the Go toolchain
 
 ## Where to change things
 
-| Task                     | Location                                                           |
-| ------------------------ | ------------------------------------------------------------------ |
-| Sync engine / strategies | `backend/internal/sync/`                                           |
-| CLI commands             | `backend/cmd/commando/commands/`                                   |
-| Wails IPC adapters       | `apps/desktop/services/`                                           |
-| React UI                 | `packages/ui/src/`                                                 |
-| Shared TS types          | `packages/shared/types/`                                           |
-| Wails TS bindings        | `apps/desktop/frontend/bindings/` (regenerate after Go API change) |
+| Task                       | Location                                                            |
+| -------------------------- | ------------------------------------------------------------------- |
+| Sync legacy planner        | `backend/internal/sync/` (root .go files — pre-RFC-012, still live) |
+| Filesystem walk primitives | `backend/internal/fsutil/` (no sync semantics, 100% coverage gate)  |
+| Sync include/exclude rules | `backend/internal/sync/filter/` (100% coverage gate)                |
+| Sync compare/categorize    | `backend/internal/sync/engine/` (100% coverage gate)                |
+| CLI commands               | `backend/cmd/commando/commands/`                                    |
+| Wails IPC adapters         | `apps/desktop/services/`                                            |
+| React UI                   | `packages/ui/src/`                                                  |
+| Shared TS types            | `packages/shared/types/`                                            |
+| Wails TS bindings          | `apps/desktop/frontend/bindings/` (regenerate after Go API change)  |
+| Sync module spec           | `.spec/rfc/012-sync-module-compare-report.md` (authoritative spec)  |
 
 ## Regenerate Wails bindings
 
@@ -111,6 +115,6 @@ replace github.com/commandotj/commando => ../../backend
 
 ```bash
 pnpm test:go
-pnpm --filter @commando/ui test
+pnpm --filter @commandojs/ui test
 go build ./apps/desktop
 ```

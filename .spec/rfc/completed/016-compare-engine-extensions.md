@@ -4,7 +4,7 @@
 
 作者: albert.li
 创建时间: 2026-07-29
-状态: Approved
+状态: **Completed**
 
 批准记录:
 
@@ -14,6 +14,7 @@
 - 2026-07-29: 依据 Feature ID 追踪，承接 CMP 与 LINK 比较能力
 - 2026-07-29: 核对代码 — Content/symlink/tolerance 原语在 `internal/sync/engine`；单测绿
 - 2026-07-29: **边界修正** — planner/`BuildPlan`/CLI 接线归 **RFC-031**（017 之后）；本 RFC 只交付 engine 包，可独立 Done
+- 2026-07-31: v2.0 Completed — 100% statement coverage achieved for sync/engine.
 
 ---
 
