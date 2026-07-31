@@ -41,10 +41,10 @@ const SyncMoreOptions: React.FC = () => {
                     onClick={close}
                 >
                     <div
-                        className="sync-plan-modal"
+                        className="sync-settings-modal"
                         onClick={e => e.stopPropagation()}
                     >
-                        <div className="sync-plan-modal__header">
+                        <div className="sync-settings-modal__header">
                             <h2>{t("sync.settings.title")}</h2>
                             <button
                                 className="sync-btn sync-btn--ghost"
@@ -54,8 +54,8 @@ const SyncMoreOptions: React.FC = () => {
                                 <Cross1Icon width={16} height={16} />
                             </button>
                         </div>
-                        <div className="sync-plan-modal__body">
-                            <div className="sync-plan-modal__section">
+                        <div className="sync-settings-modal__body">
+                            <div className="sync-settings-modal__section">
                                 <h3>{t("sync.settings.comparison")}</h3>
                                 <label className="sync-toggle">
                                     <input
@@ -70,7 +70,7 @@ const SyncMoreOptions: React.FC = () => {
                                     {t("sync.settings.contentCompare")}
                                 </label>
                             </div>
-                            <div className="sync-plan-modal__section">
+                            <div className="sync-settings-modal__section">
                                 <h3>{t("sync.settings.syncMode")}</h3>
                                 <label className="sync-toggle">
                                     <input
@@ -111,7 +111,7 @@ const SyncMoreOptions: React.FC = () => {
                                     {t("sync.settings.resume")}
                                 </label>
                             </div>
-                            <div className="sync-plan-modal__section">
+                            <div className="sync-settings-modal__section">
                                 <h3>{t("sync.settings.errorHandling")}</h3>
                                 <select
                                     value={options.errorMode ?? "ignore"}
@@ -133,7 +133,7 @@ const SyncMoreOptions: React.FC = () => {
                                     </option>
                                 </select>
                             </div>
-                            <div className="sync-plan-modal__section">
+                            <div className="sync-settings-modal__section">
                                 <h3>{t("sync.settings.deleteMethod")}</h3>
                                 <select
                                     value={options.deleteMethod ?? "permanent"}

@@ -1,61 +1,145 @@
 {
-    "sync": {
-        "toolbar": {
-            "strategy": "Strategie",
-            "compare": "Vergleichen",
-            "comparing": "Vergleiche…",
-            "sync": "Sync",
-            "syncing": "Synchronisiere…"
+    "menu": {
+        "file": {
+            "label": "Datei",
+            "newTab": "Neuer Tab",
+            "open": "Öffnen...",
+            "save": "Sichern",
+            "close": "Schließen",
+            "quit": "Beenden"
         },
-        "strategy": {
-            "mirrorRight": "Spiegeln → Rechts",
-            "updateRight": "Update → Rechts",
-            "mirrorLeft": "Spiegeln → Links",
-            "updateLeft": "Update → Links",
-            "twoWay": "Bidirektional"
+        "edit": {
+            "label": "Bearbeiten",
+            "undo": "Widerrufen",
+            "redo": "Wiederholen",
+            "cut": "Ausschneiden",
+            "copy": "Kopieren",
+            "paste": "Einsetzen",
+            "pasteAndMatchStyle": "Einsetzen und Stil anpassen",
+            "delete": "Löschen",
+            "selectAll": "Alles auswählen",
+            "speech": "Sprachausgabe",
+            "startSpeaking": "Vorlesen starten",
+            "stopSpeaking": "Vorlesen stoppen"
         },
-        "stats": {
-            "copy": "kopieren",
-            "delete": "löschen",
-            "conflicts": "Konflikte",
-            "skip": "überspringen"
-        },
-        "legend": {
-            "copy": "Wird kopiert",
-            "delete": "Wird gelöscht",
-            "conflict": "Konflikt"
-        },
-        "onboarding": { "clickCompare": "Klicke Vergleichen" },
-        "pane": {
-            "left": "Links",
-            "right": "Rechts",
-            "noRoot": "Keine Wurzel",
-            "setRoot": "Wurzel setzen",
-            "browse": "Durchsuchen"
-        },
-        "plan": {
-            "title": "Vorschau",
-            "cancel": "Abbrechen",
-            "confirm": "Starten"
-        },
-        "status": {
-            "ready": "Bereit",
-            "comparing": "Vergleiche…",
-            "complete": "Sync abgeschlossen"
-        },
-        "table": { "status": "Status" }
+        "view": {
+            "label": "Darstellung",
+            "reload": "Neu laden",
+            "toggleFullscreen": "Vollbild ein-/ausschalten",
+            "resetZoom": "Zoom zurücksetzen",
+            "zoomIn": "Vergrößern",
+            "zoomOut": "Verkleinern"
+        }
     },
     "ui": {
+        "drives": {
+            "scanning": "Laufwerke werden durchsucht...",
+            "refreshing": "Laufwerke werden aktualisiert...",
+            "loadingFailed": "Laufwerke konnten nicht geladen werden",
+            "homeDirectory": "Privater Ordner"
+        },
+        "buttons": { "more": "⋯" },
         "table": {
             "name": "Name",
-            "dateModified": "Geändert",
+            "dateModified": "Änderungsdatum",
             "size": "Größe",
             "type": "Typ"
         },
         "file": {
             "typeFolder": "Ordner",
             "typeFile": "Datei",
-            "itemsCount": "Elemente"
+            "itemsCount": "Elemente",
+            "selectedCount": "ausgewählt"
+        }
+    },
+    "sync": {
+        "toolbar": {
+            "strategy": "Synchronisierungsstrategie",
+            "compare": "Vergleichen",
+            "comparing": "Vergleich…",
+            "sync": "Synchronisieren",
+            "syncing": "Synchronisierung…",
+            "deleteExtraneous": "Überflüssige Dateien löschen",
+            "dryRun": "Simulation",
+            "refresh": "Aktualisieren"
+        },
+        "strategy": {
+            "mirrorRight": "Spiegeln → rechts",
+            "mirrorRightDesc": "Links überschreibt rechts und löscht überflüssige Dateien rechts",
+            "updateRight": "Aktualisieren → rechts",
+            "updateRightDesc": "Kopiert neue oder geänderte Dateien von links nach rechts",
+            "mirrorLeft": "Spiegeln → links",
+            "mirrorLeftDesc": "Rechts überschreibt links und löscht überflüssige Dateien links",
+            "updateLeft": "Aktualisieren → links",
+            "updateLeftDesc": "Kopiert neue oder geänderte Dateien von rechts nach links",
+            "twoWay": "Zweiseitige Synchronisierung",
+            "twoWayDesc": "Synchronisiert die neuesten Versionen in beide Richtungen"
+        },
+        "stats": {
+            "copy": "kopieren",
+            "delete": "löschen",
+            "conflicts": "Konflikte",
+            "skip": "überspringen",
+            "changed": "geändert"
+        },
+        "legend": {
+            "title": "Legende",
+            "copy": "Wird kopiert",
+            "delete": "Wird gelöscht",
+            "conflict": "Konflikt"
+        },
+        "onboarding": {
+            "pickFolders": "Wählen Sie für linke und rechte Seite unterschiedliche Synchronisierungsordner",
+            "setLeftRoot": "Links: Öffnen Sie den Quellordner und wählen Sie Synchronisierungsstamm festlegen",
+            "setRightRoot": "Rechts: Öffnen Sie einen anderen Zielordner und wählen Sie Synchronisierungsstamm festlegen",
+            "sameRoots": "Die Synchronisierungsstämme müssen unterschiedlich sein; wählen Sie auf der anderen Seite einen anderen Ordner",
+            "clickCompare": "Klicken Sie auf Vergleichen, um Unterschiede zu sehen (Kopieren, Löschen oder Konflikt)",
+            "setRootHint": "Öffnen Sie einen Ordner und wählen Sie Synchronisierungsstamm festlegen",
+            "leftRootSet": "Linker Synchronisierungsstamm festgelegt. Wählen Sie rechts einen anderen Zielordner.",
+            "rightRootSet": "Rechter Synchronisierungsstamm festgelegt. Wählen Sie links einen anderen Quellordner.",
+            "duplicateRoot": "Der Synchronisierungsstamm der anderen Seite kann nicht verwendet werden"
+        },
+        "pane": {
+            "left": "Links",
+            "right": "Rechts",
+            "noRoot": "Kein Synchronisierungsstamm festgelegt",
+            "setRoot": "Synchronisierungsstamm festlegen",
+            "browse": "Durchsuchen"
+        },
+        "table": { "status": "Status" },
+        "plan": {
+            "title": "Synchronisierungsvorschau",
+            "summary": "{{copy}} zu kopieren, {{delete}} zu löschen, {{conflicts}} Konflikte",
+            "inSync": "Die Ordner sind bereits synchronisiert",
+            "cancel": "Abbrechen",
+            "confirm": "Synchronisierung starten",
+            "syncing": "Synchronisierung…"
+        },
+        "status": {
+            "ready": "Bereit — legen Sie auf beiden Seiten unterschiedliche Synchronisierungsstämme fest und vergleichen Sie",
+            "missingLeft": "Legen Sie zuerst links den Quellstamm fest",
+            "missingRight": "Legen Sie rechts einen anderen Zielstamm fest",
+            "sameRoots": "Die Synchronisierungsstämme sind identisch — wählen Sie zwei verschiedene Ordner",
+            "comparing": "Ordner werden verglichen…",
+            "syncing": "Synchronisierung…",
+            "compared": "Verglichen: {{copy}} Kopien, {{delete}} Löschungen",
+            "complete": "Synchronisierung abgeschlossen"
+        },
+        "settings": {
+            "title": "Synchronisierungseinstellungen",
+            "comparison": "Vergleich",
+            "contentCompare": "Inhalt vergleichen (Prüfsumme)",
+            "syncMode": "Synchronisierungsmodus",
+            "deleteExtraneous": "Überflüssige Dateien löschen",
+            "dryRun": "Simulation (keine Schreibvorgänge)",
+            "resume": "Vorherige Synchronisierung fortsetzen",
+            "errorHandling": "Fehlerbehandlung",
+            "continueOnError": "Bei Fehler fortfahren",
+            "stopOnError": "Beim ersten Fehler stoppen",
+            "deleteMethod": "Löschmethode",
+            "permanent": "Dauerhaft löschen",
+            "trash": "In den Papierkorb verschieben",
+            "versioning": "Versionierte Kopie behalten"
         }
     }
 }

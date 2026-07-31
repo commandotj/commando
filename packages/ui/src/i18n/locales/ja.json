@@ -1,61 +1,145 @@
 {
-    "sync": {
-        "toolbar": {
-            "strategy": "同期方法",
-            "compare": "比較",
-            "comparing": "比較中…",
-            "sync": "同期",
-            "syncing": "同期中…"
+    "menu": {
+        "file": {
+            "label": "ファイル",
+            "newTab": "新しいタブ",
+            "open": "開く...",
+            "save": "保存",
+            "close": "閉じる",
+            "quit": "終了"
         },
-        "strategy": {
-            "mirrorRight": "ミラー → 右",
-            "updateRight": "更新 → 右",
-            "mirrorLeft": "ミラー → 左",
-            "updateLeft": "更新 → 左",
-            "twoWay": "双方向"
-        },
-        "stats": {
+        "edit": {
+            "label": "編集",
+            "undo": "取り消す",
+            "redo": "やり直す",
+            "cut": "カット",
             "copy": "コピー",
+            "paste": "ペースト",
+            "pasteAndMatchStyle": "スタイルを合わせてペースト",
             "delete": "削除",
-            "conflicts": "競合",
-            "skip": "スキップ"
+            "selectAll": "すべてを選択",
+            "speech": "読み上げ",
+            "startSpeaking": "読み上げを開始",
+            "stopSpeaking": "読み上げを停止"
         },
-        "legend": {
-            "copy": "コピーされます",
-            "delete": "削除されます",
-            "conflict": "競合"
-        },
-        "onboarding": { "clickCompare": "比較をクリック" },
-        "pane": {
-            "left": "左",
-            "right": "右",
-            "noRoot": "ルート未設定",
-            "setRoot": "ルート設定",
-            "browse": "参照"
-        },
-        "plan": {
-            "title": "プレビュー",
-            "cancel": "キャンセル",
-            "confirm": "開始"
-        },
-        "status": {
-            "ready": "準備完了",
-            "comparing": "比較中…",
-            "complete": "同期完了"
-        },
-        "table": { "status": "状態" }
+        "view": {
+            "label": "表示",
+            "reload": "再読み込み",
+            "toggleFullscreen": "フルスクリーンを切り替え",
+            "resetZoom": "ズームをリセット",
+            "zoomIn": "拡大",
+            "zoomOut": "縮小"
+        }
     },
     "ui": {
+        "drives": {
+            "scanning": "ドライブをスキャン中...",
+            "refreshing": "ドライブを更新中...",
+            "loadingFailed": "ドライブを読み込めませんでした",
+            "homeDirectory": "ホームフォルダ"
+        },
+        "buttons": { "more": "⋯" },
         "table": {
             "name": "名前",
-            "dateModified": "更新日",
+            "dateModified": "変更日",
             "size": "サイズ",
             "type": "種類"
         },
         "file": {
             "typeFolder": "フォルダ",
             "typeFile": "ファイル",
-            "itemsCount": "項目"
+            "itemsCount": "項目",
+            "selectedCount": "選択済み"
+        }
+    },
+    "sync": {
+        "toolbar": {
+            "strategy": "同期方式",
+            "compare": "比較",
+            "comparing": "比較中…",
+            "sync": "同期",
+            "syncing": "同期中…",
+            "deleteExtraneous": "余分なファイルを削除",
+            "dryRun": "シミュレーション",
+            "refresh": "更新"
+        },
+        "strategy": {
+            "mirrorRight": "ミラー → 右",
+            "mirrorRightDesc": "左側で右側を上書きし、右側の余分なファイルを削除",
+            "updateRight": "更新 → 右",
+            "updateRightDesc": "左側から新しいファイルや変更されたファイルを右側へコピー",
+            "mirrorLeft": "ミラー → 左",
+            "mirrorLeftDesc": "右側で左側を上書きし、左側の余分なファイルを削除",
+            "updateLeft": "更新 → 左",
+            "updateLeftDesc": "右側から新しいファイルや変更されたファイルを左側へコピー",
+            "twoWay": "双方向同期",
+            "twoWayDesc": "両方向で新しいバージョンを同期"
+        },
+        "stats": {
+            "copy": "コピー",
+            "delete": "削除",
+            "conflicts": "競合",
+            "skip": "スキップ",
+            "changed": "変更"
+        },
+        "legend": {
+            "title": "凡例",
+            "copy": "コピーします",
+            "delete": "削除します",
+            "conflict": "競合"
+        },
+        "onboarding": {
+            "pickFolders": "左右のペインに異なる同期フォルダを選択してください",
+            "setLeftRoot": "左：ソースフォルダを開き、同期ルートを設定を選択",
+            "setRightRoot": "右：別の対象フォルダを開き、同期ルートを設定を選択",
+            "sameRoots": "左右の同期ルートは異なる必要があります。別のペインで別のフォルダを選択してください",
+            "clickCompare": "比較をクリックして差分（コピー、削除、競合）を確認",
+            "setRootHint": "フォルダを開き、同期ルートを設定をクリック",
+            "leftRootSet": "左の同期ルートを設定しました。右側で別の対象フォルダを選択してください。",
+            "rightRootSet": "右の同期ルートを設定しました。左側で別のソースフォルダを選択してください。",
+            "duplicateRoot": "もう一方のペインと同じ同期ルートは使用できません"
+        },
+        "pane": {
+            "left": "左",
+            "right": "右",
+            "noRoot": "同期ルート未設定",
+            "setRoot": "同期ルートを設定",
+            "browse": "参照"
+        },
+        "table": { "status": "状態" },
+        "plan": {
+            "title": "同期プレビュー",
+            "summary": "コピー {{copy}} 件、削除 {{delete}} 件、競合 {{conflicts}} 件",
+            "inSync": "フォルダはすでに同期されています",
+            "cancel": "キャンセル",
+            "confirm": "同期を開始",
+            "syncing": "同期中…"
+        },
+        "status": {
+            "ready": "準備完了 — 左右に異なる同期ルートを設定して比較してください",
+            "missingLeft": "まず左ペインにソースの同期ルートを設定してください",
+            "missingRight": "右ペインに別の対象同期ルートを設定してください",
+            "sameRoots": "同期ルートが同じです。異なるフォルダを2つ選択してください",
+            "comparing": "フォルダを比較中…",
+            "syncing": "同期中…",
+            "compared": "比較完了：コピー {{copy}} 件、削除 {{delete}} 件",
+            "complete": "同期完了"
+        },
+        "settings": {
+            "title": "同期設定",
+            "comparison": "比較",
+            "contentCompare": "内容を比較（チェックサム）",
+            "syncMode": "同期モード",
+            "deleteExtraneous": "余分なファイルを削除",
+            "dryRun": "シミュレーション（書き込みなし）",
+            "resume": "前回の同期を再開",
+            "errorHandling": "エラー処理",
+            "continueOnError": "エラー後も続行",
+            "stopOnError": "最初のエラーで停止",
+            "deleteMethod": "削除方法",
+            "permanent": "完全に削除",
+            "trash": "ゴミ箱へ移動",
+            "versioning": "バージョン付きコピーを保持"
         }
     }
 }

@@ -1,61 +1,145 @@
 {
-    "sync": {
-        "toolbar": {
-            "strategy": "Stratégie",
-            "compare": "Comparer",
-            "comparing": "Comparaison…",
-            "sync": "Sync",
-            "syncing": "Synchro…"
+    "menu": {
+        "file": {
+            "label": "Fichier",
+            "newTab": "Nouvel onglet",
+            "open": "Ouvrir...",
+            "save": "Enregistrer",
+            "close": "Fermer",
+            "quit": "Quitter"
         },
-        "strategy": {
-            "mirrorRight": "Miroir → Droite",
-            "updateRight": "MàJ → Droite",
-            "mirrorLeft": "Miroir → Gauche",
-            "updateLeft": "MàJ → Gauche",
-            "twoWay": "Bidirectionnel"
+        "edit": {
+            "label": "Édition",
+            "undo": "Annuler",
+            "redo": "Rétablir",
+            "cut": "Couper",
+            "copy": "Copier",
+            "paste": "Coller",
+            "pasteAndMatchStyle": "Coller en conservant le style",
+            "delete": "Supprimer",
+            "selectAll": "Tout sélectionner",
+            "speech": "Énonciation",
+            "startSpeaking": "Commencer la lecture",
+            "stopSpeaking": "Arrêter la lecture"
         },
-        "stats": {
-            "copy": "copier",
-            "delete": "supprimer",
-            "conflicts": "conflits",
-            "skip": "ignorer"
-        },
-        "legend": {
-            "copy": "Sera copié",
-            "delete": "Sera supprimé",
-            "conflict": "Conflit"
-        },
-        "onboarding": { "clickCompare": "Cliquez Comparer" },
-        "pane": {
-            "left": "Gauche",
-            "right": "Droite",
-            "noRoot": "Aucune racine",
-            "setRoot": "Définir racine",
-            "browse": "Parcourir"
-        },
-        "plan": {
-            "title": "Aperçu",
-            "cancel": "Annuler",
-            "confirm": "Démarrer"
-        },
-        "status": {
-            "ready": "Prêt",
-            "comparing": "Comparaison…",
-            "complete": "Sync terminé"
-        },
-        "table": { "status": "Statut" }
+        "view": {
+            "label": "Présentation",
+            "reload": "Recharger",
+            "toggleFullscreen": "Basculer en plein écran",
+            "resetZoom": "Réinitialiser le zoom",
+            "zoomIn": "Agrandir",
+            "zoomOut": "Réduire"
+        }
     },
     "ui": {
+        "drives": {
+            "scanning": "Analyse des volumes...",
+            "refreshing": "Actualisation des volumes...",
+            "loadingFailed": "Échec du chargement des volumes",
+            "homeDirectory": "Dossier personnel"
+        },
+        "buttons": { "more": "⋯" },
         "table": {
             "name": "Nom",
-            "dateModified": "Modifié",
+            "dateModified": "Date de modification",
             "size": "Taille",
             "type": "Type"
         },
         "file": {
             "typeFolder": "Dossier",
             "typeFile": "Fichier",
-            "itemsCount": "éléments"
+            "itemsCount": "éléments",
+            "selectedCount": "sélectionnés"
+        }
+    },
+    "sync": {
+        "toolbar": {
+            "strategy": "Stratégie de synchronisation",
+            "compare": "Comparer",
+            "comparing": "Comparaison…",
+            "sync": "Synchroniser",
+            "syncing": "Synchronisation…",
+            "deleteExtraneous": "Supprimer les fichiers superflus",
+            "dryRun": "Simulation",
+            "refresh": "Actualiser"
+        },
+        "strategy": {
+            "mirrorRight": "Miroir → droite",
+            "mirrorRightDesc": "La gauche écrase la droite et supprime ses fichiers superflus",
+            "updateRight": "Mettre à jour → droite",
+            "updateRightDesc": "Copie de gauche à droite les fichiers nouveaux ou modifiés",
+            "mirrorLeft": "Miroir → gauche",
+            "mirrorLeftDesc": "La droite écrase la gauche et supprime ses fichiers superflus",
+            "updateLeft": "Mettre à jour → gauche",
+            "updateLeftDesc": "Copie de droite à gauche les fichiers nouveaux ou modifiés",
+            "twoWay": "Synchronisation bidirectionnelle",
+            "twoWayDesc": "Synchronise les versions les plus récentes dans les deux sens"
+        },
+        "stats": {
+            "copy": "copier",
+            "delete": "supprimer",
+            "conflicts": "conflits",
+            "skip": "ignorer",
+            "changed": "modifiés"
+        },
+        "legend": {
+            "title": "Légende",
+            "copy": "Sera copié",
+            "delete": "Sera supprimé",
+            "conflict": "Conflit"
+        },
+        "onboarding": {
+            "pickFolders": "Choisissez des dossiers de synchronisation différents pour les volets gauche et droit",
+            "setLeftRoot": "Gauche : ouvrez le dossier source puis cliquez sur Définir la racine de synchronisation",
+            "setRightRoot": "Droite : ouvrez un autre dossier cible puis cliquez sur Définir la racine de synchronisation",
+            "sameRoots": "Les racines de synchronisation doivent être différentes ; choisissez un autre dossier dans l'autre volet",
+            "clickCompare": "Cliquez sur Comparer pour voir les différences (copie, suppression ou conflit)",
+            "setRootHint": "Ouvrez un dossier puis cliquez sur Définir la racine de synchronisation",
+            "leftRootSet": "Racine gauche définie. Choisissez un autre dossier cible à droite.",
+            "rightRootSet": "Racine droite définie. Choisissez un autre dossier source à gauche.",
+            "duplicateRoot": "Impossible d'utiliser la racine de synchronisation de l'autre volet"
+        },
+        "pane": {
+            "left": "Gauche",
+            "right": "Droite",
+            "noRoot": "Aucune racine de synchronisation définie",
+            "setRoot": "Définir la racine de synchronisation",
+            "browse": "Parcourir"
+        },
+        "table": { "status": "État" },
+        "plan": {
+            "title": "Aperçu de la synchronisation",
+            "summary": "{{copy}} à copier, {{delete}} à supprimer, {{conflicts}} conflits",
+            "inSync": "Les dossiers sont déjà synchronisés",
+            "cancel": "Annuler",
+            "confirm": "Démarrer la synchronisation",
+            "syncing": "Synchronisation…"
+        },
+        "status": {
+            "ready": "Prêt — définissez des racines différentes dans les deux volets puis cliquez sur Comparer",
+            "missingLeft": "Définissez d'abord la racine source dans le volet gauche",
+            "missingRight": "Définissez une autre racine cible dans le volet droit",
+            "sameRoots": "Les racines sont identiques ; choisissez deux dossiers différents",
+            "comparing": "Comparaison des dossiers…",
+            "syncing": "Synchronisation…",
+            "compared": "Comparaison terminée : {{copy}} copies, {{delete}} suppressions",
+            "complete": "Synchronisation terminée"
+        },
+        "settings": {
+            "title": "Paramètres de synchronisation",
+            "comparison": "Comparaison",
+            "contentCompare": "Comparer le contenu (somme de contrôle)",
+            "syncMode": "Mode de synchronisation",
+            "deleteExtraneous": "Supprimer les fichiers superflus",
+            "dryRun": "Simulation (aucune écriture)",
+            "resume": "Reprendre la synchronisation précédente",
+            "errorHandling": "Gestion des erreurs",
+            "continueOnError": "Continuer après une erreur",
+            "stopOnError": "S'arrêter à la première erreur",
+            "deleteMethod": "Méthode de suppression",
+            "permanent": "Suppression définitive",
+            "trash": "Déplacer vers la corbeille",
+            "versioning": "Conserver une copie versionnée"
         }
     }
 }
