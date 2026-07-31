@@ -1,8 +1,10 @@
 import React from "react";
 import { GlobeIcon } from "@radix-ui/react-icons";
+import { DropdownMenu, Theme } from "@radix-ui/themes";
 import { useI18n } from "../../hooks/useI18n";
+import { useTheme } from "../../hooks/useTheme";
 
-const LANGUAGES = [
+const LANGS = [
     { code: "en-US", label: "English" },
     { code: "zh-CN", label: "简体中文" },
     { code: "es", label: "Español" },
@@ -14,25 +16,32 @@ const LANGUAGES = [
 
 const SyncLocaleSelector: React.FC = () => {
     const { currentLanguage, changeLanguage } = useI18n();
+    const { theme } = useTheme();
 
     return (
-        <div className="sync-locale-selector">
-            <GlobeIcon width={14} height={14} />
-            <select
-                value={currentLanguage}
-                onChange={e => {
-                    changeLanguage(e.target.value);
-                    localStorage.setItem("commando-locale", e.target.value);
-                }}
-            >
-                {LANGUAGES.map(l => (
-                    <option key={l.code} value={l.code}>
-                        {l.label}
-                    </option>
-                ))}
-            </select>
-        </div>
+        <DropdownMenu.Root>
+            <DropdownMenu.Trigger>
+                <button type="button" className="sync-btn sync-btn--ghost">
+                    <GlobeIcon width={16} height={16} />
+                </button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content>
+                <Theme appearance={theme}>
+                    {LANGS.map(l => (
+                        <DropdownMenu.Item
+                            key={l.code}
+                            onClick={() => {
+                                changeLanguage(l.code);
+                                localStorage.setItem("commando-locale", l.code);
+                            }}
+                        >
+                            {currentLanguage === l.code ? "✓ " : ""}
+                            {l.label}
+                        </DropdownMenu.Item>
+                    ))}
+                </Theme>
+            </DropdownMenu.Content>
+        </DropdownMenu.Root>
     );
 };
-
 export default SyncLocaleSelector;

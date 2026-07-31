@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { GearIcon } from "@radix-ui/react-icons";
-import { Dialog, Flex, Text, Checkbox, Select, Theme } from "@radix-ui/themes";
+import { GearIcon, Cross1Icon } from "@radix-ui/react-icons";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
     setUseChecksum,
@@ -12,135 +11,160 @@ import {
 } from "../../app/syncSlice";
 import { saveSettings } from "../../services/settingsService";
 import { useI18n } from "../../hooks/useI18n";
-import { useTheme } from "../../hooks/useTheme";
 
 const SyncMoreOptions: React.FC = () => {
     const dispatch = useAppDispatch();
     const options = useAppSelector(s => s.sync.options);
     const [open, setOpen] = useState(false);
     const { t } = useI18n();
-    const { theme } = useTheme();
 
-    const handleOpenChange = (v: boolean) => {
-        setOpen(v);
-        if (!v) saveSettings(options);
+    const close = () => {
+        setOpen(false);
+        saveSettings(options);
     };
 
     return (
-        <Dialog.Root open={open} onOpenChange={handleOpenChange}>
-            <Dialog.Trigger>
-                <button
-                    type="button"
-                    className="sync-btn sync-btn--ghost"
-                    title={t("sync.settings.title")}
+        <div className="sync-more-options">
+            <button
+                type="button"
+                className="sync-btn sync-btn--ghost"
+                onClick={() => setOpen(true)}
+                title={t("sync.settings.title")}
+            >
+                <GearIcon width={14} height={14} />
+            </button>
+            {open && (
+                <div
+                    className="sync-overlay"
+                    role="dialog"
+                    aria-modal="true"
+                    onClick={close}
                 >
-                    <GearIcon width={14} height={14} />
-                </button>
-            </Dialog.Trigger>
-            <Dialog.Content>
-                <Theme appearance={theme}>
-                    <Dialog.Title>{t("sync.settings.title")}</Dialog.Title>
-                    <Flex direction="column" gap="3" mt="3">
-                        <Text size="2" weight="bold">
-                            {t("sync.settings.comparison")}
-                        </Text>
-                        <Text as="label" size="2">
-                            <Flex gap="2" align="center">
-                                <Checkbox
-                                    checked={options.useChecksum}
-                                    onCheckedChange={v =>
-                                        dispatch(setUseChecksum(!!v))
+                    <div
+                        className="sync-plan-modal"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <div className="sync-plan-modal__header">
+                            <h2>{t("sync.settings.title")}</h2>
+                            <button
+                                className="sync-btn sync-btn--ghost"
+                                onClick={close}
+                                aria-label="Close"
+                            >
+                                <Cross1Icon width={16} height={16} />
+                            </button>
+                        </div>
+                        <div className="sync-plan-modal__body">
+                            <div className="sync-plan-modal__section">
+                                <h3>{t("sync.settings.comparison")}</h3>
+                                <label className="sync-toggle">
+                                    <input
+                                        type="checkbox"
+                                        checked={options.useChecksum}
+                                        onChange={e =>
+                                            dispatch(
+                                                setUseChecksum(e.target.checked)
+                                            )
+                                        }
+                                    />
+                                    {t("sync.settings.contentCompare")}
+                                </label>
+                            </div>
+                            <div className="sync-plan-modal__section">
+                                <h3>{t("sync.settings.syncMode")}</h3>
+                                <label className="sync-toggle">
+                                    <input
+                                        type="checkbox"
+                                        checked={options.deleteExtraneous}
+                                        onChange={e =>
+                                            dispatch(
+                                                setDeleteExtraneous(
+                                                    e.target.checked
+                                                )
+                                            )
+                                        }
+                                    />
+                                    {t("sync.settings.deleteExtraneous")}
+                                </label>
+                                <label className="sync-toggle">
+                                    <input
+                                        type="checkbox"
+                                        checked={options.dryRun}
+                                        onChange={e =>
+                                            dispatch(
+                                                setDryRun(e.target.checked)
+                                            )
+                                        }
+                                    />
+                                    {t("sync.settings.dryRun")}
+                                </label>
+                                <label className="sync-toggle">
+                                    <input
+                                        type="checkbox"
+                                        checked={options.resume ?? false}
+                                        onChange={e =>
+                                            dispatch(
+                                                setResume(e.target.checked)
+                                            )
+                                        }
+                                    />
+                                    {t("sync.settings.resume")}
+                                </label>
+                            </div>
+                            <div className="sync-plan-modal__section">
+                                <h3>{t("sync.settings.errorHandling")}</h3>
+                                <select
+                                    value={options.errorMode ?? "ignore"}
+                                    className="sync-select"
+                                    onChange={e =>
+                                        dispatch(
+                                            setErrorMode(
+                                                e.target.value as
+                                                    "stop" | "ignore"
+                                            )
+                                        )
                                     }
-                                />
-                                {t("sync.settings.contentCompare")}
-                            </Flex>
-                        </Text>
-                        <Text size="2" weight="bold">
-                            {t("sync.settings.syncMode")}
-                        </Text>
-                        <Text as="label" size="2">
-                            <Flex gap="2" align="center">
-                                <Checkbox
-                                    checked={options.deleteExtraneous}
-                                    onCheckedChange={v =>
-                                        dispatch(setDeleteExtraneous(!!v))
+                                >
+                                    <option value="ignore">
+                                        {t("sync.settings.continueOnError")}
+                                    </option>
+                                    <option value="stop">
+                                        {t("sync.settings.stopOnError")}
+                                    </option>
+                                </select>
+                            </div>
+                            <div className="sync-plan-modal__section">
+                                <h3>{t("sync.settings.deleteMethod")}</h3>
+                                <select
+                                    value={options.deleteMethod ?? "permanent"}
+                                    className="sync-select"
+                                    onChange={e =>
+                                        dispatch(
+                                            setDeleteMethod(
+                                                e.target.value as
+                                                    | "permanent"
+                                                    | "trash"
+                                                    | "versioning"
+                                            )
+                                        )
                                     }
-                                />
-                                {t("sync.settings.deleteExtraneous")}
-                            </Flex>
-                        </Text>
-                        <Text as="label" size="2">
-                            <Flex gap="2" align="center">
-                                <Checkbox
-                                    checked={options.dryRun}
-                                    onCheckedChange={v =>
-                                        dispatch(setDryRun(!!v))
-                                    }
-                                />
-                                {t("sync.settings.dryRun")}
-                            </Flex>
-                        </Text>
-                        <Text as="label" size="2">
-                            <Flex gap="2" align="center">
-                                <Checkbox
-                                    checked={options.resume ?? false}
-                                    onCheckedChange={v =>
-                                        dispatch(setResume(!!v))
-                                    }
-                                />
-                                {t("sync.settings.resume")}
-                            </Flex>
-                        </Text>
-                        <Text size="2" weight="bold">
-                            {t("sync.settings.errorHandling")}
-                        </Text>
-                        <Select.Root
-                            value={options.errorMode ?? "ignore"}
-                            onValueChange={v =>
-                                dispatch(setErrorMode(v as "stop" | "ignore"))
-                            }
-                        >
-                            <Select.Trigger />
-                            <Select.Content>
-                                <Select.Item value="ignore">
-                                    {t("sync.settings.continueOnError")}
-                                </Select.Item>
-                                <Select.Item value="stop">
-                                    {t("sync.settings.stopOnError")}
-                                </Select.Item>
-                            </Select.Content>
-                        </Select.Root>
-                        <Text size="2" weight="bold">
-                            {t("sync.settings.deleteMethod")}
-                        </Text>
-                        <Select.Root
-                            value={options.deleteMethod ?? "permanent"}
-                            onValueChange={v =>
-                                dispatch(
-                                    setDeleteMethod(
-                                        v as
-                                            "permanent" | "trash" | "versioning"
-                                    )
-                                )
-                            }
-                        >
-                            <Select.Trigger />
-                            <Select.Content>
-                                <Select.Item value="permanent">
-                                    {t("sync.settings.permanent")}
-                                </Select.Item>
-                                <Select.Item value="trash">
-                                    {t("sync.settings.trash")}
-                                </Select.Item>
-                                <Select.Item value="versioning">
-                                    {t("sync.settings.versioning")}
-                                </Select.Item>
-                            </Select.Content>
-                        </Select.Root>
-                    </Flex>
-                </Theme>
-            </Dialog.Content>
-        </Dialog.Root>
+                                >
+                                    <option value="permanent">
+                                        {t("sync.settings.permanent")}
+                                    </option>
+                                    <option value="trash">
+                                        {t("sync.settings.trash")}
+                                    </option>
+                                    <option value="versioning">
+                                        {t("sync.settings.versioning")}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 };
 export default SyncMoreOptions;
