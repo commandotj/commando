@@ -174,7 +174,7 @@ P1.5 完成 = 8 步工作流全部经 **Wails spawn CLI** 端到端可用（038 
 | [RFC-2026-017](./rfc/completed/017-sync-variants-changes-custom.md) | Sync Variants — Changes Mode, Two-way, Custom & Swap      | albert.li | 2026-07-29 | 2026-07-30 | ✅ Completed |
 | [RFC-2026-018](./rfc/completed/018-sync-database.md)                | Sync Database — `sync.commando_db` & Moved File Detection | albert.li | 2026-07-29 | 2026-07-30 | ✅ Completed |
 | [RFC-2026-019](./rfc/completed/019-filter-system.md)                | Filter System — Include/Exclude Glob                      | albert.li | 2026-07-29 | 2026-07-30 | ✅ Completed |
-| [RFC-2026-021](./rfc/021-cli-config.md)                             | CLI & Config — Return Codes, Profiles, Schedules          | albert.li | 2026-07-29 | 2026-07-29 | 🟢 Approved  |
+| [RFC-2026-021](./rfc/completed/021-cli-config.md)                   | CLI & Config — Return Codes, Profiles, Schedules          | albert.li | 2026-07-29 | 2026-07-30 | ✅ Completed |
 | [RFC-2026-024](./rfc/completed/024-reports.md)                      | Reports — Session Log, LastSyncs & Email                  | albert.li | 2026-07-29 | 2026-07-30 | ✅ Completed |
 | [RFC-2026-027](./rfc/completed/027-delete-operations.md)            | Delete Operations — Recycle Bin & Versioning              | albert.li | 2026-07-29 | 2026-07-30 | ✅ Completed |
 | [RFC-2026-028](./rfc/completed/028-execution-options.md)            | Execution Options — ctx, verify, atomic copy              | albert.li | 2026-07-29 | 2026-07-30 | ✅ Completed |
