@@ -14,6 +14,7 @@ interface PaneState {
 interface FileManagerState {
     panes: [PaneState, PaneState];
     activePane: 0 | 1;
+    viewMode: "browse" | "diff";
 }
 
 const initialState: FileManagerState = {
@@ -21,7 +22,8 @@ const initialState: FileManagerState = {
         { currentPath: "", syncRoot: "", entries: [], selectedKeys: [] },
         { currentPath: "", syncRoot: "", entries: [], selectedKeys: [] },
     ],
-    activePane: 0,
+    activePane: 0 as 0 | 1,
+    viewMode: "browse" as "browse" | "diff",
 };
 
 export const fetchDirectory = createAsyncThunk(
@@ -140,6 +142,9 @@ const fileManagerSlice = createSlice({
         },
         setActivePane(state, action: PayloadAction<0 | 1>) {
             state.activePane = action.payload;
+        },
+        setViewMode(state, action: PayloadAction<"browse" | "diff">) {
+            state.viewMode = action.payload;
         },
     },
 });
