@@ -45,6 +45,9 @@ const defaultSyncState = {
     error: null,
     lastJobId: null,
     planModalOpen: false,
+    progressFile: "",
+    progressDone: 0,
+    progressTotal: 0,
 };
 
 const mockStore = configureStore<RootState>([]);

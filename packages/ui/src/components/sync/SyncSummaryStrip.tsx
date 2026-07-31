@@ -28,7 +28,7 @@ const SyncSummaryStrip: React.FC<SyncSummaryStripProps> = ({
         return null;
     }
 
-    if (!plan && !comparing) {
+    if (!plan) {
         return null;
     }
 
