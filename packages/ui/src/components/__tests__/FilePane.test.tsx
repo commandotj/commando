@@ -207,6 +207,7 @@ describe("FilePane", () => {
                     },
                 ],
                 activePane: 0,
+                viewMode: "browse",
             },
             clipboard: {
                 items: [],

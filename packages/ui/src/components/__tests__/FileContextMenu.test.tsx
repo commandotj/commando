@@ -84,6 +84,7 @@ const createTestStore = (
                     },
                 ],
                 activePane: 0,
+                viewMode: "browse",
             },
             fileOperations: {
                 activeOperations: {},

@@ -3,8 +3,8 @@ module github.com/systembug/commando/apps/desktop
 go 1.25.0
 
 require (
-	github.com/systembug/commando v0.0.0
 	github.com/google/uuid v1.6.0
+	github.com/systembug/commando v0.0.0
 	github.com/wailsapp/wails/v3 v3.0.0-alpha2.119
 )
 

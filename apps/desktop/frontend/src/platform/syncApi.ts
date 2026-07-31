@@ -5,9 +5,9 @@ import {
     Execute,
     ExportReport,
     Plan,
-} from "../../bindings/github.com/commandotj/commando/apps/desktop/services/syncservice.js";
-import type * as SyncModels from "../../bindings/github.com/commandotj/commando/internal/sync/models.js";
-import type * as ServiceModels from "../../bindings/github.com/commandotj/commando/apps/desktop/services/models.js";
+} from "../../bindings/github.com/systembug/commando/apps/desktop/services/syncservice.js";
+import type * as SyncModels from "../../bindings/github.com/systembug/commando/internal/sync/models.js";
+import type * as ServiceModels from "../../bindings/github.com/systembug/commando/apps/desktop/services/models.js";
 import { WAILS_EVENTS } from "./constants";
 
 function payloadFromEvent<T>(event: unknown): T {

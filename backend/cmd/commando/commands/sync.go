@@ -100,6 +100,11 @@ func init() {
 			showProgress, _ := cmd.Flags().GetBool("progress")
 			resume, _ := cmd.Flags().GetBool("resume")
 			reset, _ := cmd.Flags().GetBool("reset")
+			deleteExtra, _ := cmd.Flags().GetBool("delete-extraneous")
+			errorMode, _ := cmd.Flags().GetString("error-mode")
+			deleteMethod, _ := cmd.Flags().GetString("delete-method")
+			versionDir, _ := cmd.Flags().GetString("version-dir")
+			verify, _ := cmd.Flags().GetBool("verify")
 
 			dir, err := parseDirection(dirFlag)
 			if err != nil {
@@ -112,11 +117,16 @@ func init() {
 			}
 
 			opts := sync.Options{
-				DryRun:  dryRun,
-				Filter:  rules,
-				DBPath:  filepath.Join(left, ".commando", "sync.db"),
-				Resume:  resume,
-				Reset:   reset,
+				DryRun:          dryRun,
+				Filter:          rules,
+				DBPath:          filepath.Join(left, ".commando", "sync.db"),
+				Resume:          resume,
+				Reset:           reset,
+				DeleteExtraneous: deleteExtra,
+				ErrorMode:       errorMode,
+				DeleteMethod:    deleteMethod,
+				VersionDir:      versionDir,
+				VerifyCopies:    verify,
 			}
 			if reset {
 				clearResume(opts.DBPath, jobIDForSync(left, right, dir))
@@ -170,6 +180,11 @@ func init() {
 	runCmd.Flags().Bool("progress", false, "output NDJSON progress lines")
 	runCmd.Flags().Bool("resume", false, "skip already-completed items")
 	runCmd.Flags().Bool("reset", false, "clear progress and start fresh")
+	runCmd.Flags().Bool("delete-extraneous", false, "delete files not on source")
+	runCmd.Flags().String("error-mode", "ignore", "error handling: stop or ignore")
+	runCmd.Flags().String("delete-method", "permanent", "delete method: permanent, trash, or versioning")
+	runCmd.Flags().String("version-dir", "", "versioning backup directory")
+	runCmd.Flags().Bool("verify", false, "verify copied and deleted files")
 	_ = runCmd.MarkFlagRequired("left")
 	_ = runCmd.MarkFlagRequired("right")
 

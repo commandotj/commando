@@ -4,12 +4,12 @@ import type {
     NavigationResult,
 } from "@commandojs/shared/types/DirectoryTypes";
 import type { DriveInfo } from "@commandojs/shared/types/DriveTypes";
-import type { Info } from "../../bindings/github.com/commandotj/commando/internal/drive/models.js";
+import type { Info } from "../../bindings/github.com/systembug/commando/internal/drive/models.js";
 import type {
     Entry,
     ListOptions,
     NavigationResult as WailsNavigationResult,
-} from "../../bindings/github.com/commandotj/commando/internal/file/models.js";
+} from "../../bindings/github.com/systembug/commando/internal/file/models.js";
 
 function toDirectoryEntry(entry: Entry): DirectoryEntry {
     return {

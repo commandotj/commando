@@ -12,9 +12,10 @@ import {
     SYNC_STRATEGY_DELETE_EXTRANEOUS,
     type SyncStrategyId,
 } from "../constants/sync";
-import { compareFolders, executePlan } from "../services/syncApiService";
+import { executePlan } from "../services/syncApiService";
 import { areSyncRootsEqual } from "../common/syncRoots";
 import { setViewMode } from "./fileManagerSlice";
+import type { SyncProgressPayload } from "@commandojs/shared/types/SyncTypes";
 import type { RootState } from "./store";
 
 export type DiffMap = Record<string, SyncAction>;
@@ -73,21 +74,44 @@ export const compareSync = createAsyncThunk(
                 "Left and right sync roots must be different folders"
             );
         }
-        const syncState = state.sync;
-        try {
-            const result = await compareFolders({
-                leftRoot,
-                rightRoot,
-                strategyId: syncState.strategyId,
-                options: syncState.options,
+        const api = window.syncApi;
+        if (!api) return rejectWithValue("Sync API not available");
+
+        const { jobId } = await api.compare({
+            leftRoot,
+            rightRoot,
+            strategyId: state.sync.strategyId,
+            options: { ...state.sync.options, dryRun: true },
+        });
+
+        return new Promise<CompareReport>((resolve, reject) => {
+            api.onProgress((p: SyncProgressPayload) => {
+                if (p.jobId !== jobId) return;
+                if (p.type === "progress") {
+                    dispatch(
+                        syncSlice.actions.progressUpdated({
+                            file: p.file ?? "",
+                            action: p.action ?? "",
+                            done: p.done ?? 0,
+                            total: p.total ?? 0,
+                        })
+                    );
+                    return;
+                }
+                if (p.type === "done") {
+                    if (p.status === "error" || p.error) {
+                        reject(new Error(p.error ?? "Compare failed"));
+                        return;
+                    }
+                    if (p.status === "canceled") {
+                        reject(new Error("Compare canceled"));
+                        return;
+                    }
+                    dispatch(setViewMode("diff"));
+                    resolve(p.result as CompareReport);
+                }
             });
-            dispatch(setViewMode("diff"));
-            return result;
-        } catch (error) {
-            return rejectWithValue(
-                error instanceof Error ? error.message : String(error)
-            );
-        }
+        });
     }
 );
 
@@ -153,6 +177,19 @@ const syncSlice = createSlice({
             state.status = "idle";
             state.error = null;
         },
+        progressUpdated(
+            state,
+            action: PayloadAction<{
+                file: string;
+                action: string;
+                done: number;
+                total: number;
+            }>
+        ) {
+            state.progressFile = action.payload.file;
+            state.progressDone = action.payload.done;
+            state.progressTotal = action.payload.total;
+        },
     },
     extraReducers: builder => {
         builder
@@ -199,6 +236,7 @@ export const {
     setResume,
     setPlanModalOpen,
     clearSyncPlan,
+    progressUpdated,
 } = syncSlice.actions;
 
 export default syncSlice.reducer;

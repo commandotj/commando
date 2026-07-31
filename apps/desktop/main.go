@@ -5,6 +5,7 @@ import (
 	"embed"
 	"log"
 	"os"
+	"path/filepath"
 	"runtime"
 
 	"github.com/systembug/commando/apps/desktop/services"
@@ -36,7 +37,12 @@ func main() {
 	fileService := &services.FileService{}
 	copyService := services.NewCopyService(desktopRuntime)
 	driveService := &services.DriveService{}
-	cliPath, _ := os.Executable()
+	exe, _ := os.Executable()
+	cliPath := filepath.Join(filepath.Dir(exe), "commando")
+	// Dev fallback: try relative to CWD
+	if _, err := os.Stat(cliPath); os.IsNotExist(err) {
+		cliPath = "commando"
+	}
 	syncService := services.NewSyncService(desktopRuntime, cliPath, context.Background())
 
 	app := application.New(application.Options{
