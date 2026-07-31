@@ -5,6 +5,7 @@ import (
 	"embed"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 
@@ -37,12 +38,12 @@ func main() {
 	fileService := &services.FileService{}
 	copyService := services.NewCopyService(desktopRuntime)
 	driveService := &services.DriveService{}
-	exe, _ := os.Executable()
-	cliPath := filepath.Join(filepath.Dir(exe), "commando")
-	// Dev fallback: try relative to CWD
-	if _, err := os.Stat(cliPath); os.IsNotExist(err) {
-		cliPath = "commando"
+	cliPath, _ := exec.LookPath("commando")
+	if cliPath == "" {
+		exe, _ := os.Executable()
+		cliPath = filepath.Join(filepath.Dir(exe), "commando")
 	}
+	log.Printf("CLI path: %s", cliPath)
 	syncService := services.NewSyncService(desktopRuntime, cliPath, context.Background())
 
 	app := application.New(application.Options{
