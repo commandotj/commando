@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/commandotj/commando/internal/file"
+	"github.com/systembug/commando/internal/file"
 )
 
 func init() {

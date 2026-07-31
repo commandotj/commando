@@ -8,9 +8,9 @@ import (
 	"os"
 	"path/filepath"
 
-	databaseapi "github.com/commandotj/commando/internal/sync/database"
-	dels "github.com/commandotj/commando/internal/sync/delete"
-	"github.com/commandotj/commando/internal/sync/engine"
+	databaseapi "github.com/systembug/commando/internal/sync/database"
+	dels "github.com/systembug/commando/internal/sync/delete"
+	"github.com/systembug/commando/internal/sync/engine"
 )
 
 // ProgressFn is called after each item is processed. relPath is the

@@ -4,8 +4,8 @@ package sync
 import (
 	"time"
 
-	"github.com/commandotj/commando/internal/sync/engine"
-	"github.com/commandotj/commando/internal/sync/filter"
+	"github.com/systembug/commando/internal/sync/engine"
+	"github.com/systembug/commando/internal/sync/filter"
 )
 
 // Direction controls how changes flow between the left and right pane roots.

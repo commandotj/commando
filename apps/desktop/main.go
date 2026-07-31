@@ -7,7 +7,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/commandotj/commando/apps/desktop/services"
+	"github.com/systembug/commando/apps/desktop/services"
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 

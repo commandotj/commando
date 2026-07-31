@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/commandotj/commando/internal/sync/filter"
+	"github.com/systembug/commando/internal/sync/filter"
 )
 
 func TestIndexRoot_ParallelAndSerialSame(t *testing.T) {

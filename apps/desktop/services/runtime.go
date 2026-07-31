@@ -1,6 +1,6 @@
 package services
 
-import "github.com/commandotj/commando/internal/worker"
+import "github.com/systembug/commando/internal/worker"
 
 const (
 	EventCopyBatchProgress = "copy-batch-progress"

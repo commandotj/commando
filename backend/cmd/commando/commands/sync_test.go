@@ -14,7 +14,7 @@ import (
 func buildCLI(t *testing.T) string {
 	t.Helper()
 	bin := filepath.Join(t.TempDir(), "commando")
-	cmd := exec.Command("go", "build", "-o", bin, "github.com/commandotj/commando/cmd/commando")
+	cmd := exec.Command("go", "build", "-o", bin, "github.com/systembug/commando/cmd/commando")
 	cmd.Dir = repoRoot(t)
 	if out, err := cmd.CombinedOutput(); err != nil {
 		t.Fatalf("build CLI failed: %v\n%s", err, out)

@@ -12,7 +12,7 @@ import (
 	"sync/atomic"
 
 	"github.com/google/uuid"
-	"github.com/commandotj/commando/internal/sync"
+	"github.com/systembug/commando/internal/sync"
 )
 
 type SyncRequest struct {

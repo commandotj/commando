@@ -3,8 +3,8 @@ package engine
 import (
 	"context"
 
-	"github.com/commandotj/commando/internal/fsutil"
-	"github.com/commandotj/commando/internal/sync/filter"
+	"github.com/systembug/commando/internal/fsutil"
+	"github.com/systembug/commando/internal/sync/filter"
 )
 
 // IndexOptions configures IndexRoot's traversal.

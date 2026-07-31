@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/commandotj/commando/internal/sync"
-	"github.com/commandotj/commando/internal/sync/engine"
-	"github.com/commandotj/commando/internal/sync/filter"
+	"github.com/systembug/commando/internal/sync"
+	"github.com/systembug/commando/internal/sync/engine"
+	"github.com/systembug/commando/internal/sync/filter"
 )
 
 func TestBuildPlan_LeftToRightCopiesMissingFile(t *testing.T) {

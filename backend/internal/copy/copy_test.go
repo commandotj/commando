@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/commandotj/commando/internal/copy"
+	"github.com/systembug/commando/internal/copy"
 )
 
 func TestBatchWithOptions_Cancel(t *testing.T) {

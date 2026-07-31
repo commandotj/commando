@@ -10,9 +10,9 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/commandotj/commando/internal/sync"
-	databaseapi "github.com/commandotj/commando/internal/sync/database"
-	"github.com/commandotj/commando/internal/sync/filter"
+	"github.com/systembug/commando/internal/sync"
+	databaseapi "github.com/systembug/commando/internal/sync/database"
+	"github.com/systembug/commando/internal/sync/filter"
 )
 
 func init() {

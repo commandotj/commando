@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/commandotj/commando/cmd/commando/commands"
+	"github.com/systembug/commando/cmd/commando/commands"
 )
 
 func main() {

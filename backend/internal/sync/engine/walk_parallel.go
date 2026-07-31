@@ -10,8 +10,8 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/commandotj/commando/internal/fsutil"
-	"github.com/commandotj/commando/internal/sync/filter"
+	"github.com/systembug/commando/internal/fsutil"
+	"github.com/systembug/commando/internal/sync/filter"
 )
 
 func indexRootParallel(ctx context.Context, root string, matcher filter.Matcher, opts IndexOptions) (Index, error) {

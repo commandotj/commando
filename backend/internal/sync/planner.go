@@ -9,9 +9,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/commandotj/commando/internal/sync/database"
-	"github.com/commandotj/commando/internal/sync/engine"
-	"github.com/commandotj/commando/internal/sync/filter"
+	"github.com/systembug/commando/internal/sync/database"
+	"github.com/systembug/commando/internal/sync/engine"
+	"github.com/systembug/commando/internal/sync/filter"
 )
 
 // BuildPlan compares leftRoot and rightRoot and returns a sync plan.
