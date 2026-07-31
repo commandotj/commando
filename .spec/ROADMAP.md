@@ -97,12 +97,12 @@ RFC (Request for Comments) 是 commando-react 项目中用于记录和跟踪重�
 
 | 状态                | 数量   | 百分比   |
 | ------------------- | ------ | -------- |
-| 🔵 Proposed         | 8      | 25.8%    |
+| 🔵 Proposed         | 7      | 22.6%    |
 | 🟡 Under Discussion | 0      | 0%       |
 | 🟠 Under Review     | 0      | 0%       |
-| 🟢 Approved         | 6      | 19.4%    |
+| 🟢 Approved         | 2      | 6.5%     |
 | 🔵 In Progress      | 0      | 0%       |
-| ✅ Completed        | 12     | 38.7%    |
+| ✅ Completed        | 17     | 54.8%    |
 | ❌ Deprecated       | 5      | 16.1%    |
 | **总计**            | **31** | **100%** |
 

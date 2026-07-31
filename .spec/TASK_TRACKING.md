@@ -32,7 +32,7 @@ P1 目标：本地路径 CLI `compare → deterministic plan → safe execute �
 | -------------------------------------------- | ------- | ------ |
 | Go module → `github.com/commandotj/commando` | CORE-01 | 🟢     |
 | CLI/Desktop 单一 compare/copy/execute core   | CORE-02 | 🔵     |
-| P1 末段 CLI destructive/integration 证据     | CORE-03 | 🔵     |
+| P1 末段 CLI destructive/integration 证据     | CORE-03 | 🟢     |
 
 P1 RFC 内的 UI-only、email/HTML、remote、RealtimeSync、distribution 任务不进入 P1 gate。
 
