@@ -155,6 +155,7 @@ export const {
     setPaneEntries,
     setPaneSelectedKeys,
     setActivePane,
+    setViewMode,
 } = fileManagerSlice.actions;
 
 export default fileManagerSlice.reducer;

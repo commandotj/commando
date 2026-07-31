@@ -104,6 +104,9 @@ func Execute(ctx context.Context, plan *Plan, opts Options, progress ProgressFn)
 		}
 	}
 
+	if len(result.Errors) == 0 {
+		_ = GenerateSessionLog(plan, result)
+	}
 	return result, nil
 }
 
