@@ -2,6 +2,8 @@
 package sync
 
 import (
+	"time"
+
 	"github.com/commandotj/commando/internal/sync/engine"
 	"github.com/commandotj/commando/internal/sync/filter"
 )
@@ -36,6 +38,8 @@ type PlanItem struct {
 
 // Plan is the full diff between two pane roots.
 type Plan struct {
+	ID         string     `json:"id"`
+	CreatedAt  time.Time  `json:"createdAt"`
 	LeftRoot   string     `json:"leftRoot"`
 	RightRoot  string     `json:"rightRoot"`
 	Direction  Direction  `json:"direction"`
@@ -48,10 +52,11 @@ type Plan struct {
 
 // ExecuteResult summarizes a completed sync run.
 type ExecuteResult struct {
-	Copied   int      `json:"copied"`
-	Skipped  int      `json:"skipped"`
-	Deleted  int      `json:"deleted"`
-	Errors   []string `json:"errors"`
+	PlanID    string   `json:"planId"`
+	Copied    int      `json:"copied"`
+	Skipped   int      `json:"skipped"`
+	Deleted   int      `json:"deleted"`
+	Errors    []string `json:"errors"`
 }
 
 // Options tune planner and executor behavior.

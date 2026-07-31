@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"path/filepath"
 	"sort"
+	"time"
+
+	"github.com/google/uuid"
 
 	"github.com/commandotj/commando/internal/sync/database"
 	"github.com/commandotj/commando/internal/sync/engine"
@@ -73,6 +76,8 @@ func buildDifferencesPlan(leftRoot, rightRoot string, leftEntries, rightEntries 
 	}
 
 	plan := &Plan{
+		ID:        uuid.NewString(),
+		CreatedAt: time.Now().UTC(),
 		LeftRoot:  leftRoot,
 		RightRoot: rightRoot,
 		Direction: direction,
@@ -123,7 +128,7 @@ func buildChangesPlan(ctx context.Context, leftRoot, rightRoot string, leftEntri
 		return nil, err
 	}
 
-	plan := &Plan{LeftRoot: leftRoot, RightRoot: rightRoot, Direction: direction}
+	plan := &Plan{ID: uuid.NewString(), CreatedAt: time.Now().UTC(), LeftRoot: leftRoot, RightRoot: rightRoot, Direction: direction}
 	_ = rightEntries
 
 	for rel, entry := range leftEntries {

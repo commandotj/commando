@@ -20,7 +20,7 @@ type ProgressFn func(relPath string, action Action, done, total int, err error)
 // Execute runs a sync plan. ErrorMode="stop" aborts on first failure.
 // progress is called after each item (may be nil).
 func Execute(ctx context.Context, plan *Plan, opts Options, progress ProgressFn) (*ExecuteResult, error) {
-	result := &ExecuteResult{}
+	result := &ExecuteResult{PlanID: plan.ID}
 	total := len(plan.Items)
 
 	for i, item := range plan.Items {
