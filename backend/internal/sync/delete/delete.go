@@ -19,17 +19,17 @@ const (
 
 // Delete removes path according to method. template is used by Versioning
 // for path patterns (empty = default timestamp in destDir).
-func Delete(ctx context.Context, path string, method Method, destDir string, template string) error {
+func Delete(ctx context.Context, path string, method Method, destDir string, template string) (restorePath string, err error) {
 	switch method {
 	case Permanent:
-		return os.Remove(path)
+		return "", os.Remove(path)
 	case Trash:
-		return trash(ctx, path)
+		return "", trash(ctx, path)
 	case Versioning:
 		return version(ctx, path, destDir)
 	case VersionReplace:
 		return versionReplace(ctx, path, destDir)
 	default:
-		return os.Remove(path)
+		return "", os.Remove(path)
 	}
 }

@@ -78,12 +78,22 @@ func Execute(ctx context.Context, plan *Plan, opts Options, progress ProgressFn)
 				continue
 			}
 			method := deleteMethod(opts.DeleteMethod)
-			if err := dels.Delete(ctx, item.Source, method, opts.VersionDir, ""); err != nil {
+			restorePath, err := dels.Delete(ctx, item.Source, method, opts.VersionDir, "")
+			if err != nil {
 				result.Errors = append(result.Errors, fmt.Sprintf("%s: %v", item.RelativePath, err))
 				if opts.ErrorMode == "stop" {
 					return result, fmt.Errorf("delete %s: %w", item.RelativePath, err)
 				}
 				continue
+			}
+			if opts.VerifyCopies && (method == dels.Versioning || method == dels.VersionReplace) {
+				if _, statErr := os.Stat(restorePath); statErr != nil {
+					result.Errors = append(result.Errors, fmt.Sprintf("%s: backup missing after delete", item.RelativePath))
+					if opts.ErrorMode == "stop" {
+						return result, fmt.Errorf("verify delete %s: backup missing", item.RelativePath)
+					}
+					continue
+				}
 			}
 			result.Deleted++
 		}

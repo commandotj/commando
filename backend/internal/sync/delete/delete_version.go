@@ -8,17 +8,17 @@ import (
 	"time"
 )
 
-func version(ctx context.Context, path string, destDir string) error {
+func version(ctx context.Context, path string, destDir string) (string, error) {
 	select {
 	case <-ctx.Done():
-		return ctx.Err()
+		return "", ctx.Err()
 	default:
 	}
 	if destDir == "" {
-		return fmt.Errorf("versioning requires destDir")
+		return "", fmt.Errorf("versioning requires destDir")
 	}
 	if err := os.MkdirAll(destDir, 0o755); err != nil {
-		return err
+		return "", err
 	}
 	base := filepath.Base(path)
 	ext := filepath.Ext(base)
@@ -29,18 +29,18 @@ func version(ctx context.Context, path string, destDir string) error {
 	if _, err := os.Stat(dest); err == nil {
 		dest = filepath.Join(destDir, fmt.Sprintf("%s_%s_%d%s", name, ts, time.Now().UnixNano()%1000, ext))
 	}
-	return os.Rename(path, dest)
+	return dest, os.Rename(path, dest)
 }
 
-func versionReplace(ctx context.Context, path string, destDir string) error {
+func versionReplace(ctx context.Context, path string, destDir string) (string, error) {
 	select {
 	case <-ctx.Done():
-		return ctx.Err()
+		return "", ctx.Err()
 	default:
 	}
 	if err := os.MkdirAll(destDir, 0o755); err != nil {
-		return err
+		return "", err
 	}
 	dest := filepath.Join(destDir, filepath.Base(path))
-	return os.Rename(path, dest)
+	return dest, os.Rename(path, dest)
 }

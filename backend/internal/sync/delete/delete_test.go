@@ -12,7 +12,7 @@ func TestPermanentDelete(t *testing.T) {
 	path := filepath.Join(dir, "delme.txt")
 	_ = os.WriteFile(path, []byte("x"), 0o644)
 
-	if err := Delete(context.Background(), path, Permanent, "", ""); err != nil {
+	if _, err := Delete(context.Background(), path, Permanent, "", ""); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
@@ -26,7 +26,7 @@ func TestVersioning_RenamesWithTimestamp(t *testing.T) {
 	path := filepath.Join(dir, "data.txt")
 	_ = os.WriteFile(path, []byte("hello"), 0o644)
 
-	if err := Delete(context.Background(), path, Versioning, verDir, ""); err != nil {
+	if _, err := Delete(context.Background(), path, Versioning, verDir, ""); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
@@ -39,7 +39,7 @@ func TestVersioning_RenamesWithTimestamp(t *testing.T) {
 }
 
 func TestVersioning_RequiresDestDir(t *testing.T) {
-	err := Delete(context.Background(), "/tmp/x", Versioning, "", "")
+	_, err := Delete(context.Background(), "/tmp/x", Versioning, "", "")
 	if err == nil {
 		t.Fatal("expected error for empty destDir")
 	}
@@ -51,7 +51,7 @@ func TestVersionReplace_Overwrites(t *testing.T) {
 	path := filepath.Join(dir, "data.txt")
 	_ = os.WriteFile(path, []byte("v1"), 0o644)
 
-	if err := Delete(context.Background(), path, VersionReplace, verDir, ""); err != nil {
+	if _, err := Delete(context.Background(), path, VersionReplace, verDir, ""); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
@@ -63,7 +63,7 @@ func TestVersionReplace_Overwrites(t *testing.T) {
 
 	// Second version should replace
 	_ = os.WriteFile(path, []byte("v2"), 0o644)
-	_ = Delete(context.Background(), path, VersionReplace, verDir, "")
+	_, _ = Delete(context.Background(), path, VersionReplace, verDir, "")
 	ents, _ := os.ReadDir(verDir)
 	if len(ents) != 1 {
 		t.Errorf("replace should keep 1 file, got %d", len(ents))
@@ -77,7 +77,7 @@ func TestDelete_CtxCancel(t *testing.T) {
 	path := filepath.Join(dir, "x.txt")
 	_ = os.WriteFile(path, []byte("x"), 0o644)
 
-	err := Delete(ctx, path, Trash, "", "")
+	_, err := Delete(ctx, path, Trash, "", "")
 	if err == nil {
 		t.Error("expected context error")
 	}
@@ -88,7 +88,7 @@ func TestDelete_DefaultMethod(t *testing.T) {
 	path := filepath.Join(dir, "delme.txt")
 	_ = os.WriteFile(path, []byte("x"), 0o644)
 
-	if err := Delete(context.Background(), path, Method(99), "", ""); err != nil {
+	if _, err := Delete(context.Background(), path, Method(99), "", ""); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
@@ -102,7 +102,7 @@ func TestVersion_MkdirAllError(t *testing.T) {
 	path := filepath.Join(dir, "data.txt")
 	_ = os.WriteFile(path, []byte("x"), 0o644)
 
-	err := Delete(context.Background(), path, Versioning, filepath.Join(dir, "file", "sub"), "")
+	_, err := Delete(context.Background(), path, Versioning, filepath.Join(dir, "file", "sub"), "")
 	if err == nil {
 		t.Fatal("expected MkdirAll error")
 	}
@@ -114,7 +114,7 @@ func TestVersionReplace_MkdirAllError(t *testing.T) {
 	path := filepath.Join(dir, "data.txt")
 	_ = os.WriteFile(path, []byte("x"), 0o644)
 
-	err := Delete(context.Background(), path, VersionReplace, filepath.Join(dir, "file", "sub"), "")
+	_, err := Delete(context.Background(), path, VersionReplace, filepath.Join(dir, "file", "sub"), "")
 	if err == nil {
 		t.Fatal("expected MkdirAll error")
 	}
