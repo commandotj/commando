@@ -4,10 +4,11 @@
 
 作者: albert.li
 创建时间: 2026-07-29
-状态: Proposed
+状态: Rejected — replaced by RFC-034
 修改历史:
 
 - 2026-07-29: 依据 Feature ID 追踪，承接 UI-20…23
+- 2026-07-31: Rejected，内容并入 RFC-2026-034（UI Consolidation）
 
 ---
 
@@ -107,13 +108,13 @@ ETA 计算：滑动窗口平均速度 × 剩余文件数。
 
 ---
 
-**状态**: Proposed
-**最后更新**: 2026-07-29
+**状态**: Rejected — replaced by RFC-034
+**最后更新**: 2026-07-31
 
 ## Task Tracking 追踪
 
 本 RFC 明确拥有：`UI-10`, `UI-20`, `UI-21`, `UI-22`, `UI-23`。
 
-Feature ID 与实施状态以 [TASK TRACKING](../TASK_TRACKING.md) 为准，优先级与 RFC 状态以 [ROADMAP](../ROADMAP.md) 为准；本 RFC 负责产品决策、Commando 设计与验收。
-Replaced by RFC-034: # RFC-2026-020: UI Progress — Compare/Sync Dialogs & Results
-Status: Deprecated — replaced by RFC-034
+Feature ID 与实施状态以 [TASK TRACKING](../../TASK_TRACKING.md) 为准，优先级与 RFC 状态以 [ROADMAP](../../ROADMAP.md) 为准。
+
+**Replaced by [RFC-2026-034](../034-ui-consolidation.md)** — 内容并入 UI Consolidation，本 RFC 不再单独维护。

@@ -30,6 +30,7 @@ func init() {
 			dirFlag, _ := cmd.Flags().GetString("direction")
 			include, _ := cmd.Flags().GetString("include")
 			exclude, _ := cmd.Flags().GetString("exclude")
+			showProgress, _ := cmd.Flags().GetBool("progress")
 
 			dir, err := parseDirection(dirFlag)
 			if err != nil {
@@ -41,12 +42,33 @@ func init() {
 				return err
 			}
 
+			var progressFn sync.ProgressFn
+			if showProgress {
+				progressFn = func(rel string, act sync.Action, done, total int, itemErr error) {
+					evt := map[string]any{
+						"type": "progress", "file": rel, "action": string(act),
+						"done": done, "total": total,
+					}
+					if itemErr != nil {
+						evt["error"] = itemErr.Error()
+					}
+					b, _ := json.Marshal(evt)
+					fmt.Println(string(b))
+				}
+			}
+
 			plan, err := sync.BuildPlan(context.Background(), left, right, dir, sync.Options{
 				DryRun: true,
 				Filter: rules,
-			})
+			}, progressFn)
 			if err != nil {
 				return err
+			}
+
+			if showProgress {
+				b, _ := json.Marshal(map[string]any{"type": "done", "status": "done", "result": plan})
+				fmt.Println(string(b))
+				return nil
 			}
 
 			enc := json.NewEncoder(os.Stdout)
@@ -58,6 +80,7 @@ func init() {
 	planCmd.Flags().String("direction", "both", "sync direction: l2r, r2l, both")
 	planCmd.Flags().String("include", "", "include glob pattern (comma-separated, default: **)")
 	planCmd.Flags().String("exclude", "", "exclude glob pattern (comma-separated)")
+	planCmd.Flags().Bool("progress", false, "output NDJSON progress lines")
 	_ = planCmd.MarkFlagRequired("left")
 	_ = planCmd.MarkFlagRequired("right")
 
@@ -99,7 +122,7 @@ func init() {
 				clearResume(opts.DBPath, jobIDForSync(left, right, dir))
 			}
 
-			plan, err := sync.BuildPlan(ctx, left, right, dir, opts)
+			plan, err := sync.BuildPlan(ctx, left, right, dir, opts, nil)
 			if err != nil {
 				return err
 			}

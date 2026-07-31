@@ -21,7 +21,7 @@ func TestBuildPlan_LeftToRightCopiesMissingFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{})
+	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -31,6 +31,39 @@ func TestBuildPlan_LeftToRightCopiesMissingFile(t *testing.T) {
 	}
 	if plan.Items[0].Action != sync.ActionCopy {
 		t.Fatalf("expected copy action, got %s", plan.Items[0].Action)
+	}
+}
+
+func TestBuildPlan_ProgressFn_CalledForEachItem(t *testing.T) {
+	left := t.TempDir()
+	right := t.TempDir()
+
+	_ = os.WriteFile(filepath.Join(left, "a.txt"), []byte("hello"), 0o644)
+	_ = os.WriteFile(filepath.Join(left, "b.txt"), []byte("world"), 0o644)
+
+	var calls []string
+	progress := func(relPath string, action sync.Action, done, total int, err error) {
+		calls = append(calls, relPath)
+	}
+
+	plan, buildErr := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{}, progress)
+	if buildErr != nil {
+		t.Fatal(buildErr)
+	}
+
+	if len(calls) != len(plan.Items) {
+		t.Fatalf("expected progress called once per plan item (%d), got %d calls", len(plan.Items), len(calls))
+	}
+}
+
+func TestBuildPlan_NilProgressFn_NoPanic(t *testing.T) {
+	left := t.TempDir()
+	right := t.TempDir()
+	_ = os.WriteFile(filepath.Join(left, "a.txt"), []byte("hello"), 0o644)
+
+	_, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{}, nil)
+	if err != nil {
+		t.Fatal(err)
 	}
 }
 
@@ -57,7 +90,7 @@ func TestBuildPlan_BidirectionalUsesNewerSide(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionBidirectional, sync.Options{})
+	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionBidirectional, sync.Options{}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -82,7 +115,7 @@ func TestBuildPlan_FilterExcludesFile(t *testing.T) {
 			Include: []string{"**"},
 			Exclude: []string{"*.tmp"},
 		},
-	})
+	}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -105,7 +138,7 @@ func TestBuildPlan_DefaultFilterExcludesGit(t *testing.T) {
 	_ = os.WriteFile(filepath.Join(left, ".git", "config"), []byte("x"), 0o644)
 	_ = os.WriteFile(filepath.Join(left, "a.txt"), []byte("hello"), 0o644)
 
-	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{})
+	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -159,7 +192,7 @@ func TestBuildPlan_CustomAction_SkipsEqual(t *testing.T) {
 		CustomActions: map[engine.Category]sync.Action{
 			engine.Equal: sync.ActionConflict,
 		},
-	})
+	}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -181,7 +214,7 @@ func TestBuildPlan_UseChecksum_DifferentContent(t *testing.T) {
 	_ = os.Chtimes(lf, now, now)
 	_ = os.Chtimes(rf, now, now)
 
-	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{UseChecksum: true})
+	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{UseChecksum: true}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -203,7 +236,7 @@ func TestBuildPlan_ContentMode_SameContent_Equal(t *testing.T) {
 	_ = os.Chtimes(lf, time.Now(), time.Now())
 	_ = os.Chtimes(rf, time.Now().Add(-time.Hour), time.Now().Add(-time.Hour))
 
-	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{UseChecksum: true})
+	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{UseChecksum: true}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -226,7 +259,7 @@ func TestBuildPlan_Tolerance_WithinBounds(t *testing.T) {
 	_ = os.Chtimes(lf, now, now)
 	_ = os.Chtimes(rf, now.Add(1*time.Second), now.Add(1*time.Second))
 
-	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionBidirectional, sync.Options{})
+	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionBidirectional, sync.Options{}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -245,7 +278,7 @@ func TestBuildPlan_SymlinkExclude(t *testing.T) {
 		t.Skipf("symlink unsupported: %v", err)
 	}
 
-	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{})
+	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -266,7 +299,7 @@ func TestBuildPlan_ChangesMode_CreatedFile(t *testing.T) {
 	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{
 		ChangesMode: true,
 		DBPath:      dbPath,
-	})
+	}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -296,7 +329,7 @@ func TestBuildPlan_ChangesMode_Unchanged(t *testing.T) {
 	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{
 		ChangesMode: true,
 		DBPath:      dbPath,
-	})
+	}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -308,7 +341,7 @@ func TestBuildPlan_ChangesMode_Unchanged(t *testing.T) {
 func TestBuildPlan_ChangesMode_NoDBPath(t *testing.T) {
 	_, err := sync.BuildPlan(context.Background(), "/tmp/a", "/tmp/b", sync.DirectionLeftToRight, sync.Options{
 		ChangesMode: true,
-	})
+	}, nil)
 	if err == nil {
 		t.Fatal("expected error for changes mode without dbPath")
 	}

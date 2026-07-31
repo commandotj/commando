@@ -117,12 +117,12 @@ P1 只包含完成本地路径 CLI `compare → plan → safe execute → termin
 | 1    | [RFC-2026-016](./rfc/completed/016-compare-engine-extensions.md)          | Compare engine            | engine 原语+单测；**不含** planner 接线                    |
 | 2    | [RFC-2026-019](./rfc/completed/019-filter-system.md)                      | Filter CLI-first ✅       | matcher 经统一 engine 进入 CLI compare；非法 glob 报错     |
 | 3    | [RFC-2026-030](./rfc/completed/030-local-smb-filesystem-compatibility.md) | Local filesystem baseline | 本地路径错误与文件系统差异可观察                           |
-| 4    | [RFC-2026-017](./rfc/017-sync-variants-changes-custom.md)                 | Plan semantics            | Mirror/Update/Two-way 不用名称掩盖错误语义                 |
+| 4    | [RFC-2026-017](./rfc/completed/017-sync-variants-changes-custom.md)       | Plan semantics            | Mirror/Update/Two-way 不用名称掩盖错误语义                 |
 | 5    | [RFC-2026-031](./rfc/completed/031-compare-plan-e2e-verify.md)            | Compare↔Plan E2E verify   | **017 完成后**；BuildPlan 接 engine；CLI T1–T7 全绿        |
-| 6    | [RFC-2026-018](./rfc/018-sync-database.md)                                | Changes database          | Two-way/move detection 有持久状态与恢复                    |
-| 7    | [RFC-2026-027](./rfc/027-delete-operations.md)                            | Delete semantics          | Permanent/Trash/Versioning 行为显式                        |
-| 8    | [RFC-2026-028](./rfc/028-execution-options.md)                            | Safe execution            | core-owned plan；truthful Outcome；context；atomic replace |
-| 9    | [RFC-2026-021](./rfc/021-cli-config.md)                                   | CLI contract              | 严格输入、NDJSON stdout、stderr 诊断、稳定退出码           |
+| 6    | [RFC-2026-018](./rfc/completed/018-sync-database.md)                      | Changes database          | Two-way/move detection 有持久状态与恢复                    |
+| 7    | [RFC-2026-027](./rfc/completed/027-delete-operations.md)                  | Delete semantics          | Permanent/Trash/Versioning 行为显式                        |
+| 8    | [RFC-2026-028](./rfc/completed/028-execution-options.md)                  | Safe execution            | core-owned plan；truthful Outcome；context；atomic replace |
+| 9    | [RFC-2026-021](./rfc/completed/021-cli-config.md)                         | CLI contract              | 严格输入、NDJSON stdout、stderr 诊断、稳定退出码           |
 
 **伞 RFC：** [RFC-2026-012](./rfc/completed/012-sync-module-compare-report.md) 为能力目录/Owner 章程。领域 RFC（014–031）均已打开后 **012 = Completed**，不占 P1 实现序号、不挡 016。
 
@@ -130,7 +130,26 @@ P1 只包含完成本地路径 CLI `compare → plan → safe execute → termin
 
 **依赖：** RFC-031 在 RFC-017 Completed 之后实施/验收，不阻塞 016 Done；不替代 017 语义工作。
 
-P1 完成前，UI（RFC-015/020/022/023）、report 增强（RFC-024）、platform/distribution（RFC-029）为 P2；Realtime/remote（RFC-014/025/026）为 P3。P2/P3 不得反向要求 P1 core 引入 Wails、React 或 provider-specific 类型。
+P1 完成前，UI（**RFC-034** 取代 015/020/022/023）、report 增强（RFC-024）、platform/distribution（RFC-029）为 P2；Realtime/remote（RFC-014/025/026）为 P3。P2/P3 不得反向要求 P1 core 引入 Wails、React 或 provider-specific 类型。
+
+### P1.5 — Compare/Sync E2E（UI 接线 + 收尾闭环）
+
+P1 交付的是 core CLI 闭环；P1.5 接着把它接到 UI，并补上 verify/restore/replay 让 8 步工作流完整闭环。序号接续 P1（10 起）。
+
+| 顺序 | RFC                                                          | P1.5 责任                               | Gate                                                                  |
+| ---- | ------------------------------------------------------------ | --------------------------------------- | --------------------------------------------------------------------- |
+| 10   | [RFC-2026-033](./rfc/033-sync-execution-progress.md)         | Execute 进度/取消/恢复（CLI 层）        | CLI `run --progress`/`--resume` 已实现；RFC 状态待同步                |
+| 11   | [RFC-2026-034](./rfc/034-ui-consolidation.md)                | UI 整合 + **Wails CLI bridge（Gap 4）** | 🔶 In Progress；**Gap 4 挡 038/039/041 UI 验收**                      |
+| 12   | [RFC-2026-037](./rfc/037-compare-cli-diff-view.md)           | Compare spawn + diff view（步骤 2–3）   | 依赖 034 Gap 4 + Gap 2；037 §2.1 CLI 部分已实现                       |
+| 13   | [RFC-2026-039](./rfc/039-execute-verify-parity.md)           | Verify 覆盖 delete（步骤6 一部分）      | 与 14 可并行，互不依赖                                                |
+| 14   | [RFC-2026-041](./rfc/041-plan-persistence-replay-history.md) | Plan/ExecuteResult 持久化、replay、历史 | 与 13 可并行；是 15 的地基                                            |
+| 15   | [RFC-2026-040](./rfc/040-restorable-cleanup-restore.md)      | Restorable 清理/撤销（步骤7）           | **依赖 13（Restorable 来源）+ 14（按 Plan.ID 持久化查询）**，最后实施 |
+
+**伞 RFC：** [RFC-2026-038](./rfc/038-sync-execution-verify-restore-replan.md) 为 039/040/041 的能力目录，不占 P1.5 实现序号，完成标准是三份子 RFC 全部 Approved（非物理代码完工）。
+
+**依赖顺序：** 034 **Gap 4** 先于 037/038 步骤 4–5 UI 验收。039、041 可并行；040 最后。037 §2.1：`plan --progress` 已在 CLI 实现，037 剩余 = Wails spawn + diff 视图。
+
+P1.5 完成 = 8 步工作流全部经 **Wails spawn CLI** 端到端可用（038 §4；034 Gap 4）。
 
 ## RFC 列表
 
@@ -171,28 +190,33 @@ _暂无_
 
 ### 提案中的 RFC
 
-| RFC 编号                                                                  | 标题                                                               | 作者         | 创建时间   | 状态        |
-| ------------------------------------------------------------------------- | ------------------------------------------------------------------ | ------------ | ---------- | ----------- |
-| [RFC-2026-014](./rfc/014-remote-provider-gdrive-mtp.md)                   | 远程存储扩展 — Google Drive / MTP                                  | albert.li/AI | 2026-07-28 | 🔵 Proposed |
-| [RFC-2026-015](./rfc/015-ui-foundation.md)                                | UI Foundation — Folder Selection & Compare/Sync Settings           | albert.li    | 2026-07-29 | 🔵 Proposed |
-| [RFC-2026-020](./rfc/020-ui-progress.md)                                  | UI Progress — Compare/Sync Dialogs & Results                       | albert.li    | 2026-07-29 | 🔵 Proposed |
-| [RFC-2026-022](./rfc/022-ui-panels.md)                                    | UI Panels — Tree Overview, Category Filter, Direction & Multi-pair | albert.li    | 2026-07-29 | 🔵 Proposed |
-| [RFC-2026-023](./rfc/023-ui-tools.md)                                     | UI Tools — Explorer, External Tools, Context Menu & Rename         | albert.li    | 2026-07-29 | 🔵 Proposed |
-| [RFC-2026-025](./rfc/025-realtimesync.md)                                 | RealtimeSync — File Watcher, Idle Debounce & Service               | albert.li    | 2026-07-29 | 🔵 Proposed |
-| [RFC-2026-026](./rfc/026-remote-sftp-ftp.md)                              | Remote — SFTP & FTP Transfers                                      | albert.li    | 2026-07-29 | 🔵 Proposed |
-| [RFC-2026-029](./rfc/029-platform-distribution-and-i18n.md)               | Platform, Distribution, Localization & Scale                       | albert.li/AI | 2026-07-29 | 🔵 Proposed |
-| [RFC-2026-030](./rfc/completed/030-local-smb-filesystem-compatibility.md) | Local & SMB Filesystem Compatibility                               | albert.li/AI | 2026-07-29 | 2026-07-30  | ✅ Completed |
-| [RFC-2026-031](./rfc/completed/031-compare-plan-e2e-verify.md)            | Compare ↔ Plan E2E Verify（engine+planner+CLI）                    | albert.li/AI | 2026-07-29 | 2026-07-30  | ✅ Completed |
+| RFC 编号                                                                  | 标题                                                                    | 作者         | 创建时间   | 状态        |
+| ------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ------------ | ---------- | ----------- |
+| [RFC-2026-014](./rfc/014-remote-provider-gdrive-mtp.md)                   | 远程存储扩展 — Google Drive / MTP                                       | albert.li/AI | 2026-07-28 | 🔵 Proposed |
+| [RFC-2026-025](./rfc/025-realtimesync.md)                                 | RealtimeSync — File Watcher, Idle Debounce & Service                    | albert.li    | 2026-07-29 | 🔵 Proposed |
+| [RFC-2026-026](./rfc/026-remote-sftp-ftp.md)                              | Remote — SFTP & FTP Transfers                                           | albert.li    | 2026-07-29 | 🔵 Proposed |
+| [RFC-2026-029](./rfc/029-platform-distribution-and-i18n.md)               | Platform, Distribution, Localization & Scale                            | albert.li/AI | 2026-07-29 | 🔵 Proposed |
+| [RFC-2026-030](./rfc/completed/030-local-smb-filesystem-compatibility.md) | Local & SMB Filesystem Compatibility                                    | albert.li/AI | 2026-07-29 | 2026-07-30  | ✅ Completed |
+| [RFC-2026-031](./rfc/completed/031-compare-plan-e2e-verify.md)            | Compare ↔ Plan E2E Verify（engine+planner+CLI）                         | albert.li/AI | 2026-07-29 | 2026-07-30  | ✅ Completed |
+| [RFC-2026-037](./rfc/037-compare-cli-diff-view.md)                        | Compare CLI 子进程 + Diff View                                          | albert.li/AI | 2026-07-31 | 🔵 Proposed |
+| [RFC-2026-038](./rfc/038-sync-execution-verify-restore-replan.md)         | Sync Execution E2E — Verify, Restore & Re-runnable Plans **(Umbrella)** | albert.li/AI | 2026-07-31 | 🔵 Proposed |
+| [RFC-2026-039](./rfc/039-execute-verify-parity.md)                        | Execute — Verify Parity for Delete（子 RFC of 038）                     | albert.li/AI | 2026-07-31 | 🔵 Proposed |
+| [RFC-2026-040](./rfc/040-restorable-cleanup-restore.md)                   | Restorable — Cleanup & Restore After Sync（子 RFC of 038）              | albert.li/AI | 2026-07-31 | 🔵 Proposed |
+| [RFC-2026-041](./rfc/041-plan-persistence-replay-history.md)              | Plan & ExecuteResult Persistence — Replay & History（子 RFC of 038）    | albert.li/AI | 2026-07-31 | 🔵 Proposed |
 
 ### 已废弃的 RFC
 
-| RFC 编号                                                               | 标题                                                     | 作者                     | 创建时间   | 废弃时间   | 状态          | 原因                                                                             |
-| ---------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------ | ---------- | ---------- | ------------- | -------------------------------------------------------------------------------- |
-| [RFC-2025-001](./rfc/completed/001-worker-architecture-vite.md)        | Worker Architecture for Electron-Vite                    | Albert Lee/AI            | 2025-01-14 | 2026-07-29 | ❌ Deprecated | 项目已迁移至 Wails 3，Electron-Vite Worker 架构不再适用                          |
-| [RFC-2025-010](./rfc/completed/010-electron-spacetime-architecture.md) | Electron Spacetime Architecture with Personified Engines | Linus Torvalds/albert.li | 2025-01-05 | 2026-07-29 | ❌ Deprecated | Electron-era architecture; Go backend replaces personified engine concepts       |
-| [RFC-2025-008](./rfc/completed/008-window-service-api.md)              | Window Service API 设计                                  | AI Assistant             | 2025-01-27 | 2026-07-29 | ❌ Deprecated | Electron IPC window service; Wails 3 handles windows natively                    |
-| [RFC-2025-009](./rfc/completed/009-shell-service-api.md)               | Shell Service API 设计                                   | AI Assistant             | 2025-01-27 | 2026-07-29 | ❌ Deprecated | Electron-era shell/LubanEngine service; Go backend replaces with direct packages |
-| [RFC-2025-007](./rfc/completed/007-constant-management-system.md)      | Constant Management System                               | Albert Lee/AI            | 2025-01-14 | 2026-07-29 | ❌ Deprecated | Electron-era TS constants; Go backend uses Go constants/iota                     |
+| RFC 编号                                                               | 标题                                                               | 作者                     | 创建时间   | 废弃时间   | 状态          | 原因                                                                             |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------ | ------------------------ | ---------- | ---------- | ------------- | -------------------------------------------------------------------------------- |
+| [RFC-2025-001](./rfc/completed/001-worker-architecture-vite.md)        | Worker Architecture for Electron-Vite                              | Albert Lee/AI            | 2025-01-14 | 2026-07-29 | ❌ Deprecated | 项目已迁移至 Wails 3，Electron-Vite Worker 架构不再适用                          |
+| [RFC-2025-010](./rfc/completed/010-electron-spacetime-architecture.md) | Electron Spacetime Architecture with Personified Engines           | Linus Torvalds/albert.li | 2025-01-05 | 2026-07-29 | ❌ Deprecated | Electron-era architecture; Go backend replaces personified engine concepts       |
+| [RFC-2025-008](./rfc/completed/008-window-service-api.md)              | Window Service API 设计                                            | AI Assistant             | 2025-01-27 | 2026-07-29 | ❌ Deprecated | Electron IPC window service; Wails 3 handles windows natively                    |
+| [RFC-2025-009](./rfc/completed/009-shell-service-api.md)               | Shell Service API 设计                                             | AI Assistant             | 2025-01-27 | 2026-07-29 | ❌ Deprecated | Electron-era shell/LubanEngine service; Go backend replaces with direct packages |
+| [RFC-2025-007](./rfc/completed/007-constant-management-system.md)      | Constant Management System                                         | Albert Lee/AI            | 2025-01-14 | 2026-07-29 | ❌ Deprecated | Electron-era TS constants; Go backend uses Go constants/iota                     |
+| [RFC-2026-015](./rfc/rejected/015-ui-foundation.md)                    | UI Foundation — Folder Selection & Compare/Sync Settings           | albert.li                | 2026-07-29 | 2026-07-31 | ❌ Rejected   | 内容并入 RFC-2026-034（UI Consolidation）                                        |
+| [RFC-2026-020](./rfc/rejected/020-ui-progress.md)                      | UI Progress — Compare/Sync Dialogs & Results                       | albert.li                | 2026-07-29 | 2026-07-31 | ❌ Rejected   | 内容并入 RFC-2026-034（UI Consolidation）                                        |
+| [RFC-2026-022](./rfc/rejected/022-ui-panels.md)                        | UI Panels — Tree Overview, Category Filter, Direction & Multi-pair | albert.li                | 2026-07-29 | 2026-07-31 | ❌ Rejected   | 内容并入 RFC-2026-034（UI Consolidation）                                        |
+| [RFC-2026-023](./rfc/rejected/023-ui-tools.md)                         | UI Tools — Explorer, External Tools, Context Menu & Rename         | albert.li                | 2026-07-29 | 2026-07-31 | ❌ Rejected   | 内容并入 RFC-2026-034（UI Consolidation）                                        |
 
 ## RFC 统计
 
@@ -288,7 +312,7 @@ _暂无_
 3. **国际化扩展 RFC** - 多语言支持扩展
 4. **测试策略 RFC** - 测试覆盖率和质量保证
 
-> **治理规则（2026-07-29）：** [RFC-2026-012](./rfc/012-sync-module-compare-report.md) 管理 FFS 能力库存、Commando 决策、Owner 与跨 RFC 交付 gate。具体架构与验收由领域 RFC-014…030 管理；领域 RFC 获批前不得扩写其范围。
+> **治理规则（2026-07-29）：** [RFC-2026-012](./rfc/completed/012-sync-module-compare-report.md) 管理 FFS 能力库存、Commando 决策、Owner 与跨 RFC 交付 gate。具体架构与验收由领域 RFC-014…041 管理；领域 RFC 获批前不得扩写其范围。
 
 ### 需要评审的 RFC
 

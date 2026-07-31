@@ -6,6 +6,11 @@
 创建时间: 2026-07-30
 状态: Draft — 待审批
 
+修改历史:
+
+- 2026-07-30: 初稿
+- 2026-07-31: §11 与 RFC-041 replay 关系
+
 ---
 
 ## 1. 摘要
@@ -169,7 +174,17 @@ CREATE TABLE progress (
 - `--signal` 可配置？→ 目前固定 SIGINT
 - Pause（暂停）→ 不在此 RFC
 
+## 11. 与 RFC-041 `replay` 的关系
+
+|      | RFC-033 `--resume`           | RFC-041 `replay`                        |
+| ---- | ---------------------------- | --------------------------------------- |
+| 存储 | SQLite `sync.db` progress 表 | JSON `.commando/plans/{id}.result.json` |
+| 粒度 | `job_id` + `relative_path`   | `Plan.ID` + `DoneItems`                 |
+| 场景 | 同一次 `run` 崩溃/取消后续跑 | 跨会话重放已保存 plan                   |
+
+**互斥：** `sync run --resume` 与 `sync replay --plan-id` 不得同时使用（CLI 报错）。详见 RFC-041 §11。
+
 ---
 
 **状态**: Draft
-**最后更新**: 2026-07-30
+**最后更新**: 2026-07-31

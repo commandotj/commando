@@ -6,6 +6,11 @@
 创建时间: 2026-07-30
 状态: Draft — 待审批
 
+修改历史:
+
+- 2026-07-30: 初稿
+- 2026-07-31: §2/§4 现状重写（`plan --progress` 与 `BuildPlan(…, ProgressFn)` 已实现）；§10 移除假阻塞项
+
 ---
 
 ## 1. 摘要
@@ -16,15 +21,33 @@
 
 **命名澄清：** 真实 CLI 子命令叫 `sync plan`，不是 `sync compare`（无此子命令）。"Compare"是 UI 侧的按钮文案/产品语言，`plan`（dry-run 建计划）是它在 CLI 层对应的真实操作——本 RFC 统一用 `plan` 指代 CLI 命令，`Compare` 指代 UI 交互动作，两者说的是同一件事的两个视角，不是两个不同功能。
 
-## 2. 现状问题（已核实 `backend/cmd/commando/commands/sync.go`）
+## 2. 现状核实（2026-07-31 对照代码）
 
-`packages/ui/src/services/syncApiService.ts` 的 `compareFolders()` 走 `window.syncApi.compare()`——这是 Wails binding 直接调 Go 后端（`sync.BuildReport`），不经过 CLI 子进程，违反 CLI-first。
+### 2.1 已实现 ✅（本 RFC **不要重复实现**）
 
-现有 CLI 只有 `sync plan`（一次性 JSON 输出，**无 `--progress` 支持**）和 `sync run`（支持 `--progress`/`--resume`/`--reset`）。`sync plan` 的参数是 `--left`/`--right`/`--direction`（l2r/r2l/both）/`--include`/`--exclude`，**没有 `--strategy` 参数**——策略/变体的概念目前只在 Wails 层的 `SyncRequest.StrategyID`（通过 `strategyID()` 换算成 `Direction`+`DeleteExtraneous`）存在，CLI 侧还是裸的 direction+filter。本 RFC 之前草稿假设的 `--strategy` flag 不存在，需要先在 CLI 补上（或换算逻辑一并搬到 CLI 层），否则 UI 传的策略信息在 spawn 子进程时无处安放。
+| 能力                                       | 证据                                                                                                        |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `sync plan --progress`                     | `backend/cmd/commando/commands/sync.go` planCmd + `--progress` flag                                         |
+| `BuildPlan(ctx, …, progress ProgressFn)`   | `backend/internal/sync/planner.go` 第六参数                                                                 |
+| NDJSON 进度 + 终态 `type:"done"`           | planCmd 在 `--progress` 时逐行 `fmt.Println` JSON                                                           |
+| `sync run --progress`/`--resume`/`--reset` | runCmd 已实现（RFC-033）                                                                                    |
+| CLI 单测                                   | `TestPlanCmd_ProgressFlag_EmitsNDJSONLines`、`TestPlanCmd_NoProgressFlag_UnchangedOutput`（`sync_test.go`） |
+| planner 单测                               | `TestBuildPlan_ProgressFn_CalledForEachItem`、`TestBuildPlan_NilProgressFn_NoPanic`（`planner_test.go`）    |
 
-`syncSlice.ts` 的 `waitForJob()` 只在收到终态（done/error/canceled）时 resolve，中间进度事件被订阅但从未 dispatch 进 Redux——`progressFile`/`progressDone`/`progressTotal` 永远停在初始值，`SyncProgressBar` 显示假进度。
+### 2.2 仍缺 ❌（本 RFC 范围）
 
-现有 UI 无"结果展示"与"文件浏览"两种视图切换的概念，pane 只有单一浏览态。
+| 缺口                   | 说明                                                                |
+| ---------------------- | ------------------------------------------------------------------- |
+| Wails **未 spawn CLI** | `apps/desktop/services/sync.go` `Compare()` 直调 `sync.BuildReport` |
+| Redux 进度未接线       | `syncSlice` 中间 progress 未 dispatch（RFC-034 Gap 2）              |
+| 无 diff 视图           | 无 `viewMode` / `SyncDiffView`（§7）                                |
+| CLI 无 `--strategy`    | 见 §2.3；不挡 Compare 桥接                                          |
+
+`compareFolders()` → `window.syncApi.compare()` 违反 CLI-first → **RFC-034 Gap 4** + §5。
+
+### 2.3 策略参数（可选增量）
+
+Wails 已有 `strategyID()` + `ResolveStrategy`。spawn 时用 `string(strategy.Direction)` 作 `--direction`。`plan` 不传 `DeleteExtraneous`；`run` 阶段再传（或 RFC-041 `run --plan-id`）。
 
 ## 3. E2E 流程
 
@@ -36,9 +59,9 @@
    （不同则 reject，UI 显示 inline 错误，不发起任何调用）
   │
   ▼
-2. Wails 后端 spawn 子进程：
+2. Wails 后端 spawn 子进程（**RFC-034 Gap 4 — 未实现**）：
    commando sync plan --left <L> --right <R> --direction <dir> --include <inc> --exclude <exc> --progress
-   （--progress 是本 RFC 新增到 planCmd 的 flag，现状没有，见 §4）
+   （`--progress` **已实现**于 CLI，见 §2.1）
   │
   ▼
 3. 子进程逐行输出 NDJSON 到 stdout，Wails 后端逐行读取并转发为
@@ -54,9 +77,11 @@
    支持切回浏览态（不销毁 diff 结果，可来回切换直到下次 Compare 或 Sync 执行）
 ```
 
-## 4. CLI 契约（新增：`sync plan` 目前无 `--progress`，需要补）
+## 4. CLI 契约（**已实现部分 — 勿改签名**）
 
-**现状（`backend/cmd/commando/commands/sync.go` line 44-53）：** `planCmd` 直接调 `sync.BuildPlan` 后一次性 `json.NewEncoder(os.Stdout).Encode(plan)`，中途完全静默，无进度、无 `--strategy` 参数（只有 `--direction`/`--include`/`--exclude`）。
+**当前实现（`sync.go` planCmd）：** `--progress` 时 `BuildPlan(…, progressFn)` 逐 item 回调 → NDJSON `type:"progress"` 行；最后一行 `type:"done"` + `result: plan`。无 `--progress` 时一次性裸 JSON（`TestPlanCmd_NoProgressFlag_UnchangedOutput` 回归保护）。
+
+**本 RFC 增量（可选，非阻塞 Compare 桥接）：** CLI `--strategy <id>`，与 Wails `StrategyID` 对齐；未实现前继续用 `ResolveStrategy` → `--direction` 换算（§2.3）。
 
 **唯一权威 payload 类型：`SyncProgressPayload`（`packages/shared/types/SyncTypes.ts:85-96`，已存在，不新造）：**
 
@@ -74,7 +99,7 @@ export interface SyncProgressPayload {
 }
 ```
 
-**新增 `--progress` 后的 CLI 输出（每行是一个 `SyncProgressPayload` 的 JSON 序列化，跟 Wails event 走的是同一个类型，不是两套）：**
+**CLI 输出示例（`--progress` 已实现，勿重复实现 planCmd）：** 每行是一个 `SyncProgressPayload` 的 JSON 序列化，跟 Wails event 走的是同一个类型，不是两套。
 
 ```
 $ commando sync plan --left /a --right /b --direction both --progress
@@ -83,8 +108,8 @@ $ commando sync plan --left /a --right /b --direction both --progress
 {"type":"done","status":"done","result":{"leftRoot":"/a","rightRoot":"/b","items":[...],"toCopy":3,"toDelete":1,"conflicts":1,"toSkip":40}}
 ```
 
-- 复用 `sync.ProgressFn`（`func(rel string, act sync.Action, done, total int, err error)`），跟 `run --progress` 是**同一个类型**，不新造一套进度回调签名——`BuildPlan` 需要接受可选 `ProgressFn` 参数（现状不接受，需要改签名）
-- **只有最后一行**是 `type:"done"`，其余全是 `type:"progress"`——`streamNDJSONAsEvents`（§5）靠这个字段区分，不是靠"是不是最后一行"这种位置猜测。`result` 字段装完整 `Plan`（`CompareReport` 的 `plan` 部分），不单独发 per-item `{"relativePath":...}` 行
+- **只有最后一行**是 `type:"done"`，其余全是 `type:"progress"`——`streamNDJSONAsEvents`（§5）靠 `payload.Type == "done"` 判定终态（**已实现于 CLI**，§9a 单测已绿）
+- `result` 字段装完整 `Plan`；`ProgressFn` 签名 **已存在**，禁止再改 `BuildPlan` 第六参数
 - 退出码沿用 RFC-012 §4.6 CLI-05：0 成功 / 1 警告（有 conflict/skip）/ 2 错误 / 3 中止（Ctrl+C）
 
 **策略/变体参数缺口，具体换算路径（已核实，非假设）：**
@@ -95,9 +120,11 @@ $ commando sync plan --left /a --right /b --direction both --progress
 
 `plan` 阶段只关心 diff 分类不关心删除策略，`DeleteExtraneous` 不需要传给 `plan`（只在后续 `run` 阶段用）。
 
-## 5. Wails 子进程桥接 + 可取消（明确语义，不留待定）
+## 5. Wails 子进程桥接 + 可取消
 
-**现状缺口：** 现有 `SyncService.Compare()`（`apps/desktop/services/sync.go` line 99-104）直调 `sync.BuildReport`，`startJob` 包装只在开始/结束各发一次 `"running"`/`"done"` 事件，**中途完全静默**，也没有逐文件进度。`CancelSync(jobID)` 走 `s.runtime.Tasks.Cancel(jobID)`——这是 `context.Context` 取消，对内部函数调用有效，但换成真实 spawn 的 `exec.Command` 子进程后，**光取消 context 不会杀掉子进程**，必须显式终止进程。
+**归属：** 实现规格以 **RFC-034 Gap 4** 为准；本节为 037 Compare 路径的细节。
+
+**现状缺口（2026-07-31）：** `SyncService.Compare()`/`Execute()` 直调 `internal/sync`。`startJob` 仅发开始/结束事件，无逐文件进度。`CancelSync` 用 in-process `context.Cancel`——**不足以**杀 CLI 子进程；须改 `exec.CommandContext`（RFC-034 Gap 4）。
 
 **实现（spawn + 取消一并给出，取消是首要需求不是后补）：**
 
@@ -283,14 +310,14 @@ export const compareSync = createAsyncThunk(
 
 ## 8. 文件变更
 
-| 文件                                               | 职责                                                                                                                                                           |
-| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `packages/ui/src/components/sync/SyncDiffView.tsx` | 新建：§7 规格的单列表 diff 展示，复用 `VirtualizedTable`                                                                                                       |
-| `packages/ui/src/components/sync/SyncPane.tsx`     | 按 `fileManagerSlice.viewMode` 条件渲染 `SyncDiffView` 或原有文件列表                                                                                          |
-| `packages/ui/src/app/fileManagerSlice.ts`          | `viewMode` 状态 + `setViewMode` action                                                                                                                         |
-| `packages/ui/src/app/syncSlice.ts`                 | `compareReport` 状态 + `progressUpdated` reducer + `compareSync` 改流式                                                                                        |
-| `apps/desktop/services/sync.go`                    | 新增 `SyncProgressPayload` struct（现状不存在）+ Compare 改为 spawn CLI 子进程 + `exec.CommandContext` 取消 + `streamNDJSONAsEvents` 状态机（§5）+ NDJSON 转发 |
-| `backend/cmd/commando/commands/sync.go`            | `planCmd` 加 `--progress` flag + `sync.BuildPlan` 接受 `ProgressFn`                                                                                            |
+| 文件                                               | 职责                                                                        |
+| -------------------------------------------------- | --------------------------------------------------------------------------- |
+| `packages/ui/src/components/sync/SyncDiffView.tsx` | 新建：§7 规格的单列表 diff 展示，复用 `VirtualizedTable`                    |
+| `packages/ui/src/components/sync/SyncPane.tsx`     | 按 `fileManagerSlice.viewMode` 条件渲染 `SyncDiffView` 或原有文件列表       |
+| `packages/ui/src/app/fileManagerSlice.ts`          | `viewMode` 状态 + `setViewMode` action                                      |
+| `packages/ui/src/app/syncSlice.ts`                 | `compareReport` 状态 + `progressUpdated` reducer + `compareSync` 改流式     |
+| `apps/desktop/services/sync.go`                    | **RFC-034 Gap 4**：Compare/Execute spawn CLI + `streamNDJSONAsEvents`（§5） |
+| `backend/cmd/commando/commands/sync.go`            | **无签名变更**；可选后续 `--strategy` flag                                  |
 
 **切回浏览态：** 用户点击"返回浏览"或发起新的 Compare 才 `dispatch(setViewMode("browse"))`；Sync 执行完成后同样切回浏览态并刷新两侧目录内容。
 
@@ -306,12 +333,13 @@ export const compareSync = createAsyncThunk(
 
 ## 9a. 测试计划（TDD 前置，非事后补测）
 
-| 层    | 测试名                                                                                        | 验证什么                                                                                                                                                                              |
+| 层    | 测试名                                                                                        | 状态 / 验证什么                                                                                                                                                                       |
 | ----- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CLI   | `TestPlanCmd_ProgressFlag_EmitsNDJSONLines`                                                   | `sync plan --progress` stdout 每行可独立 `json.Unmarshal` 成 `SyncProgressPayload` 形状；仅最后一行 `type=="done"`，其余全是 `type=="progress"`                                       |
-| CLI   | `TestPlanCmd_ProgressFlag_DonePayloadContainsFullPlan`                                        | 终态行的 `result` 字段反序列化后等于 `sync.BuildPlan` 的返回值（字段一一对应，不丢数据）                                                                                              |
-| CLI   | `TestPlanCmd_NoProgressFlag_UnchangedOutput`                                                  | 不传 `--progress` 时行为与现状完全一致（一次性裸 JSON，无 NDJSON 包装），回归保护                                                                                                     |
-| CLI   | `TestBuildPlan_NilProgressFn_NoPanic`                                                         | `ProgressFn` 传 `nil`（现有调用方式）不崩，向后兼容                                                                                                                                   |
+| CLI   | `TestPlanCmd_ProgressFlag_EmitsNDJSONLines`                                                   | **✅ 已实现** — NDJSON 行；仅最后一行 `type=="done"`                                                                                                                                  |
+| CLI   | `TestPlanCmd_ProgressFlag_DonePayloadContainsFullPlan`                                        | 待补（可选）— 终态 `result` 等于 `BuildPlan` 返回值                                                                                                                                   |
+| CLI   | `TestPlanCmd_NoProgressFlag_UnchangedOutput`                                                  | **✅ 已实现** — 无 `--progress` 时裸 JSON 回归                                                                                                                                        |
+| CLI   | `TestBuildPlan_NilProgressFn_NoPanic`                                                         | **✅ 已实现** — `ProgressFn` 传 `nil` 不崩                                                                                                                                            |
+| CLI   | `TestBuildPlan_ProgressFn_CalledForEachItem`                                                  | **✅ 已实现** — `planner_test.go`                                                                                                                                                     |
 | Wails | `TestCompare_SpawnsRealSubprocess`                                                            | mock 包级 `execCommand` 变量，断言调用参数含 `["sync","plan","--left",...,"--progress"]`（不是直调 `sync.BuildReport`）                                                               |
 | Wails | `TestCompare_ResolveStrategyError_ReturnsEarlyNoSpawn`                                        | `req.strategyID()` 是非法值时 `ResolveStrategy` 报错，`execCommand` 未被调用（断言 mock 调用次数为 0）                                                                                |
 | Wails | `TestCancelSync_KillsRunningSubprocess`                                                       | 取消后子进程进程号不再存在（非 zombie），且仅收到一次 `type:"done"` 事件（验证 §5 修复的重复终态 bug 不再发生）                                                                       |
@@ -329,10 +357,11 @@ export const compareSync = createAsyncThunk(
 
 ## 10. 待定
 
-- **实施顺序**：`sync.BuildPlan` 需先改签名接受 `ProgressFn`（现状不接受，`planCmd` 需要新增 `--progress` flag 并接线），这是本 RFC 其余部分的前置阻塞项，须在 Wails 桥接（§5）开工前完成
-- Diff 视图分组的折叠状态是否需要持久化（下次打开还记得上次哪些组展开/折叠）——非阻塞，可后续迭代加
+- **实施顺序**：① RFC-034 Gap 4（Wails spawn）② RFC-034 Gap 2（Redux 进度）③ 本 RFC §7 diff 视图。~~`BuildPlan` 改签名~~ **已完成，非阻塞项**。
+- CLI `--strategy` flag：可选，不挡 Compare 桥接。
+- Diff 分组折叠状态持久化：非阻塞。
 
 ---
 
 **状态**: Draft
-**最后更新**: 2026-07-30
+**最后更新**: 2026-07-31

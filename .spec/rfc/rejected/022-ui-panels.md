@@ -4,10 +4,11 @@
 
 作者: albert.li
 创建时间: 2026-07-29
-状态: Proposed
+状态: Rejected — replaced by RFC-034
 修改历史:
 
 - 2026-07-29: 依据 Feature ID 追踪，承接同步工作区与多目录对能力
+- 2026-07-31: Rejected，内容并入 RFC-2026-034（UI Consolidation）
 
 ---
 
@@ -93,13 +94,13 @@ CLI: `commando sync run --profile pairs.json` 逐个执行。
 
 ---
 
-**状态**: Proposed
-**最后更新**: 2026-07-29
+**状态**: Rejected — replaced by RFC-034
+**最后更新**: 2026-07-31
 
 ## Task Tracking 追踪
 
 本 RFC 明确拥有：`UI-07`, `UI-08`, `UI-09`, `UI-11`, `UI-14`, `UI-15`, `UI-16`, `UI-26`, `UI-27`, `UI-32`, `UI-33`, `UI-35`。
 
-Feature ID 与实施状态以 [TASK TRACKING](../TASK_TRACKING.md) 为准，优先级与 RFC 状态以 [ROADMAP](../ROADMAP.md) 为准；本 RFC 负责产品决策、Commando 设计与验收。
-Replaced by RFC-034: # RFC-2026-022: UI Panels — Tree Overview, Category Filter, Direction & Multi-pair
-Status: Deprecated — replaced by RFC-034
+Feature ID 与实施状态以 [TASK TRACKING](../../TASK_TRACKING.md) 为准，优先级与 RFC 状态以 [ROADMAP](../../ROADMAP.md) 为准。
+
+**Replaced by [RFC-2026-034](../034-ui-consolidation.md)** — 内容并入 UI Consolidation，本 RFC 不再单独维护。

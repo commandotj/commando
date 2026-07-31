@@ -36,7 +36,7 @@ func BuildReport(leftRoot, rightRoot string, strategyID StrategyID, overrides Op
 	}
 
 	opts := strategy.PlannerOptions(overrides)
-	plan, err := BuildPlan(context.Background(), leftRoot, rightRoot, strategy.Direction, opts)
+	plan, err := BuildPlan(context.Background(), leftRoot, rightRoot, strategy.Direction, opts, nil)
 	if err != nil {
 		return nil, err
 	}

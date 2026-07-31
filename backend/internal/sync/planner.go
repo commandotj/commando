@@ -11,7 +11,9 @@ import (
 	"github.com/commandotj/commando/internal/sync/filter"
 )
 
-func BuildPlan(ctx context.Context, leftRoot, rightRoot string, direction Direction, opts Options) (*Plan, error) {
+// BuildPlan compares leftRoot and rightRoot and returns a sync plan.
+// progress is called once per plan item after it is resolved (may be nil).
+func BuildPlan(ctx context.Context, leftRoot, rightRoot string, direction Direction, opts Options, progress ProgressFn) (*Plan, error) {
 	leftRoot = filepath.Clean(leftRoot)
 	rightRoot = filepath.Clean(rightRoot)
 
@@ -31,11 +33,24 @@ func BuildPlan(ctx context.Context, leftRoot, rightRoot string, direction Direct
 		return nil, err
 	}
 
+	var plan *Plan
 	if opts.ChangesMode {
-		return buildChangesPlan(ctx, leftRoot, rightRoot, leftEntries, rightEntries, direction, opts)
+		plan, err = buildChangesPlan(ctx, leftRoot, rightRoot, leftEntries, rightEntries, direction, opts)
+	} else {
+		plan, err = buildDifferencesPlan(leftRoot, rightRoot, leftEntries, rightEntries, direction, opts)
+	}
+	if err != nil {
+		return nil, err
 	}
 
-	return buildDifferencesPlan(leftRoot, rightRoot, leftEntries, rightEntries, direction, opts)
+	if progress != nil {
+		total := len(plan.Items)
+		for i, item := range plan.Items {
+			progress(item.RelativePath, item.Action, i+1, total, nil)
+		}
+	}
+
+	return plan, nil
 }
 
 func jobIDForRoots(leftRoot, rightRoot string, direction Direction) string {

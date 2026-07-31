@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"embed"
 	"log"
+	"os"
 	"runtime"
 
 	"github.com/commandotj/commando/apps/desktop/services"
@@ -34,7 +36,8 @@ func main() {
 	fileService := &services.FileService{}
 	copyService := services.NewCopyService(desktopRuntime)
 	driveService := &services.DriveService{}
-	syncService := services.NewSyncService(desktopRuntime)
+	cliPath, _ := os.Executable()
+	syncService := services.NewSyncService(desktopRuntime, cliPath, context.Background())
 
 	app := application.New(application.Options{
 		Name:        identity.Name,
