@@ -14,6 +14,7 @@ import {
 } from "../constants/sync";
 import { compareFolders, executePlan } from "../services/syncApiService";
 import { areSyncRootsEqual } from "../common/syncRoots";
+import { setViewMode } from "./fileManagerSlice";
 import type { RootState } from "./store";
 
 export type DiffMap = Record<string, SyncAction>;
@@ -60,7 +61,7 @@ function buildDiffMap(report: CompareReport): DiffMap {
 
 export const compareSync = createAsyncThunk(
     "sync/compare",
-    async (_, { getState, rejectWithValue }) => {
+    async (_, { getState, dispatch, rejectWithValue }) => {
         const state = getState() as RootState;
         const leftRoot = state.fileManager.panes[0].syncRoot;
         const rightRoot = state.fileManager.panes[1].syncRoot;
@@ -74,12 +75,14 @@ export const compareSync = createAsyncThunk(
         }
         const syncState = state.sync;
         try {
-            return await compareFolders({
+            const result = await compareFolders({
                 leftRoot,
                 rightRoot,
                 strategyId: syncState.strategyId,
                 options: syncState.options,
             });
+            dispatch(setViewMode("diff"));
+            return result;
         } catch (error) {
             return rejectWithValue(
                 error instanceof Error ? error.message : String(error)
