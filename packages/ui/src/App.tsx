@@ -10,10 +10,13 @@ import { ThemeProvider } from "./theme";
 import SyncToolbar from "./components/sync/SyncToolbar";
 import SyncPane from "./components/sync/SyncPane";
 import SyncStatusBar from "./components/sync/SyncStatusBar";
+import SyncDiffView from "./components/sync/SyncDiffView";
+import { useAppSelector } from "./app/hooks";
 import "./i18n";
 
 const App: React.FC = () => {
     const dispatch = useAppDispatch();
+    const viewMode = useAppSelector(s => s.fileManager.viewMode);
 
     useEffect(() => {
         const homeDir = window.fsApi.getHomeDir();
@@ -27,12 +30,16 @@ const App: React.FC = () => {
         <ThemeProvider>
             <div className="sync-app">
                 <SyncToolbar />
-                <div className="sync-workspace wails-no-drag">
-                    <SplitterLayout primaryIndex={0} percentage>
-                        <SyncPane paneIndex={0} />
-                        <SyncPane paneIndex={1} />
-                    </SplitterLayout>
-                </div>
+                {viewMode === "diff" ? (
+                    <SyncDiffView />
+                ) : (
+                    <div className="sync-workspace wails-no-drag">
+                        <SplitterLayout primaryIndex={0} percentage>
+                            <SyncPane paneIndex={0} />
+                            <SyncPane paneIndex={1} />
+                        </SplitterLayout>
+                    </div>
+                )}
                 <SyncStatusBar />
             </div>
         </ThemeProvider>
