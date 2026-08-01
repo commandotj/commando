@@ -2,6 +2,7 @@ import type { CopyWorkerMessage } from "@commandojs/shared/types/CopyTypes";
 import type {
     CompareReport,
     SyncExportFormat,
+    SyncOptions,
     SyncStrategyId,
 } from "@commandojs/shared/types/SyncTypes";
 import type {
@@ -141,11 +142,7 @@ declare global {
             }) => Promise<{ filePath: string }>;
             execute: (
                 plan: unknown,
-                opts: {
-                    deleteExtraneous?: boolean;
-                    dryRun?: boolean;
-                    useChecksum?: boolean;
-                }
+                opts: SyncOptions
             ) => Promise<{ jobId: string }>;
             cancel: (
                 jobId: string

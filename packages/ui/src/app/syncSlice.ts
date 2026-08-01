@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type {
     CompareReport,
     SyncAction,
+    SyncExecuteResult,
     SyncJobStatus,
     SyncOptions,
     SyncPlan,
@@ -12,10 +13,16 @@ import {
     SYNC_STRATEGY_DELETE_EXTRANEOUS,
     type SyncStrategyId,
 } from "../constants/sync";
-import { executePlan } from "../services/syncApiService";
+import { normalizeCompareResult } from "../common/compareReport";
+import { normalizeExecuteResult } from "../common/normalizeExecuteResult";
+import { effectiveSyncRoot } from "../common/effectiveSyncRoot";
 import { areSyncRootsEqual } from "../common/syncRoots";
-import { setViewMode } from "./fileManagerSlice";
-import type { SyncProgressPayload } from "@commandojs/shared/types/SyncTypes";
+import { waitForSyncJob } from "../services/syncJobHub";
+import {
+    fetchDirectory,
+    setPaneSyncRoot,
+    setViewMode,
+} from "./fileManagerSlice";
 import type { RootState } from "./store";
 
 export type DiffMap = Record<string, SyncAction>;
@@ -31,8 +38,10 @@ interface SyncState {
     lastJobId: string | null;
     planModalOpen: boolean;
     progressFile: string | null;
+    progressAction: string | null;
     progressDone: number;
     progressTotal: number;
+    executeResult: SyncExecuteResult | null;
 }
 
 const initialState: SyncState = {
@@ -46,8 +55,10 @@ const initialState: SyncState = {
     lastJobId: null,
     planModalOpen: false,
     progressFile: null,
+    progressAction: null,
     progressDone: 0,
     progressTotal: 0,
+    executeResult: null,
 };
 
 function buildDiffMap(report: CompareReport): DiffMap {
@@ -60,12 +71,23 @@ function buildDiffMap(report: CompareReport): DiffMap {
     return map;
 }
 
+function resolveSyncRoots(state: RootState): {
+    leftRoot: string;
+    rightRoot: string;
+} {
+    const leftPane = state.fileManager.panes[0];
+    const rightPane = state.fileManager.panes[1];
+    return {
+        leftRoot: effectiveSyncRoot(leftPane.syncRoot, leftPane.currentPath),
+        rightRoot: effectiveSyncRoot(rightPane.syncRoot, rightPane.currentPath),
+    };
+}
+
 export const compareSync = createAsyncThunk(
     "sync/compare",
     async (_, { getState, dispatch, rejectWithValue }) => {
         const state = getState() as RootState;
-        const leftRoot = state.fileManager.panes[0].syncRoot;
-        const rightRoot = state.fileManager.panes[1].syncRoot;
+        const { leftRoot, rightRoot } = resolveSyncRoots(state);
         if (!leftRoot || !rightRoot) {
             return rejectWithValue("Set sync folders on both panes first");
         }
@@ -77,55 +99,68 @@ export const compareSync = createAsyncThunk(
         const api = window.syncApi;
         if (!api) return rejectWithValue("Sync API not available");
 
+        if (!state.fileManager.panes[0].syncRoot) {
+            dispatch(setPaneSyncRoot({ paneIndex: 0, syncRoot: leftRoot }));
+        }
+        if (!state.fileManager.panes[1].syncRoot) {
+            dispatch(setPaneSyncRoot({ paneIndex: 1, syncRoot: rightRoot }));
+        }
+
         const { jobId } = await api.compare({
             leftRoot,
             rightRoot,
             strategyId: state.sync.strategyId,
             options: { ...state.sync.options, dryRun: true },
         });
+        dispatch(syncSlice.actions.jobStarted(jobId));
 
-        return new Promise<CompareReport>((resolve, reject) => {
-            api.onProgress((p: SyncProgressPayload) => {
-                if (p.jobId !== jobId) return;
-                if (p.type === "progress") {
-                    dispatch(
-                        syncSlice.actions.progressUpdated({
-                            file: p.file ?? "",
-                            action: p.action ?? "",
-                            done: p.done ?? 0,
-                            total: p.total ?? 0,
-                        })
-                    );
-                    return;
-                }
-                if (p.type === "done") {
-                    if (p.status === "error" || p.error) {
-                        reject(new Error(p.error ?? "Compare failed"));
-                        return;
-                    }
-                    if (p.status === "canceled") {
-                        reject(new Error("Compare canceled"));
-                        return;
-                    }
-                    dispatch(setViewMode("diff"));
-                    resolve(p.result as CompareReport);
-                }
-            });
-        });
+        try {
+            const raw = await waitForSyncJob<unknown>(jobId, () => {});
+            const report = normalizeCompareResult(raw, state.sync.strategyId);
+            dispatch(setViewMode("diff"));
+            return report;
+        } catch (error) {
+            return rejectWithValue(
+                error instanceof Error ? error.message : String(error)
+            );
+        }
     }
 );
 
 export const runSync = createAsyncThunk(
     "sync/run",
-    async (_, { getState, rejectWithValue }) => {
+    async (_, { getState, dispatch, rejectWithValue }) => {
         const state = getState() as RootState;
         const plan = state.sync.plan;
         if (!plan) {
             return rejectWithValue("Compare folders before syncing");
         }
+        const api = window.syncApi;
+        if (!api) return rejectWithValue("Sync API not available");
+
+        const { leftRoot, rightRoot } = resolveSyncRoots(state);
+
+        const { jobId } = await api.execute(plan, {
+            ...state.sync.options,
+            deleteExtraneous:
+                state.sync.options.deleteExtraneous ??
+                SYNC_STRATEGY_DELETE_EXTRANEOUS[state.sync.strategyId],
+        });
+        dispatch(syncSlice.actions.jobStarted(jobId));
+
         try {
-            const result = await executePlan(plan, state.sync.options);
-            return result;
+            const result = await waitForSyncJob<SyncExecuteResult>(
+                jobId,
+                () => {}
+            );
+            dispatch(setViewMode("browse"));
+            if (leftRoot) {
+                dispatch(fetchDirectory({ paneIndex: 0, path: leftRoot }));
+            }
+            if (rightRoot) {
+                dispatch(fetchDirectory({ paneIndex: 1, path: rightRoot }));
+            }
+            return normalizeExecuteResult(result);
         } catch (error) {
             return rejectWithValue(
                 error instanceof Error ? error.message : String(error)
@@ -170,12 +205,21 @@ const syncSlice = createSlice({
         setPlanModalOpen(state, action: PayloadAction<boolean>) {
             state.planModalOpen = action.payload;
         },
+        jobStarted(state, action: PayloadAction<string>) {
+            state.lastJobId = action.payload;
+        },
         clearSyncPlan(state) {
             state.report = null;
             state.plan = null;
             state.diffMap = {};
             state.status = "idle";
             state.error = null;
+            state.executeResult = null;
+            state.lastJobId = null;
+            state.progressFile = null;
+            state.progressAction = null;
+            state.progressDone = 0;
+            state.progressTotal = 0;
         },
         progressUpdated(
             state,
@@ -187,6 +231,7 @@ const syncSlice = createSlice({
             }>
         ) {
             state.progressFile = action.payload.file;
+            state.progressAction = action.payload.action;
             state.progressDone = action.payload.done;
             state.progressTotal = action.payload.total;
         },
@@ -196,28 +241,41 @@ const syncSlice = createSlice({
             .addCase(compareSync.pending, state => {
                 state.status = "comparing";
                 state.error = null;
+                state.executeResult = null;
+                state.planModalOpen = true;
+                state.progressFile = null;
+                state.progressAction = null;
+                state.progressDone = 0;
+                state.progressTotal = 0;
             })
             .addCase(compareSync.fulfilled, (state, action) => {
                 state.status = "done";
                 state.report = action.payload;
                 state.plan = action.payload.plan;
                 state.diffMap = buildDiffMap(action.payload);
-                state.planModalOpen = true;
+                state.planModalOpen = false;
             })
             .addCase(compareSync.rejected, (state, action) => {
                 state.status = "error";
                 state.error = String(action.payload ?? action.error.message);
+                state.planModalOpen = false;
             })
             .addCase(runSync.pending, state => {
                 state.status = "syncing";
                 state.error = null;
                 state.planModalOpen = false;
+                state.progressFile = null;
+                state.progressAction = null;
+                state.progressDone = 0;
+                state.progressTotal = 0;
             })
-            .addCase(runSync.fulfilled, state => {
+            .addCase(runSync.fulfilled, (state, action) => {
                 state.status = "done";
+                state.executeResult = normalizeExecuteResult(action.payload);
                 state.report = null;
                 state.plan = null;
                 state.diffMap = {};
+                state.lastJobId = null;
             })
             .addCase(runSync.rejected, (state, action) => {
                 state.status = "error";
@@ -235,6 +293,7 @@ export const {
     setDeleteMethod,
     setResume,
     setPlanModalOpen,
+    jobStarted,
     clearSyncPlan,
     progressUpdated,
 } = syncSlice.actions;

@@ -84,6 +84,34 @@
             "skip": "skip",
             "changed": "changed"
         },
+        "diff": {
+            "backToBrowse": "Back to browse",
+            "execute": "Execute sync",
+            "filterLabel": "Filter by action",
+            "filter": {
+                "all": "All",
+                "conflict": "Conflicts",
+                "copy": "Copy",
+                "delete": "Delete",
+                "skip": "Skip"
+            },
+            "searchPlaceholder": "Search paths…",
+            "colPath": "Path",
+            "colReason": "Reason",
+            "colDetails": "Details",
+            "from": "From",
+            "to": "To",
+            "toggleDetails": "Show path details",
+            "emptyFilter": "No items match this filter.",
+            "showing": "Showing {{shown}} of {{total}} items",
+            "action": {
+                "copy": "Copy",
+                "delete": "Delete",
+                "conflict": "Conflict",
+                "skip": "Skip",
+                "index": "Index"
+            }
+        },
         "legend": {
             "title": "Legend",
             "copy": "Will copy",
@@ -113,11 +141,31 @@
         },
         "plan": {
             "title": "Sync preview",
+            "comparingTitle": "Compare folders",
+            "comparing": "Scanning for differences…",
+            "indexing": "Indexing folders — reading file lists…",
+            "indexingCount": "Indexed {{done}} files",
+            "stepIndex": "Index",
+            "stepAnalyze": "Compare",
+            "filesScanned": "files scanned",
+            "ofItems": "{{done}} of {{total}} items",
+            "analyzing": "Analyzing {{done}} / {{total}} items",
+            "comparingHint": "Diff view opens automatically when compare finishes. Large folders may take a few minutes.",
+            "diffTitle": "Compare results",
+            "viewDiff": "View diff",
             "summary": "{{copy}} to copy, {{delete}} to delete, {{conflicts}} conflicts",
             "inSync": "Folders are already in sync",
             "cancel": "Cancel",
             "confirm": "Start sync",
             "syncing": "Syncing…"
+        },
+        "result": {
+            "executeSummary": "{{copied}} copied, {{skipped}} skipped, {{deleted}} deleted",
+            "errorCount": "{{count}} errors",
+            "compareSummary": "{{copy}} to copy, {{skip}} skipped, {{delete}} to delete, {{conflicts}} conflicts",
+            "dismiss": "Dismiss",
+            "showMore": "Show {{count}} more errors",
+            "showLess": "Show less"
         },
         "status": {
             "ready": "Ready — set different sync roots on both panes, then Compare",

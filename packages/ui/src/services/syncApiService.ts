@@ -2,20 +2,19 @@ import type {
     CompareReport,
     SyncExecuteResult,
     SyncExportFormat,
+    SyncOptions,
     SyncPlan,
     SyncProgressPayload,
     SyncStrategyId,
 } from "@commandojs/shared/types/SyncTypes";
+import { normalizeCompareResult } from "../common/compareReport";
+import { waitForSyncJob } from "./syncJobHub";
 
 export interface SyncRequestPayload {
     leftRoot: string;
     rightRoot: string;
     strategyId: SyncStrategyId;
-    options: {
-        deleteExtraneous?: boolean;
-        dryRun?: boolean;
-        useChecksum?: boolean;
-    };
+    options: SyncOptions;
 }
 
 function requireSyncApi(): NonNullable<typeof window.syncApi> {
@@ -23,30 +22,6 @@ function requireSyncApi(): NonNullable<typeof window.syncApi> {
         throw new Error("Sync API is not available in this environment");
     }
     return window.syncApi;
-}
-
-function waitForJob<T>(jobId: string): Promise<T> {
-    const api = requireSyncApi();
-    return new Promise<T>((resolve, reject) => {
-        api.onProgress((payload: SyncProgressPayload) => {
-            if (payload.jobId !== jobId) {
-                return;
-            }
-            const terminal =
-                payload.type === "done" ||
-                payload.status === "done" ||
-                payload.status === "error" ||
-                payload.status === "canceled";
-            if (!terminal) {
-                return;
-            }
-            if (payload.status === "error" || payload.error) {
-                reject(new Error(payload.error ?? "Sync job failed"));
-                return;
-            }
-            resolve(payload.result as T);
-        });
-    });
 }
 
 export async function compareFolders(
@@ -57,16 +32,18 @@ export async function compareFolders(
         ...request,
         options: { ...request.options, dryRun: true },
     });
-    return waitForJob<CompareReport>(jobId);
+    const raw = await waitForSyncJob<unknown>(jobId, () => {});
+    return normalizeCompareResult(raw, request.strategyId);
 }
 
 export async function executePlan(
     plan: SyncPlan,
-    options: SyncRequestPayload["options"]
+    options: SyncOptions,
+    onProgress?: (payload: SyncProgressPayload) => void
 ): Promise<SyncExecuteResult> {
     const api = requireSyncApi();
     const { jobId } = await api.execute(plan, options);
-    return waitForJob<SyncExecuteResult>(jobId);
+    return waitForSyncJob<SyncExecuteResult>(jobId, p => onProgress?.(p));
 }
 
 export async function exportCompareReport(

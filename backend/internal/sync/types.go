@@ -25,6 +25,8 @@ const (
 	ActionDelete   Action = "delete"
 	ActionSkip     Action = "skip"
 	ActionConflict Action = "conflict"
+	// ActionIndex is progress-only: filesystem walk during plan build.
+	ActionIndex Action = "index"
 )
 
 // PlanItem is one row in a sync plan shown to the user before execution.

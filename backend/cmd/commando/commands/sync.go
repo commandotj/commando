@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"strings"
+	gosync "sync"
 
 	"github.com/spf13/cobra"
 	"github.com/systembug/commando/internal/sync"
@@ -52,8 +53,7 @@ func init() {
 					if itemErr != nil {
 						evt["error"] = itemErr.Error()
 					}
-					b, _ := json.Marshal(evt)
-					fmt.Println(string(b))
+					writeProgressLine(evt)
 				}
 			}
 
@@ -62,12 +62,15 @@ func init() {
 				Filter: rules,
 			}, progressFn)
 			if err != nil {
+				if showProgress {
+					emitSyncDone("error", nil, err)
+					return nil
+				}
 				return err
 			}
 
 			if showProgress {
-				b, _ := json.Marshal(map[string]any{"type": "done", "status": "done", "result": plan})
-				fmt.Println(string(b))
+				emitSyncDone("done", plan, nil)
 				return nil
 			}
 
@@ -134,6 +137,10 @@ func init() {
 
 			plan, err := sync.BuildPlan(ctx, left, right, dir, opts, nil)
 			if err != nil {
+				if showProgress {
+					emitSyncDone("error", nil, err)
+					return nil
+				}
 				return err
 			}
 
@@ -147,18 +154,26 @@ func init() {
 					if itemErr != nil {
 						evt["error"] = itemErr.Error()
 					}
-					b, _ := json.Marshal(evt)
-					fmt.Println(string(b))
+					writeProgressLine(evt)
 				}
 			}
 
 			result, err := sync.Execute(ctx, plan, opts, progressFn)
 			if err != nil {
+				if showProgress {
+					emitSyncDone("error", nil, err)
+					return nil
+				}
 				fmt.Fprintln(os.Stderr, "error:", err)
 				return nil
 			}
 			if len(result.Errors) == 0 {
 				clearResume(opts.DBPath, jobIDForSync(left, right, dir))
+			}
+
+			if showProgress {
+				emitSyncDone("done", result, nil)
+				return nil
 			}
 
 			enc := json.NewEncoder(os.Stdout)
@@ -213,6 +228,29 @@ func splitTrim(s string) []string {
 		}
 	}
 	return result
+}
+
+func emitSyncDone(status string, result any, err error) {
+	evt := map[string]any{"type": "done", "status": status}
+	if result != nil {
+		evt["result"] = result
+	}
+	if err != nil {
+		evt["error"] = err.Error()
+	}
+	writeProgressLine(evt)
+}
+
+var progressStdoutMu gosync.Mutex
+
+func writeProgressLine(evt map[string]any) {
+	b, err := json.Marshal(evt)
+	if err != nil {
+		return
+	}
+	progressStdoutMu.Lock()
+	defer progressStdoutMu.Unlock()
+	_, _ = os.Stdout.Write(append(b, '\n'))
 }
 
 func parseDirection(value string) (sync.Direction, error) {

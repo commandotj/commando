@@ -48,6 +48,7 @@ const defaultSyncState = {
     progressFile: "",
     progressDone: 0,
     progressTotal: 0,
+    executeResult: null,
 };
 
 const mockStore = configureStore<RootState>([]);

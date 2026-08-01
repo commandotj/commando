@@ -1,13 +1,13 @@
 import React from "react";
 import { CounterClockwiseClockIcon, PlayIcon } from "@radix-ui/react-icons";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { fetchDirectory } from "../../app/fileManagerSlice";
 import {
     compareSync,
     runSync,
     setPlanModalOpen,
     setStrategyId,
 } from "../../app/syncSlice";
+import { cancelSyncJob } from "../../services/syncApiService";
 import { SYNC_STRATEGY_OPTIONS } from "../../constants/sync";
 import { useI18n } from "../../hooks/useI18n";
 import { ThemeSwitchButton } from "../ThemeSwitcher";
@@ -23,30 +23,43 @@ import SyncSummaryStrip from "./SyncSummaryStrip";
 const SyncToolbar: React.FC = () => {
     const dispatch = useAppDispatch();
     const { t } = useI18n();
-    const { strategyId, plan, status, error, planModalOpen } = useAppSelector(
-        state => state.sync
-    );
-    const { leftRoot, rightRoot, state: rootsState } = useSyncRootsState();
+    const {
+        strategyId,
+        plan,
+        status,
+        error,
+        planModalOpen,
+        progressFile,
+        progressAction,
+        progressDone,
+        progressTotal,
+        lastJobId,
+    } = useAppSelector(state => state.sync);
+    const { state: rootsState, rootsReady } = useSyncRootsState();
     const busy = status === "comparing" || status === "syncing";
 
-    const handleCompare = (): void => {
-        if (!leftRoot || !rightRoot) return;
-        if (leftRoot === rightRoot) return;
+    const handleModalClose = (): void => {
+        if (status === "comparing" && lastJobId) {
+            void cancelSyncJob(lastJobId);
+        }
+        dispatch(setPlanModalOpen(false));
+    };
+
+    const startCompareWithModal = (): void => {
+        dispatch(setPlanModalOpen(true));
         void dispatch(compareSync());
     };
 
+    const handleCompare = (): void => {
+        startCompareWithModal();
+    };
+
     const handleSync = (): void => {
-        if (!plan) return;
-        dispatch(setPlanModalOpen(true));
+        startCompareWithModal();
     };
 
     const handleConfirmSync = (): void => {
-        void dispatch(runSync()).then(result => {
-            if (runSync.fulfilled.match(result)) {
-                dispatch(fetchDirectory({ paneIndex: 0, path: leftRoot }));
-                dispatch(fetchDirectory({ paneIndex: 1, path: rightRoot }));
-            }
-        });
+        void dispatch(runSync());
     };
 
     return (
@@ -94,7 +107,7 @@ const SyncToolbar: React.FC = () => {
                     <button
                         type="button"
                         className="sync-btn sync-btn--primary"
-                        disabled={busy || !plan}
+                        disabled={busy || (!plan && !rootsReady)}
                         onClick={handleSync}
                     >
                         <PlayIcon width={14} height={14} />
@@ -108,17 +121,18 @@ const SyncToolbar: React.FC = () => {
                 </div>
             </header>
 
-            <SyncSummaryStrip
-                plan={plan}
-                comparing={status === "comparing"}
-                rootsState={rootsState}
-            />
+            <SyncSummaryStrip plan={plan} rootsState={rootsState} />
 
             <SyncPlanModal
                 open={planModalOpen}
                 plan={plan}
+                comparing={status === "comparing"}
+                progressFile={progressFile}
+                progressAction={progressAction}
+                progressDone={progressDone}
+                progressTotal={progressTotal}
                 loading={status === "syncing"}
-                onClose={() => dispatch(setPlanModalOpen(false))}
+                onClose={handleModalClose}
                 onConfirm={handleConfirmSync}
             />
 

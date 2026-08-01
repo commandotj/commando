@@ -1,13 +1,23 @@
 import React from "react";
 import type { SyncPlan } from "@commandojs/shared/types/SyncTypes";
 import { useI18n } from "../../hooks/useI18n";
+import CompareProgressModal from "./CompareProgressModal";
+
+export type SyncPlanModalMode = "compare" | "confirm";
 
 interface SyncPlanModalProps {
     open: boolean;
     plan: SyncPlan | null;
+    mode?: SyncPlanModalMode;
+    comparing?: boolean;
+    progressFile?: string | null;
+    progressAction?: string | null;
+    progressDone?: number;
+    progressTotal?: number;
     loading?: boolean;
     onClose: () => void;
     onConfirm: () => void;
+    onViewDiff?: () => void;
 }
 
 const actionClass = (action: string): string => {
@@ -26,12 +36,37 @@ const actionClass = (action: string): string => {
 const SyncPlanModal: React.FC<SyncPlanModalProps> = ({
     open,
     plan,
+    mode = "confirm",
+    comparing = false,
+    progressFile = null,
+    progressAction = null,
+    progressDone = 0,
+    progressTotal = 0,
     loading = false,
     onClose,
     onConfirm,
+    onViewDiff,
 }) => {
     const { t } = useI18n();
-    if (!open || !plan) {
+
+    if (!open) {
+        return null;
+    }
+
+    if (comparing) {
+        return (
+            <CompareProgressModal
+                open={open}
+                progressFile={progressFile}
+                progressAction={progressAction}
+                progressDone={progressDone}
+                progressTotal={progressTotal}
+                onCancel={onClose}
+            />
+        );
+    }
+
+    if (!plan) {
         return null;
     }
 
@@ -50,7 +85,9 @@ const SyncPlanModal: React.FC<SyncPlanModalProps> = ({
             <div className="sync-plan-modal" onClick={e => e.stopPropagation()}>
                 <div className="sync-plan-modal__header">
                     <h2 id="sync-plan-title" className="sync-plan-modal__title">
-                        {t("sync.plan.title")}
+                        {mode === "compare"
+                            ? t("sync.plan.diffTitle")
+                            : t("sync.plan.title")}
                     </h2>
                     <p className="sync-plan-modal__subtitle">
                         {t("sync.plan.summary", {
@@ -94,6 +131,15 @@ const SyncPlanModal: React.FC<SyncPlanModalProps> = ({
                     >
                         {t("sync.plan.cancel")}
                     </button>
+                    {onViewDiff && (
+                        <button
+                            type="button"
+                            className="sync-btn sync-btn--ghost"
+                            onClick={onViewDiff}
+                        >
+                            {t("sync.plan.viewDiff")}
+                        </button>
+                    )}
                     <button
                         type="button"
                         className="sync-btn sync-btn--primary"

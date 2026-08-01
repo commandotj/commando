@@ -4,7 +4,7 @@ BIN_DIR := bin
 WAILS3 := ./scripts/wails3.sh
 
 cli:
-	cd backend && go build -o ../$(BIN_DIR)/commando ./cmd/commando
+	./scripts/build-commando-cli.sh
 
 cli-install:
 	cd backend && go install ./cmd/commando

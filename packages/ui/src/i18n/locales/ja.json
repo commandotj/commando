@@ -82,6 +82,34 @@
             "skip": "スキップ",
             "changed": "変更"
         },
+        "diff": {
+            "backToBrowse": "ブラウズに戻る",
+            "execute": "同期を実行",
+            "filterLabel": "操作でフィルター",
+            "filter": {
+                "all": "すべて",
+                "conflict": "競合",
+                "copy": "コピー",
+                "delete": "削除",
+                "skip": "スキップ"
+            },
+            "searchPlaceholder": "パスを検索…",
+            "colPath": "パス",
+            "colReason": "理由",
+            "colDetails": "詳細",
+            "from": "元",
+            "to": "先",
+            "toggleDetails": "パス詳細を表示",
+            "emptyFilter": "フィルターに一致する項目がありません。",
+            "showing": "{{shown}} / {{total}} 件を表示",
+            "action": {
+                "copy": "コピー",
+                "delete": "削除",
+                "conflict": "競合",
+                "skip": "スキップ",
+                "index": "索引"
+            }
+        },
         "legend": {
             "title": "凡例",
             "copy": "コピーします",
@@ -109,11 +137,31 @@
         "table": { "status": "状態" },
         "plan": {
             "title": "同期プレビュー",
+            "comparingTitle": "フォルダを比較",
+            "comparing": "差分をスキャン中…",
+            "indexing": "フォルダをインデックス中…",
+            "indexingCount": "{{done}} 件のファイルをインデックス済み",
+            "stepIndex": "索引",
+            "stepAnalyze": "比較",
+            "filesScanned": "スキャン済みファイル",
+            "ofItems": "{{done}} / {{total}} 件",
+            "analyzing": "{{done}} / {{total}} 件を分析中",
+            "comparingHint": "比較完了後、差分ビューが自動的に開きます。",
+            "diffTitle": "比較結果",
+            "viewDiff": "差分を表示",
             "summary": "コピー {{copy}} 件、削除 {{delete}} 件、競合 {{conflicts}} 件",
             "inSync": "フォルダはすでに同期されています",
             "cancel": "キャンセル",
             "confirm": "同期を開始",
             "syncing": "同期中…"
+        },
+        "result": {
+            "executeSummary": "コピー {{copied}}、スキップ {{skipped}}、削除 {{deleted}}",
+            "errorCount": "エラー {{count}} 件",
+            "compareSummary": "コピー {{copy}}、スキップ {{skip}}、削除 {{delete}}、競合 {{conflicts}}",
+            "dismiss": "閉じる",
+            "showMore": "あと {{count}} 件のエラー",
+            "showLess": "折りたたむ"
         },
         "status": {
             "ready": "準備完了 — 左右に異なる同期ルートを設定して比較してください",

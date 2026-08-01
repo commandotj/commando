@@ -1,7 +1,7 @@
 /** Sync direction — mirrors backend internal/sync.Direction */
 export type SyncDirection = "left-to-right" | "right-to-left" | "bidirectional";
 
-export type SyncAction = "copy" | "delete" | "skip" | "conflict";
+export type SyncAction = "copy" | "delete" | "skip" | "conflict" | "index";
 
 export type SyncStrategyId =
     "mirror-right" | "update-right" | "mirror-left" | "update-left" | "two-way";

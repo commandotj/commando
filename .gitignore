@@ -31,6 +31,7 @@ release
 out
 bin/
 apps/desktop/bin
+apps/desktop/commando
 backend/covfilter
 apps/desktop/frontend/dist
 apps/desktop/frontend/bindings

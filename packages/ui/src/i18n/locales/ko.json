@@ -82,6 +82,34 @@
             "skip": "건너뛰기",
             "changed": "변경됨"
         },
+        "diff": {
+            "backToBrowse": "탐색으로 돌아가기",
+            "execute": "동기화 실행",
+            "filterLabel": "작업별 필터",
+            "filter": {
+                "all": "전체",
+                "conflict": "충돌",
+                "copy": "복사",
+                "delete": "삭제",
+                "skip": "건너뛰기"
+            },
+            "searchPlaceholder": "경로 검색…",
+            "colPath": "경로",
+            "colReason": "사유",
+            "colDetails": "세부정보",
+            "from": "원본",
+            "to": "대상",
+            "toggleDetails": "경로 세부정보 표시",
+            "emptyFilter": "필터와 일치하는 항목이 없습니다.",
+            "showing": "{{shown}} / {{total}}개 항목 표시",
+            "action": {
+                "copy": "복사",
+                "delete": "삭제",
+                "conflict": "충돌",
+                "skip": "건너뛰기",
+                "index": "인덱스"
+            }
+        },
         "legend": {
             "title": "범례",
             "copy": "복사 예정",
@@ -109,11 +137,31 @@
         "table": { "status": "상태" },
         "plan": {
             "title": "동기화 미리 보기",
+            "comparingTitle": "폴더 비교",
+            "comparing": "차이점 검색 중…",
+            "indexing": "폴더 인덱싱 중…",
+            "indexingCount": "{{done}}개 파일 인덱싱됨",
+            "stepIndex": "인덱스",
+            "stepAnalyze": "비교",
+            "filesScanned": "스캔된 파일",
+            "ofItems": "{{done}} / {{total}}개 항목",
+            "analyzing": "{{done}} / {{total}}개 항목 분석 중",
+            "comparingHint": "비교가 끝나면 차이 보기가 자동으로 열립니다.",
+            "diffTitle": "비교 결과",
+            "viewDiff": "차이 보기",
             "summary": "복사 {{copy}}개, 삭제 {{delete}}개, 충돌 {{conflicts}}개",
             "inSync": "폴더가 이미 동기화되어 있습니다",
             "cancel": "취소",
             "confirm": "동기화 시작",
             "syncing": "동기화 중…"
+        },
+        "result": {
+            "executeSummary": "복사 {{copied}}, 건너뜀 {{skipped}}, 삭제 {{deleted}}",
+            "errorCount": "오류 {{count}}개",
+            "compareSummary": "복사 {{copy}}, 건너뜀 {{skip}}, 삭제 {{delete}}, 충돌 {{conflicts}}",
+            "dismiss": "닫기",
+            "showMore": "오류 {{count}}개 더 보기",
+            "showLess": "접기"
         },
         "status": {
             "ready": "준비됨 — 양쪽 창에 다른 동기화 루트를 설정한 후 비교하세요",

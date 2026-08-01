@@ -36,12 +36,14 @@ const (
 // WalkOptions configures Walk behavior.
 type WalkOptions struct {
 	SymlinkMode SymlinkMode
+	// OnEntry is invoked for each indexed path (after skip rules). Optional.
+	OnEntry func(Entry)
 }
 
 // Walk indexes root according to opts. Unlike WalkRoot, it lets the caller
 // choose how symlinks are handled instead of always following them.
 func Walk(root string, opts WalkOptions) (map[string]Entry, error) {
-	entries, err := WalkRoot(root)
+	entries, err := walkRoot(root, opts.OnEntry)
 	if err != nil {
 		return nil, err
 	}
@@ -145,6 +147,10 @@ func isSymlink(path string) (bool, error) {
 
 // WalkRoot indexes every file and directory under root using slash-separated relative paths.
 func WalkRoot(root string) (map[string]Entry, error) {
+	return walkRoot(root, nil)
+}
+
+func walkRoot(root string, onEntry func(Entry)) (map[string]Entry, error) {
 	root = filepath.Clean(root)
 	info, err := os.Stat(root)
 	if err != nil {
@@ -192,6 +198,9 @@ func WalkRoot(root string) (map[string]Entry, error) {
 			IsDir:        d.IsDir(),
 			Size:         stat.Size(),
 			ModTimeUnix:  stat.ModTime().Unix(),
+		}
+		if onEntry != nil {
+			onEntry(entries[rel])
 		}
 		return nil
 	})

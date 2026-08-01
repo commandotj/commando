@@ -12,11 +12,13 @@ import SyncPane from "./components/sync/SyncPane";
 import SyncStatusBar from "./components/sync/SyncStatusBar";
 import SyncDiffView from "./components/sync/SyncDiffView";
 import { useAppSelector } from "./app/hooks";
+import { useSyncProgressRelay } from "./hooks/useSyncProgressRelay";
 import "./i18n";
 
 const App: React.FC = () => {
     const dispatch = useAppDispatch();
     const viewMode = useAppSelector(s => s.fileManager.viewMode);
+    useSyncProgressRelay();
 
     useEffect(() => {
         const homeDir = window.fsApi.getHomeDir();

@@ -84,6 +84,34 @@
             "skip": "跳过",
             "changed": "有差异"
         },
+        "diff": {
+            "backToBrowse": "返回浏览",
+            "execute": "执行同步",
+            "filterLabel": "按操作筛选",
+            "filter": {
+                "all": "全部",
+                "conflict": "冲突",
+                "copy": "复制",
+                "delete": "删除",
+                "skip": "跳过"
+            },
+            "searchPlaceholder": "搜索路径…",
+            "colPath": "路径",
+            "colReason": "原因",
+            "colDetails": "详情",
+            "from": "来源",
+            "to": "目标",
+            "toggleDetails": "显示路径详情",
+            "emptyFilter": "没有符合筛选条件的项。",
+            "showing": "显示 {{shown}} / {{total}} 项",
+            "action": {
+                "copy": "复制",
+                "delete": "删除",
+                "conflict": "冲突",
+                "skip": "跳过",
+                "index": "索引"
+            }
+        },
         "legend": {
             "title": "图例",
             "copy": "将复制",
@@ -113,11 +141,31 @@
         },
         "plan": {
             "title": "同步预览",
+            "comparingTitle": "比较文件夹",
+            "comparing": "正在扫描差异…",
+            "indexing": "正在索引文件夹…",
+            "indexingCount": "已索引 {{done}} 个文件",
+            "stepIndex": "索引",
+            "stepAnalyze": "比较",
+            "filesScanned": "已扫描文件",
+            "ofItems": "{{done}} / {{total}} 项",
+            "analyzing": "正在分析 {{done}} / {{total}} 项",
+            "comparingHint": "比较完成后将自动打开差异视图。大文件夹可能需要几分钟。",
+            "diffTitle": "比较结果",
+            "viewDiff": "查看差异",
             "summary": "{{copy}} 项复制，{{delete}} 项删除，{{conflicts}} 项冲突",
             "inSync": "两侧已同步，无需操作",
             "cancel": "取消",
             "confirm": "开始同步",
             "syncing": "同步中…"
+        },
+        "result": {
+            "executeSummary": "已复制 {{copied}}，跳过 {{skipped}}，删除 {{deleted}}",
+            "errorCount": "{{count}} 个错误",
+            "compareSummary": "复制 {{copy}}，跳过 {{skip}}，删除 {{delete}}，冲突 {{conflicts}}",
+            "dismiss": "关闭",
+            "showMore": "还有 {{count}} 条错误",
+            "showLess": "收起"
         },
         "status": {
             "ready": "就绪 — 设置两侧不同的同步根目录后点击比较",

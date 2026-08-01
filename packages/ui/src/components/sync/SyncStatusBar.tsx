@@ -6,13 +6,16 @@ import { getSyncRootsStatusKey } from "../../common/syncRoots";
 
 const SyncStatusBar: React.FC = () => {
     const { t } = useI18n();
-    const { status, plan, error } = useAppSelector(state => state.sync);
+    const { status, plan, error, planModalOpen } = useAppSelector(
+        state => state.sync
+    );
     const { leftRoot, rightRoot, state: rootsState } = useSyncRootsState();
 
-    const busy = status === "comparing" || status === "syncing";
+    const busy =
+        status === "syncing" || (status === "comparing" && !planModalOpen);
 
     let message = t(getSyncRootsStatusKey(rootsState));
-    if (status === "comparing") {
+    if (status === "comparing" && !planModalOpen) {
         message = t("sync.status.comparing");
     } else if (status === "syncing") {
         message = t("sync.status.syncing");

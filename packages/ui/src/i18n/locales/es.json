@@ -82,6 +82,34 @@
             "skip": "omitir",
             "changed": "modificados"
         },
+        "diff": {
+            "backToBrowse": "Volver al explorador",
+            "execute": "Ejecutar sincronización",
+            "filterLabel": "Filtrar por acción",
+            "filter": {
+                "all": "Todos",
+                "conflict": "Conflictos",
+                "copy": "Copiar",
+                "delete": "Eliminar",
+                "skip": "Omitir"
+            },
+            "searchPlaceholder": "Buscar rutas…",
+            "colPath": "Ruta",
+            "colReason": "Motivo",
+            "colDetails": "Detalles",
+            "from": "Origen",
+            "to": "Destino",
+            "toggleDetails": "Mostrar detalles",
+            "emptyFilter": "Ningún elemento coincide con el filtro.",
+            "showing": "{{shown}} de {{total}} elementos",
+            "action": {
+                "copy": "Copiar",
+                "delete": "Eliminar",
+                "conflict": "Conflicto",
+                "skip": "Omitir",
+                "index": "Índice"
+            }
+        },
         "legend": {
             "title": "Leyenda",
             "copy": "Se copiará",
@@ -109,11 +137,31 @@
         "table": { "status": "Estado" },
         "plan": {
             "title": "Vista previa de sincronización",
+            "comparingTitle": "Comparar carpetas",
+            "comparing": "Buscando diferencias…",
+            "indexing": "Indexando carpetas…",
+            "indexingCount": "{{done}} archivos indexados",
+            "stepIndex": "Índice",
+            "stepAnalyze": "Comparar",
+            "filesScanned": "archivos escaneados",
+            "ofItems": "{{done}} de {{total}} elementos",
+            "analyzing": "Analizando {{done}} / {{total}} elementos",
+            "comparingHint": "La vista de diferencias se abrirá automáticamente al terminar.",
+            "diffTitle": "Resultados de comparación",
+            "viewDiff": "Ver diferencias",
             "summary": "{{copy}} para copiar, {{delete}} para eliminar, {{conflicts}} conflictos",
             "inSync": "Las carpetas ya están sincronizadas",
             "cancel": "Cancelar",
             "confirm": "Iniciar sincronización",
             "syncing": "Sincronizando…"
+        },
+        "result": {
+            "executeSummary": "{{copied}} copiados, {{skipped}} omitidos, {{deleted}} eliminados",
+            "errorCount": "{{count}} errores",
+            "compareSummary": "{{copy}} a copiar, {{skip}} omitidos, {{delete}} a eliminar, {{conflicts}} conflictos",
+            "dismiss": "Cerrar",
+            "showMore": "{{count}} errores más",
+            "showLess": "Mostrar menos"
         },
         "status": {
             "ready": "Listo — establezca raíces diferentes en ambos paneles y pulse Comparar",

@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"sync/atomic"
 
 	"golang.org/x/sync/errgroup"
 
@@ -35,7 +36,14 @@ func indexRootParallel(ctx context.Context, root string, matcher filter.Matcher,
 	var mu sync.Mutex
 	idx := make(Index)
 	visited := &pathSet{seen: make(map[string]bool)}
-	fsOpts := fsutil.WalkOptions{SymlinkMode: toFsutilSymlinkMode(opts.SymlinkMode)}
+	var scanned atomic.Int64
+	reportEntry := func(rel string) {
+		if opts.IndexProgress == nil {
+			return
+		}
+		n := int(scanned.Add(1))
+		opts.IndexProgress(n, rel)
+	}
 
 	processDir := func(absPath, relPrefix string) error {
 		select {
@@ -59,9 +67,17 @@ func indexRootParallel(ctx context.Context, root string, matcher filter.Matcher,
 				Size:         di.Size(),
 				ModTimeUnix:  di.ModTime().Unix(),
 			}
+			reportEntry(relPrefix)
 		}
 		mu.Unlock()
 
+		prefix := relPrefix
+		fsOpts := fsutil.WalkOptions{
+			SymlinkMode: toFsutilSymlinkMode(opts.SymlinkMode),
+			OnEntry: func(e fsutil.Entry) {
+				reportEntry(prefix + "/" + e.RelativePath)
+			},
+		}
 		// coverage:ignore Walk after Stat — TOCTOU race, untestable
 		// coverage:ignore Walk after Stat — TOCTOU race
 		entries, err := fsutil.Walk(absPath, fsOpts)
@@ -135,7 +151,12 @@ func indexRootParallel(ctx context.Context, root string, matcher filter.Matcher,
 						default:
 						}
 						// coverage:ignore WalkRoot after EvalSymlinks — TOCTOU, untestable
-						entries, err := fsutil.WalkRoot(realPath)
+						entries, err := fsutil.Walk(realPath, fsutil.WalkOptions{
+							SymlinkMode: toFsutilSymlinkMode(opts.SymlinkMode),
+							OnEntry: func(e fsutil.Entry) {
+								reportEntry(rel + "/" + e.RelativePath)
+							},
+						})
 						if err != nil {
 							// coverage:ignore WalkRoot after EvalSymlinks — TOCTOU, untestable
 							return err
@@ -158,6 +179,7 @@ func indexRootParallel(ctx context.Context, root string, matcher filter.Matcher,
 		mu.Lock()
 		idx[rel] = entry
 		mu.Unlock()
+		reportEntry(rel)
 	}
 
 	return idx, g.Wait()

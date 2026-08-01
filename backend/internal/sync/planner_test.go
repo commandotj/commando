@@ -43,6 +43,9 @@ func TestBuildPlan_ProgressFn_CalledForEachItem(t *testing.T) {
 
 	var calls []string
 	progress := func(relPath string, action sync.Action, done, total int, err error) {
+		if action == sync.ActionIndex || total == 0 {
+			return
+		}
 		calls = append(calls, relPath)
 	}
 
@@ -53,6 +56,27 @@ func TestBuildPlan_ProgressFn_CalledForEachItem(t *testing.T) {
 
 	if len(calls) != len(plan.Items) {
 		t.Fatalf("expected progress called once per plan item (%d), got %d calls", len(plan.Items), len(calls))
+	}
+}
+
+func TestBuildPlan_ProgressFn_EmitsIndexProgress(t *testing.T) {
+	left := t.TempDir()
+	right := t.TempDir()
+	_ = os.WriteFile(filepath.Join(left, "a.txt"), []byte("x"), 0o644)
+
+	var indexCalls int
+	progress := func(_ string, action sync.Action, done, total int, _ error) {
+		if action == sync.ActionIndex && done > 0 && total == 0 {
+			indexCalls++
+		}
+	}
+
+	_, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{}, progress)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if indexCalls == 0 {
+		t.Fatal("expected index progress during filesystem walk")
 	}
 }
 

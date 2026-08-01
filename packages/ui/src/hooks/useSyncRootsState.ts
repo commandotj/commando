@@ -4,6 +4,7 @@ import {
     isSyncRootsReady,
     type SyncRootsState,
 } from "../common/syncRoots";
+import { effectiveSyncRoot } from "../common/effectiveSyncRoot";
 
 export function useSyncRootsState(): {
     leftRoot: string;
@@ -12,8 +13,11 @@ export function useSyncRootsState(): {
     rootsReady: boolean;
 } {
     const panes = useAppSelector(state => state.fileManager.panes);
-    const leftRoot = panes[0].syncRoot;
-    const rightRoot = panes[1].syncRoot;
+    const leftRoot = effectiveSyncRoot(panes[0].syncRoot, panes[0].currentPath);
+    const rightRoot = effectiveSyncRoot(
+        panes[1].syncRoot,
+        panes[1].currentPath
+    );
     const syncRootsState = getSyncRootsState(leftRoot, rightRoot);
 
     return {

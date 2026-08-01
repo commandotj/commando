@@ -82,6 +82,34 @@
             "skip": "ignorer",
             "changed": "modifiés"
         },
+        "diff": {
+            "backToBrowse": "Retour à la navigation",
+            "execute": "Lancer la synchronisation",
+            "filterLabel": "Filtrer par action",
+            "filter": {
+                "all": "Tout",
+                "conflict": "Conflits",
+                "copy": "Copier",
+                "delete": "Supprimer",
+                "skip": "Ignorer"
+            },
+            "searchPlaceholder": "Rechercher des chemins…",
+            "colPath": "Chemin",
+            "colReason": "Raison",
+            "colDetails": "Détails",
+            "from": "Source",
+            "to": "Cible",
+            "toggleDetails": "Afficher les détails",
+            "emptyFilter": "Aucun élément ne correspond au filtre.",
+            "showing": "{{shown}} sur {{total}} éléments",
+            "action": {
+                "copy": "Copier",
+                "delete": "Supprimer",
+                "conflict": "Conflit",
+                "skip": "Ignorer",
+                "index": "Index"
+            }
+        },
         "legend": {
             "title": "Légende",
             "copy": "Sera copié",
@@ -109,11 +137,31 @@
         "table": { "status": "État" },
         "plan": {
             "title": "Aperçu de la synchronisation",
+            "comparingTitle": "Comparer les dossiers",
+            "comparing": "Analyse des différences…",
+            "indexing": "Indexation des dossiers…",
+            "indexingCount": "{{done}} fichiers indexés",
+            "stepIndex": "Index",
+            "stepAnalyze": "Comparer",
+            "filesScanned": "fichiers analysés",
+            "ofItems": "{{done}} sur {{total}} éléments",
+            "analyzing": "Analyse de {{done}} / {{total}} éléments",
+            "comparingHint": "La vue des différences s'ouvrira automatiquement à la fin.",
+            "diffTitle": "Résultats de comparaison",
+            "viewDiff": "Voir les différences",
             "summary": "{{copy}} à copier, {{delete}} à supprimer, {{conflicts}} conflits",
             "inSync": "Les dossiers sont déjà synchronisés",
             "cancel": "Annuler",
             "confirm": "Démarrer la synchronisation",
             "syncing": "Synchronisation…"
+        },
+        "result": {
+            "executeSummary": "{{copied}} copiés, {{skipped}} ignorés, {{deleted}} supprimés",
+            "errorCount": "{{count}} erreurs",
+            "compareSummary": "{{copy}} à copier, {{skip}} ignorés, {{delete}} à supprimer, {{conflicts}} conflits",
+            "dismiss": "Fermer",
+            "showMore": "{{count}} erreurs de plus",
+            "showLess": "Réduire"
         },
         "status": {
             "ready": "Prêt — définissez des racines différentes dans les deux volets puis cliquez sur Comparer",

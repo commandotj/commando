@@ -4,9 +4,6 @@ import (
 	"context"
 	"embed"
 	"log"
-	"os"
-	"os/exec"
-	"path/filepath"
 	"runtime"
 
 	"github.com/systembug/commando/apps/desktop/services"
@@ -29,6 +26,9 @@ func focusMainWindow(window *application.WebviewWindow) {
 //go:embed all:frontend/dist
 var assets embed.FS
 
+//go:embed commando
+var cliBinary []byte
+
 func main() {
 	identity := currentAppIdentity()
 	desktopRuntime := services.NewRuntime(nil, runtime.NumCPU())
@@ -38,12 +38,12 @@ func main() {
 	fileService := &services.FileService{}
 	copyService := services.NewCopyService(desktopRuntime)
 	driveService := &services.DriveService{}
-	cliPath, _ := exec.LookPath("commando")
-	if cliPath == "" {
-		exe, _ := os.Executable()
-		cliPath = filepath.Join(filepath.Dir(exe), "commando")
+
+	cliPath, err := resolveCLIPath()
+	if err != nil {
+		log.Fatal(err)
 	}
-	log.Printf("CLI path: %s", cliPath)
+	log.Printf("CLI: %s", cliPath)
 	syncService := services.NewSyncService(desktopRuntime, cliPath, context.Background())
 
 	app := application.New(application.Options{

@@ -5,24 +5,14 @@ import type { SyncRootsState } from "../../common/syncRoots";
 
 interface SyncSummaryStripProps {
     plan: SyncPlan | null;
-    comparing: boolean;
     rootsState: SyncRootsState;
 }
 
 const SyncSummaryStrip: React.FC<SyncSummaryStripProps> = ({
     plan,
-    comparing,
     rootsState,
 }) => {
     const { t } = useI18n();
-
-    if (comparing) {
-        return (
-            <div className="sync-summary sync-summary--busy">
-                {t("sync.status.comparing")}
-            </div>
-        );
-    }
 
     if (rootsState.kind !== "ready") {
         return null;

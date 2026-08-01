@@ -82,6 +82,34 @@
             "skip": "überspringen",
             "changed": "geändert"
         },
+        "diff": {
+            "backToBrowse": "Zurück zur Ansicht",
+            "execute": "Sync ausführen",
+            "filterLabel": "Nach Aktion filtern",
+            "filter": {
+                "all": "Alle",
+                "conflict": "Konflikte",
+                "copy": "Kopieren",
+                "delete": "Löschen",
+                "skip": "Überspringen"
+            },
+            "searchPlaceholder": "Pfade suchen…",
+            "colPath": "Pfad",
+            "colReason": "Grund",
+            "colDetails": "Details",
+            "from": "Von",
+            "to": "Nach",
+            "toggleDetails": "Pfaddetails anzeigen",
+            "emptyFilter": "Keine Einträge für diesen Filter.",
+            "showing": "{{shown}} von {{total}} Einträgen",
+            "action": {
+                "copy": "Kopieren",
+                "delete": "Löschen",
+                "conflict": "Konflikt",
+                "skip": "Überspringen",
+                "index": "Index"
+            }
+        },
         "legend": {
             "title": "Legende",
             "copy": "Wird kopiert",
@@ -109,11 +137,31 @@
         "table": { "status": "Status" },
         "plan": {
             "title": "Synchronisierungsvorschau",
+            "comparingTitle": "Ordner vergleichen",
+            "comparing": "Unterschiede werden gescannt…",
+            "indexing": "Ordner werden indexiert…",
+            "indexingCount": "{{done}} Dateien indexiert",
+            "stepIndex": "Index",
+            "stepAnalyze": "Vergleichen",
+            "filesScanned": "Dateien gescannt",
+            "ofItems": "{{done}} von {{total}} Elementen",
+            "analyzing": "Analysiere {{done}} / {{total}} Elemente",
+            "comparingHint": "Die Diff-Ansicht öffnet sich automatisch nach dem Vergleich.",
+            "diffTitle": "Vergleichsergebnis",
+            "viewDiff": "Diff anzeigen",
             "summary": "{{copy}} zu kopieren, {{delete}} zu löschen, {{conflicts}} Konflikte",
             "inSync": "Die Ordner sind bereits synchronisiert",
             "cancel": "Abbrechen",
             "confirm": "Synchronisierung starten",
             "syncing": "Synchronisierung…"
+        },
+        "result": {
+            "executeSummary": "{{copied}} kopiert, {{skipped}} übersprungen, {{deleted}} gelöscht",
+            "errorCount": "{{count}} Fehler",
+            "compareSummary": "{{copy}} zu kopieren, {{skip}} übersprungen, {{delete}} zu löschen, {{conflicts}} Konflikte",
+            "dismiss": "Schließen",
+            "showMore": "{{count}} weitere Fehler",
+            "showLess": "Weniger anzeigen"
         },
         "status": {
             "ready": "Bereit — legen Sie auf beiden Seiten unterschiedliche Synchronisierungsstämme fest und vergleichen Sie",

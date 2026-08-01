@@ -11,6 +11,8 @@ import (
 type IndexOptions struct {
 	SymlinkMode SymlinkMode
 	Parallelism int // >1 enables parallel sub-directory walk via errgroup
+	// IndexProgress is called for each filesystem entry discovered (may be nil).
+	IndexProgress func(scanned int, relPath string)
 }
 
 func toFsutilSymlinkMode(mode SymlinkMode) fsutil.SymlinkMode {
@@ -35,7 +37,16 @@ func IndexRoot(ctx context.Context, root string, matcher filter.Matcher, opts In
 		return indexRootParallel(ctx, root, matcher, opts)
 	}
 
-	entries, err := fsutil.Walk(root, fsutil.WalkOptions{SymlinkMode: toFsutilSymlinkMode(opts.SymlinkMode)})
+	scanned := 0
+	entries, err := fsutil.Walk(root, fsutil.WalkOptions{
+		SymlinkMode: toFsutilSymlinkMode(opts.SymlinkMode),
+		OnEntry: func(e fsutil.Entry) {
+			scanned++
+			if opts.IndexProgress != nil {
+				opts.IndexProgress(scanned, e.RelativePath)
+			}
+		},
+	})
 	if err != nil {
 		return nil, err
 	}

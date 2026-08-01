@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"sort"
+	"sync/atomic"
 	"time"
 
 	"github.com/google/uuid"
@@ -26,14 +27,44 @@ func BuildPlan(ctx context.Context, leftRoot, rightRoot string, direction Direct
 	}
 	m := filter.NewMatcher(rules)
 
-	engOpts := engine.IndexOptions{SymlinkMode: engine.SymlinkExclude}
+	var indexScanned atomic.Int64
+	var lastIndexEmit atomic.Int64 // unix nano
+	reportIndex := func(side, rel string) {
+		if progress == nil {
+			return
+		}
+		n := indexScanned.Add(1)
+		now := time.Now().UnixNano()
+		if n > 1 && now-lastIndexEmit.Load() < int64(50*time.Millisecond) {
+			return
+		}
+		lastIndexEmit.Store(now)
+		progress(side+"/"+rel, ActionIndex, int(n), 0, nil)
+	}
+
+	engOpts := engine.IndexOptions{
+		SymlinkMode: engine.SymlinkExclude,
+		IndexProgress: func(scanned int, rel string) {
+			_ = scanned
+			reportIndex("left", rel)
+		},
+	}
 	leftEntries, err := engine.IndexRoot(ctx, leftRoot, m, engOpts)
 	if err != nil {
 		return nil, err
 	}
+	engOpts.IndexProgress = func(scanned int, rel string) {
+		_ = scanned
+		reportIndex("right", rel)
+	}
 	rightEntries, err := engine.IndexRoot(ctx, rightRoot, m, engOpts)
 	if err != nil {
 		return nil, err
+	}
+	if progress != nil {
+		if final := int(indexScanned.Load()); final > 0 {
+			progress("", ActionIndex, final, 0, nil)
+		}
 	}
 
 	var plan *Plan
