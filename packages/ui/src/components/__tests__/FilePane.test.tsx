@@ -46,6 +46,7 @@ const defaultSyncState = {
     lastJobId: null,
     planModalOpen: false,
     progressFile: "",
+    progressAction: "",
     progressDone: 0,
     progressTotal: 0,
     executeResult: null,

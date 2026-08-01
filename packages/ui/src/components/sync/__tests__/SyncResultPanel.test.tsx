@@ -24,18 +24,45 @@ describe("SyncResultPanel", () => {
             preloadedState: {
                 sync: {
                     strategyId: "update-right",
-                    options: { deleteExtraneous: false, dryRun: true, useChecksum: false },
+                    options: {
+                        deleteExtraneous: false,
+                        dryRun: true,
+                        useChecksum: false,
+                    },
                     report: {
-                        strategy: { id: "update-right", direction: "left-to-right", deleteExtraneous: false, label: "", description: "" },
+                        strategy: {
+                            id: "update-right",
+                            direction: "left-to-right",
+                            deleteExtraneous: false,
+                            label: "",
+                            description: "",
+                        },
                         leftRoot: "/l",
                         rightRoot: "/r",
                         generatedAt: "",
-                        items: [{ relativePath: "a.txt", action: "copy", from: "", to: "", reason: "" }],
+                        items: [
+                            {
+                                relativePath: "a.txt",
+                                action: "copy",
+                                from: "",
+                                to: "",
+                                reason: "",
+                            },
+                        ],
                         conflicts: 0,
                         toCopy: 1,
                         toDelete: 0,
                         toSkip: 0,
-                        plan: { leftRoot: "/l", rightRoot: "/r", direction: "left-to-right", items: [], conflicts: 0, toCopy: 1, toDelete: 0, toSkip: 0 },
+                        plan: {
+                            leftRoot: "/l",
+                            rightRoot: "/r",
+                            direction: "left-to-right",
+                            items: [],
+                            conflicts: 0,
+                            toCopy: 1,
+                            toDelete: 0,
+                            toSkip: 0,
+                        },
                     },
                     plan: null,
                     diffMap: {},
@@ -51,7 +78,21 @@ describe("SyncResultPanel", () => {
                 },
                 fileManager: {
                     viewMode: "diff",
-                    panes: [],
+                    panes: [
+                        {
+                            currentPath: "",
+                            syncRoot: "",
+                            entries: [],
+                            selectedKeys: [],
+                        },
+                        {
+                            currentPath: "",
+                            syncRoot: "",
+                            entries: [],
+                            selectedKeys: [],
+                        },
+                    ] as any,
+                    activePane: 0,
                 },
             },
         });
@@ -70,9 +111,19 @@ describe("SyncResultPanel", () => {
             preloadedState: {
                 sync: {
                     strategyId: "update-right",
-                    options: { deleteExtraneous: false, dryRun: true, useChecksum: false },
+                    options: {
+                        deleteExtraneous: false,
+                        dryRun: true,
+                        useChecksum: false,
+                    },
                     report: {
-                        strategy: { id: "update-right", direction: "left-to-right", deleteExtraneous: false, label: "", description: "" },
+                        strategy: {
+                            id: "update-right",
+                            direction: "left-to-right",
+                            deleteExtraneous: false,
+                            label: "",
+                            description: "",
+                        },
                         leftRoot: "/l",
                         rightRoot: "/r",
                         generatedAt: "",
@@ -81,7 +132,16 @@ describe("SyncResultPanel", () => {
                         toCopy: 5,
                         toDelete: 0,
                         toSkip: 2,
-                        plan: { leftRoot: "/l", rightRoot: "/r", direction: "left-to-right", items: [], conflicts: 0, toCopy: 5, toDelete: 0, toSkip: 2 },
+                        plan: {
+                            leftRoot: "/l",
+                            rightRoot: "/r",
+                            direction: "left-to-right",
+                            items: [],
+                            conflicts: 0,
+                            toCopy: 5,
+                            toDelete: 0,
+                            toSkip: 2,
+                        },
                     },
                     plan: null,
                     diffMap: {},
@@ -97,7 +157,21 @@ describe("SyncResultPanel", () => {
                 },
                 fileManager: {
                     viewMode: "browse",
-                    panes: [],
+                    panes: [
+                        {
+                            currentPath: "",
+                            syncRoot: "",
+                            entries: [],
+                            selectedKeys: [],
+                        },
+                        {
+                            currentPath: "",
+                            syncRoot: "",
+                            entries: [],
+                            selectedKeys: [],
+                        },
+                    ] as any,
+                    activePane: 0,
                 },
             },
         });

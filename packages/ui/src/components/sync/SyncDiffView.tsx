@@ -90,7 +90,7 @@ const SyncDiffView: React.FC = () => {
     const [query, setQuery] = useState("");
     const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
-    const counts = useMemo(() => {
+    const counts: Record<DiffFilter, number> = useMemo(() => {
         const items = report?.items ?? [];
         return {
             all: items.length,
@@ -98,6 +98,7 @@ const SyncDiffView: React.FC = () => {
             copy: items.filter(i => i.action === "copy").length,
             delete: items.filter(i => i.action === "delete").length,
             skip: items.filter(i => i.action === "skip").length,
+            index: items.filter(i => i.action === "index").length,
         };
     }, [report?.items]);
 
