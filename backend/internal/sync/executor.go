@@ -86,7 +86,6 @@ func Execute(ctx context.Context, plan *Plan, opts Options, progress ProgressFn)
 					continue
 				}
 			}
-			result.Copied++
 		case ActionDelete:
 			if opts.DryRun {
 				result.Deleted++

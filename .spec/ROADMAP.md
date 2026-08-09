@@ -155,16 +155,17 @@ P1.5 完成 = 8 步工作流全部经 **Wails spawn CLI** 端到端可用（038 
 
 ### 已完成的 RFC
 
-| RFC 编号                                                             | 标题                                                        | 作者                            | 创建时间   | 完成时间   | 状态         |
-| -------------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------------- | ---------- | ---------- | ------------ |
-| [RFC-2024-002](./rfc/completed/002-batch-copy-unique-key.md)         | 批量复制唯一性与路径准确性设计                              | AI+albert.li                    | 2024-06-15 | 2024-06-15 | ✅ Completed |
-| [RFC-2024-003](./rfc/completed/003-filepane-key-consistency.md)      | FilePane 多选 key 类型一致性问题                            | AI (albert.li)                  | 2024-06-09 | 2024-06-09 | ✅ Completed |
-| [RFC-2024-004](./rfc/completed/004-log-module-api.md)                | 日志模块 API 设计                                           | albert.li/AI                    | 2024-06-09 | 2024-06-09 | ✅ Completed |
-| [RFC-2024-005](./rfc/completed/005-file-management-key-functions.md) | File Management Key Functions v1                            | Albert Lee/AI                   | 2025-01-14 | 2025-01-14 | ✅ Completed |
-| [RFC-2026-011](./rfc/completed/011-commando-app-icon.md)             | Commando 卡通应用图标                                       | Codex/albert.li                 | 2026-07-27 | 2026-07-27 | ✅ Completed |
-| [RFC-2026-013](./rfc/completed/013-dev-prod-app-identity.md)         | Wails Dev/Prod 应用身份分离                                 | Codex/albert.li                 | 2026-07-27 | 2026-07-27 | ✅ Completed |
-| [RFC-2025-006](./rfc/completed/006-real-file-copy-operations.md)     | Complete File Operations with Total Commander Functionality | Claude Code Assistant/albert.li | 2025-09-25 | 2026-07-29 | ✅ Completed |
-| [RFC-2026-012](./rfc/completed/012-sync-module-compare-report.md)    | FreeFileSync 能力目录与 Commando 决策追踪（伞）             | albert.li/AI                    | 2026-07-27 | 2026-07-29 | ✅ Completed |
+| RFC 编号                                                                     | 标题                                                        | 作者                            | 创建时间   | 完成时间   | 状态         |
+| ---------------------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------------- | ---------- | ---------- | ------------ |
+| [RFC-2024-002](./rfc/completed/002-batch-copy-unique-key.md)                 | 批量复制唯一性与路径准确性设计                              | AI+albert.li                    | 2024-06-15 | 2024-06-15 | ✅ Completed |
+| [RFC-2024-003](./rfc/completed/003-filepane-key-consistency.md)              | FilePane 多选 key 类型一致性问题                            | AI (albert.li)                  | 2024-06-09 | 2024-06-09 | ✅ Completed |
+| [RFC-2024-004](./rfc/completed/004-log-module-api.md)                        | 日志模块 API 设计                                           | albert.li/AI                    | 2024-06-09 | 2024-06-09 | ✅ Completed |
+| [RFC-2024-005](./rfc/completed/005-file-management-key-functions.md)         | File Management Key Functions v1                            | Albert Lee/AI                   | 2025-01-14 | 2025-01-14 | ✅ Completed |
+| [RFC-2026-011](./rfc/completed/011-commando-app-icon.md)                     | Commando 卡通应用图标                                       | Codex/albert.li                 | 2026-07-27 | 2026-07-27 | ✅ Completed |
+| [RFC-2026-013](./rfc/completed/013-dev-prod-app-identity.md)                 | Wails Dev/Prod 应用身份分离                                 | Codex/albert.li                 | 2026-07-27 | 2026-07-27 | ✅ Completed |
+| [RFC-2025-006](./rfc/completed/006-real-file-copy-operations.md)             | Complete File Operations with Total Commander Functionality | Claude Code Assistant/albert.li | 2025-09-25 | 2026-07-29 | ✅ Completed |
+| [RFC-2026-012](./rfc/completed/012-sync-module-compare-report.md)            | FreeFileSync 能力目录与 Commando 决策追踪（伞）             | albert.li/AI                    | 2026-07-27 | 2026-07-29 | ✅ Completed |
+| [RFC-2026-042](./rfc/042-sync-empty-dir-toCopy-and-executor-double-count.md) | 空目录 toCopy 缺失 + Executor 计数翻倍：根因与修复          | albert.li/AI                    | 2026-08-06 | 2026-08-06 | ✅ Completed |
 
 ### 已批准的 RFC
 

@@ -162,6 +162,16 @@ P1 RFC 内的 UI-only、email/HTML、remote、RealtimeSync、distribution 任务
 | NTFS 元数据保留（压缩/加密/DACL/ADS）          | META-01, 02, 03    | 🔵     |
 | HFS+ 元数据保留（扩展属性/ACL）                | META-04, 05        | 🔵     |
 
+### RFC-042 — 空目录 toCopy + Executor 计数（Completed）
+
+| Task                                                          | IDs         | 状态 |
+| ------------------------------------------------------------- | ----------- | ---- |
+| planner：缺失空目录 → `ActionCopy` + `IsDir`（两方向）        | EXEC-03     | 🟢   |
+| executor：`IsDir` 走 `os.MkdirAll`，不再走 copyFileAtomic     | EXEC-04     | 🟢   |
+| executor：file copy 只计 `Copied` 一次（删 double `Copied++`) | EXEC-05     | 🟢   |
+| UI：normalize + SyncDiffView 保留并渲染空目录行               | UI-36/UI-37 | 🟢   |
+| 回归测试集（Go executor + UI）见 RFC-042 §4                   | EXEC-06     | 🟢   |
+
 ---
 
 ## 提案中的 RFC
