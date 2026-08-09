@@ -51,7 +51,9 @@
             "typeFolder": "文件夹",
             "typeFile": "文件",
             "itemsCount": "项",
-            "selectedCount": "已选中"
+            "selectedCount": "已选中",
+            "loading": "正在加载…",
+            "empty": "文件夹为空"
         }
     },
     "sync": {

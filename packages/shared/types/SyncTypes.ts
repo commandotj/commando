@@ -55,6 +55,7 @@ export interface CompareReportItem {
     from: string;
     to: string;
     reason: string;
+    isDir?: boolean;
 }
 
 /** Compare output from Go sync module (strategy + planned actions). */

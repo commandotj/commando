@@ -49,7 +49,9 @@
             "typeFolder": "Dossier",
             "typeFile": "Fichier",
             "itemsCount": "éléments",
-            "selectedCount": "sélectionnés"
+            "selectedCount": "sélectionnés",
+            "loading": "Chargement…",
+            "empty": "Le dossier est vide"
         }
     },
     "sync": {

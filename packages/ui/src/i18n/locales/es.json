@@ -49,7 +49,9 @@
             "typeFolder": "Carpeta",
             "typeFile": "Archivo",
             "itemsCount": "elementos",
-            "selectedCount": "seleccionados"
+            "selectedCount": "seleccionados",
+            "loading": "Cargando…",
+            "empty": "La carpeta está vacía"
         }
     },
     "sync": {

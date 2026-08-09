@@ -12,6 +12,7 @@ type ReportItem struct {
 	From         string `json:"from"`
 	To           string `json:"to"`
 	Reason       string `json:"reason"`
+	IsDir        bool   `json:"isDir,omitempty"`
 }
 
 // CompareReport is the output of Compare: strategy context plus planned actions.
@@ -61,6 +62,7 @@ func BuildReport(leftRoot, rightRoot string, strategyID StrategyID, overrides Op
 			From:         item.Source,
 			To:           item.Destination,
 			Reason:       item.Reason,
+			IsDir:        item.IsDir,
 		})
 	}
 

@@ -9,6 +9,7 @@ interface PaneState {
     syncRoot: string;
     entries: FileEntry[];
     selectedKeys: string[];
+    loading: boolean;
 }
 
 interface FileManagerState {
@@ -19,8 +20,20 @@ interface FileManagerState {
 
 const initialState: FileManagerState = {
     panes: [
-        { currentPath: "", syncRoot: "", entries: [], selectedKeys: [] },
-        { currentPath: "", syncRoot: "", entries: [], selectedKeys: [] },
+        {
+            currentPath: "",
+            syncRoot: "",
+            entries: [],
+            selectedKeys: [],
+            loading: false,
+        },
+        {
+            currentPath: "",
+            syncRoot: "",
+            entries: [],
+            selectedKeys: [],
+            loading: false,
+        },
     ],
     activePane: 0 as 0 | 1,
     viewMode: "browse" as "browse" | "diff",
@@ -146,6 +159,18 @@ const fileManagerSlice = createSlice({
         setViewMode(state, action: PayloadAction<"browse" | "diff">) {
             state.viewMode = action.payload;
         },
+    },
+    extraReducers: builder => {
+        builder
+            .addCase(fetchDirectory.pending, (state, action) => {
+                state.panes[action.meta.arg.paneIndex].loading = true;
+            })
+            .addCase(fetchDirectory.fulfilled, (state, action) => {
+                state.panes[action.meta.arg.paneIndex].loading = false;
+            })
+            .addCase(fetchDirectory.rejected, (state, action) => {
+                state.panes[action.meta.arg.paneIndex].loading = false;
+            });
     },
 });
 

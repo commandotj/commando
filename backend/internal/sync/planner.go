@@ -160,10 +160,22 @@ func buildChangesPlan(ctx context.Context, leftRoot, rightRoot string, leftEntri
 	}
 
 	plan := &Plan{ID: uuid.NewString(), CreatedAt: time.Now().UTC(), LeftRoot: leftRoot, RightRoot: rightRoot, Direction: direction}
-	_ = rightEntries
 
 	for rel, entry := range leftEntries {
 		if entry.IsDir {
+			if _, existsOnRight := rightEntries[rel]; existsOnRight {
+				plan.ToSkip++
+				plan.Items = append(plan.Items, PlanItem{
+					RelativePath: rel, Action: ActionSkip, Reason: "directory already exists on both sides",
+				})
+				continue
+			}
+			plan.ToCopy++
+			plan.Items = append(plan.Items, PlanItem{
+				RelativePath: rel, Action: ActionCopy,
+				Source: entry.AbsolutePath, Destination: filepath.Join(rightRoot, rel),
+				Reason: "missing on right", IsDir: true,
+			})
 			continue
 		}
 		snap, existed := prev[rel]
@@ -269,10 +281,6 @@ func planMissingSide(
 	opts Options,
 	sourceIsLeft bool,
 ) PlanItem {
-	if source.IsDir {
-		return PlanItem{RelativePath: rel, Action: ActionSkip, Reason: "directory placeholder"}
-	}
-
 	if direction == DirectionLeftToRight {
 		if sourceIsLeft {
 			return PlanItem{
@@ -281,6 +289,7 @@ func planMissingSide(
 				Source:       source.AbsolutePath,
 				Destination:  filepath.Join(destRoot, rel),
 				Reason:       "missing on right",
+				IsDir:        source.IsDir,
 			}
 		}
 		if opts.DeleteExtraneous {
@@ -289,6 +298,7 @@ func planMissingSide(
 				Action:       ActionDelete,
 				Source:       source.AbsolutePath,
 				Reason:       "extraneous on right",
+				IsDir:        source.IsDir,
 			}
 		}
 		return PlanItem{RelativePath: rel, Action: ActionSkip, Reason: "only on right; update strategy skips"}
@@ -302,6 +312,7 @@ func planMissingSide(
 				Source:       source.AbsolutePath,
 				Destination:  filepath.Join(destRoot, rel),
 				Reason:       "missing on left",
+				IsDir:        source.IsDir,
 			}
 		}
 		if opts.DeleteExtraneous {
@@ -310,6 +321,7 @@ func planMissingSide(
 				Action:       ActionDelete,
 				Source:       source.AbsolutePath,
 				Reason:       "extraneous on left",
+				IsDir:        source.IsDir,
 			}
 		}
 		return PlanItem{RelativePath: rel, Action: ActionSkip, Reason: "only on left; update strategy skips"}
@@ -321,6 +333,7 @@ func planMissingSide(
 		Source:       source.AbsolutePath,
 		Destination:  filepath.Join(destRoot, rel),
 		Reason:       "missing on other pane",
+		IsDir:        source.IsDir,
 	}
 }
 

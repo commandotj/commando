@@ -370,3 +370,109 @@ func TestBuildPlan_ChangesMode_NoDBPath(t *testing.T) {
 		t.Fatal("expected error for changes mode without dbPath")
 	}
 }
+
+func TestBuildPlan_LeftToRightCopiesMissingEmptyDir(t *testing.T) {
+	left := t.TempDir()
+	right := t.TempDir()
+
+	if err := os.Mkdir(filepath.Join(left, "empty"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if plan.ToCopy != 1 {
+		t.Fatalf("expected 1 copy, got copies=%d skips=%d", plan.ToCopy, plan.ToSkip)
+	}
+	if plan.Items[0].Action != sync.ActionCopy || !plan.Items[0].IsDir {
+		t.Fatalf("expected dir copy action, got action=%s isDir=%v", plan.Items[0].Action, plan.Items[0].IsDir)
+	}
+}
+
+func TestBuildPlan_RightToLeftCopiesMissingEmptyDir(t *testing.T) {
+	left := t.TempDir()
+	right := t.TempDir()
+
+	if err := os.Mkdir(filepath.Join(right, "empty"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionRightToLeft, sync.Options{}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if plan.ToCopy != 1 {
+		t.Fatalf("expected 1 copy, got copies=%d skips=%d", plan.ToCopy, plan.ToSkip)
+	}
+	if plan.Items[0].Action != sync.ActionCopy || !plan.Items[0].IsDir {
+		t.Fatalf("expected dir copy action, got action=%s isDir=%v", plan.Items[0].Action, plan.Items[0].IsDir)
+	}
+}
+
+func TestBuildPlan_BidirectionalCopiesMissingEmptyDir(t *testing.T) {
+	left := t.TempDir()
+	right := t.TempDir()
+
+	if err := os.Mkdir(filepath.Join(left, "empty"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionBidirectional, sync.Options{}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if plan.ToCopy != 1 {
+		t.Fatalf("expected 1 copy, got copies=%d skips=%d", plan.ToCopy, plan.ToSkip)
+	}
+	if plan.Items[0].Action != sync.ActionCopy || !plan.Items[0].IsDir {
+		t.Fatalf("expected dir copy action, got action=%s isDir=%v", plan.Items[0].Action, plan.Items[0].IsDir)
+	}
+}
+
+func TestBuildPlan_BothSidesEmptyDirSkips(t *testing.T) {
+	left := t.TempDir()
+	right := t.TempDir()
+
+	if err := os.Mkdir(filepath.Join(left, "empty"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Mkdir(filepath.Join(right, "empty"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if plan.ToSkip != 1 || plan.ToCopy != 0 {
+		t.Fatalf("expected skip (nothing to do), got copies=%d skips=%d", plan.ToCopy, plan.ToSkip)
+	}
+}
+
+func TestBuildPlan_ChangesModeIncludesEmptyDir(t *testing.T) {
+	left := t.TempDir()
+	right := t.TempDir()
+	dbPath := filepath.Join(t.TempDir(), "sync.db")
+
+	if err := os.Mkdir(filepath.Join(left, "empty"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	plan, err := sync.BuildPlan(context.Background(), left, right, sync.DirectionLeftToRight, sync.Options{
+		ChangesMode: true,
+		DBPath:      dbPath,
+	}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if plan.ToCopy != 1 {
+		t.Fatalf("expected changes-mode to copy new empty dir, got copies=%d skips=%d", plan.ToCopy, plan.ToSkip)
+	}
+}

@@ -47,6 +47,12 @@ type Plan struct {
     ToSkip     int        `json:"toSkip"`
 }
 
+// PlanItem 补充（2026-08-01，空目录同步修复同批加入）：
+//   IsDir bool `json:"isDir,omitempty"` — 标记该项对应目录而非文件。
+//   ActionCopy 且 IsDir=true 时 executor 走 os.MkdirAll，不走 copyFileAtomic。
+//   影响：本 RFC 的持久化/重放对 IsDir 字段透传即可，无需特殊处理
+//   （replay 遇到 IsDir 目录项仍按 ActionCopy 走 mkdir 路径）。
+
 type ExecuteResult struct {
     PlanID     string         `json:"planId"`
     Copied     int            `json:"copied"`

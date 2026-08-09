@@ -125,4 +125,69 @@ describe("SyncDiffView", () => {
         expect(screen.queryByText("a.jpg")).not.toBeInTheDocument();
         expect(screen.getAllByText("old.txt").length).toBeGreaterThan(0);
     });
+
+    it("renders empty-folder copy rows", () => {
+        const reportWithEmptyFolder: CompareReport = {
+            ...report,
+            toCopy: 1,
+            toDelete: 0,
+            conflicts: 0,
+            toSkip: 1,
+            items: [
+                {
+                    relativePath: "parent",
+                    action: "skip",
+                    from: "",
+                    to: "",
+                    reason: "directory already exists on both sides",
+                },
+                {
+                    relativePath: "parent/emptyfolder",
+                    action: "copy",
+                    from: "/left/parent/emptyfolder",
+                    to: "/right/parent/emptyfolder",
+                    reason: "missing on right",
+                    isDir: true,
+                },
+            ],
+        };
+        const store = configureStore({
+            reducer: {
+                sync: syncReducer,
+                fileManager: fileManagerReducer,
+            },
+            preloadedState: {
+                sync: {
+                    strategyId: "update-right",
+                    options: {
+                        deleteExtraneous: false,
+                        dryRun: true,
+                        useChecksum: false,
+                    },
+                    report: reportWithEmptyFolder,
+                    plan: reportWithEmptyFolder.plan,
+                    diffMap: {},
+                    status: "done",
+                    error: null,
+                    lastJobId: null,
+                    planModalOpen: false,
+                    progressFile: null,
+                    progressAction: null,
+                    progressDone: 0,
+                    progressTotal: 0,
+                    executeResult: null,
+                },
+            },
+        });
+        render(
+            <Provider store={store}>
+                <SyncDiffView />
+            </Provider>
+        );
+        expect(screen.getByText("emptyfolder")).toBeInTheDocument();
+        expect(
+            screen.getByText("parent/emptyfolder")
+        ).toBeInTheDocument();
+        expect(screen.getByText("showing 2/2")).toBeInTheDocument();
+    });
 });

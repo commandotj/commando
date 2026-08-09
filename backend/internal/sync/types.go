@@ -36,6 +36,7 @@ type PlanItem struct {
 	Source       string `json:"source"`
 	Destination  string `json:"destination"`
 	Reason       string `json:"reason"`
+	IsDir        bool   `json:"isDir,omitempty"`
 }
 
 // Plan is the full diff between two pane roots.

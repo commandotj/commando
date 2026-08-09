@@ -51,7 +51,9 @@
             "typeFolder": "Folder",
             "typeFile": "File",
             "itemsCount": "items",
-            "selectedCount": "selected"
+            "selectedCount": "selected",
+            "loading": "Loading…",
+            "empty": "Folder is empty"
         }
     },
     "sync": {

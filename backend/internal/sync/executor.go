@@ -44,6 +44,21 @@ func Execute(ctx context.Context, plan *Plan, opts Options, progress ProgressFn)
 				}
 				continue
 			}
+			if item.IsDir {
+				mkErr := os.MkdirAll(item.Destination, 0o755)
+				if progress != nil {
+					progress(item.RelativePath, item.Action, i+1, total, mkErr)
+				}
+				if mkErr != nil {
+					result.Errors = append(result.Errors, fmt.Sprintf("%s: %v", item.RelativePath, mkErr))
+					if opts.ErrorMode == "stop" {
+						return result, fmt.Errorf("mkdir %s: %w", item.RelativePath, mkErr)
+					}
+					continue
+				}
+				result.Copied++
+				continue
+			}
 			cpErr := copyFileAtomic(item.Source, item.Destination)
 			if progress != nil {
 				progress(item.RelativePath, item.Action, i+1, total, cpErr)

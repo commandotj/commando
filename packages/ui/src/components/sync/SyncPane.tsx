@@ -233,6 +233,19 @@ const SyncPane: React.FC<{ paneIndex: 0 | 1 }> = ({ paneIndex }) => {
                         getRowClassName={row => getRowClass(row.name)}
                     />
                 )}
+                {pane.loading && (
+                    <div className="sync-pane__empty sync-pane__empty--overlay">
+                        <span className="sync-pane__spinner" aria-hidden />
+                        {t("ui.file.loading")}
+                    </div>
+                )}
+                {!pane.loading &&
+                    (pane.syncRoot || pane.currentPath) &&
+                    pane.entries.length === 0 && (
+                        <div className="sync-pane__empty">
+                            {t("ui.file.empty")}
+                        </div>
+                    )}
             </div>
 
             <footer className="sync-pane__footer">
