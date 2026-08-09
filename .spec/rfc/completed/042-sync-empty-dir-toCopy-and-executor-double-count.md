@@ -4,7 +4,8 @@
 
 作者: albert.li/AI
 创建时间: 2026-08-08
-状态: Draft — 待审批
+状态: Completed
+完成时间: 2026-08-08
 父 RFC: [RFC-2026-037](./037-compare-cli-diff-view.md)（UI 展示侧）
 
 ---
